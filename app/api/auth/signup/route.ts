@@ -22,7 +22,12 @@ import {
 export async function POST(request: NextRequest) {
   try {
     // Initialize database
-    initializeDatabase();
+    try {
+      initializeDatabase();
+    } catch (dbError) {
+      console.error("Database initialization failed:", dbError);
+      return createErrorResponse("Database is not available. Please try again later.", 503);
+    }
 
     const body = await request.json();
     const { username, email, password, passwordConfirm } = body;
