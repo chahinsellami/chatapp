@@ -143,27 +143,6 @@ export default function LoginPage() {
             </Link>
           </p>
         </div>
-
-        {/* Demo credentials */}
-        <div className="mt-4 p-4 bg-[#2F3136] rounded-lg border border-[#40444B] text-center relative z-10 scale-in shadow-lg">
-          <p className="text-[#72767D] text-xs mb-2 font-semibold">
-            ✨ Demo Account:
-          </p>
-          <div className="space-y-1">
-            <p className="text-[#DCDDDE] text-xs">
-              <span className="text-[#5B65F5] font-bold">Email:</span>{" "}
-              <code className="bg-[#36393F] px-2 py-0.5 rounded text-[#7289DA] text-xs">
-                demo@example.com
-              </code>
-            </p>
-            <p className="text-[#DCDDDE] text-xs">
-              <span className="text-[#5B65F5] font-bold">Password:</span>{" "}
-              <code className="bg-[#36393F] px-2 py-0.5 rounded text-[#7289DA] text-xs">
-                Demo1234
-              </code>
-            </p>
-          </div>
-        </div>
       </div>
     </div>
   );
