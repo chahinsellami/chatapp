@@ -3,13 +3,13 @@
 // ============================================================================
 // This custom hook manages the WebSocket connection lifecycle and provides
 // a simple interface for components to send/receive messages and typing updates.
-// 
+//
 // Why hooks? Hooks keep our component logic clean and reusable across components
 // ============================================================================
 
-'use client';
+"use client";
 
-import { useEffect, useRef, useCallback, useState } from 'react';
+import { useEffect, useRef, useCallback, useState } from "react";
 
 // ============================================================================
 // Type Definitions
@@ -33,7 +33,7 @@ type ConnectionHandler = () => void;
 
 /**
  * Custom React hook for WebSocket connection management
- * 
+ *
  * Usage:
  * ```
  * const ws = useWebSocket('user-123', {
@@ -41,7 +41,7 @@ type ConnectionHandler = () => void;
  *   onTyping: (users) => console.log('Typing:', users),
  *   onConnect: () => console.log('Connected!'),
  * });
- * 
+ *
  * ws.send('message', { text: 'Hello', receiverId: 'user-456' });
  * ws.sendTyping(true); // Notify others I'm typing
  * ws.close();
@@ -59,16 +59,16 @@ export function useWebSocket(
 ) {
   // Reference to the WebSocket connection (persists across renders)
   const wsRef = useRef<WebSocket | null>(null);
-  
+
   // State for UI: is connected?
   const [isConnected, setIsConnected] = useState(false);
-  
+
   // Reference to reconnection timeout (so we can cancel it)
   const reconnectTimeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
-  
+
   // How many times we've tried to reconnect (increases delay with each retry)
   const reconnectAttemptsRef = useRef(0);
-  
+
   // Maximum number of reconnection attempts before giving up
   const MAX_RECONNECT_ATTEMPTS = 5;
 
@@ -79,17 +79,17 @@ export function useWebSocket(
   const connect = useCallback(() => {
     // Don't create multiple connections
     if (wsRef.current?.readyState === WebSocket.OPEN) {
-      console.log('[useWebSocket] Already connected');
+      console.log("[useWebSocket] Already connected");
       return;
     }
 
-    console.log('[useWebSocket] Connecting to server...');
+    console.log("[useWebSocket] Connecting to server...");
 
     try {
       // Create WebSocket connection
       // In production: use wss:// for secure WebSocket
       // For development: ws:// is fine (same server, same port)
-      const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+      const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
       const wsUrl = `${protocol}//${window.location.host}`;
 
       const ws = new WebSocket(wsUrl);
@@ -100,7 +100,7 @@ export function useWebSocket(
 
       // Connection opened successfully
       ws.onopen = () => {
-        console.log('[useWebSocket] Connected to server');
+        console.log("[useWebSocket] Connected to server");
         setIsConnected(true);
         reconnectAttemptsRef.current = 0; // Reset retry counter
 
@@ -108,7 +108,7 @@ export function useWebSocket(
         // Send our userId so server knows which client we are
         ws.send(
           JSON.stringify({
-            type: 'register',
+            type: "register",
             userId: userId,
           })
         );
@@ -121,53 +121,53 @@ export function useWebSocket(
       ws.onmessage = (event: MessageEvent<string>) => {
         try {
           const message: WebSocketMessage = JSON.parse(event.data);
-          console.log('[useWebSocket] Received:', message.type);
+          console.log("[useWebSocket] Received:", message.type);
 
           // Route different message types to appropriate handlers
           switch (message.type) {
             // New message from another user
-            case 'message':
+            case "message":
               callbacks?.onMessage?.(message.data);
               break;
 
             // Typing status update (list of users currently typing)
-            case 'typing-update':
+            case "typing-update":
               callbacks?.onTyping?.(message.typingUsers);
               break;
 
             // Another user joined the chat
-            case 'user-joined':
+            case "user-joined":
               console.log(`[useWebSocket] User joined: ${message.userId}`);
               break;
 
             // Another user left the chat
-            case 'user-left':
+            case "user-left":
               console.log(`[useWebSocket] User left: ${message.userId}`);
               break;
 
             // Server error response
-            case 'error':
+            case "error":
               callbacks?.onError?.(message.message);
               break;
 
             // Acknowledge messages (we can ignore these)
-            case 'pong':
-            case 'connection-established':
-            case 'registration-confirmed':
-              console.log('[useWebSocket] Server says:', message.message);
+            case "pong":
+            case "connection-established":
+            case "registration-confirmed":
+              console.log("[useWebSocket] Server says:", message.message);
               break;
 
             default:
-              console.log('[useWebSocket] Unknown message type:', message.type);
+              console.log("[useWebSocket] Unknown message type:", message.type);
           }
         } catch (error) {
-          console.error('[useWebSocket] Failed to parse message:', error);
+          console.error("[useWebSocket] Failed to parse message:", error);
         }
       };
 
       // Connection closed (user left, server stopped, network issue, etc)
       ws.onclose = () => {
-        console.log('[useWebSocket] Disconnected from server');
+        console.log("[useWebSocket] Disconnected from server");
         setIsConnected(false);
         callbacks?.onDisconnect?.();
 
@@ -186,21 +186,21 @@ export function useWebSocket(
             connect(); // Recursive call to try again
           }, delayMs);
         } else {
-          console.error('[useWebSocket] Max reconnection attempts reached');
-          callbacks?.onError?.('Failed to maintain connection');
+          console.error("[useWebSocket] Max reconnection attempts reached");
+          callbacks?.onError?.("Failed to maintain connection");
         }
       };
 
       // Connection error
       ws.onerror = (event: Event) => {
-        console.error('[useWebSocket] WebSocket error:', event);
-        callbacks?.onError?.('WebSocket connection error');
+        console.error("[useWebSocket] WebSocket error:", event);
+        callbacks?.onError?.("WebSocket connection error");
       };
 
       // Save reference so we can use it later
       wsRef.current = ws;
     } catch (error) {
-      console.error('[useWebSocket] Connection failed:', error);
+      console.error("[useWebSocket] Connection failed:", error);
       callbacks?.onError?.(String(error));
     }
   }, [userId, callbacks]);
@@ -237,7 +237,7 @@ export function useWebSocket(
    */
   const send = useCallback((type: string, data: any = {}) => {
     if (!wsRef.current || wsRef.current.readyState !== WebSocket.OPEN) {
-      console.warn('[useWebSocket] Cannot send - not connected');
+      console.warn("[useWebSocket] Cannot send - not connected");
       return false;
     }
 
@@ -249,10 +249,10 @@ export function useWebSocket(
           ...data,
         })
       );
-      console.log('[useWebSocket] Sent:', type);
+      console.log("[useWebSocket] Sent:", type);
       return true;
     } catch (error) {
-      console.error('[useWebSocket] Send failed:', error);
+      console.error("[useWebSocket] Send failed:", error);
       return false;
     }
   }, []);
@@ -265,7 +265,7 @@ export function useWebSocket(
    */
   const sendMessage = useCallback(
     (text: string, senderId: string, receiverId: string) => {
-      return send('message', {
+      return send("message", {
         text,
         senderId,
         receiverId,
@@ -282,7 +282,7 @@ export function useWebSocket(
    */
   const sendTyping = useCallback(
     (isTyping: boolean) => {
-      return send('typing', { isTyping });
+      return send("typing", { isTyping });
     },
     [send]
   );
@@ -333,4 +333,9 @@ export function useWebSocket(
 // Export Types for use in other files
 // ============================================================================
 
-export type { WebSocketMessage, MessageHandler, TypingHandler, ConnectionHandler };
+export type {
+  WebSocketMessage,
+  MessageHandler,
+  TypingHandler,
+  ConnectionHandler,
+};

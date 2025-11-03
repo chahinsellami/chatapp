@@ -12,13 +12,13 @@ interface SidebarProps {
 
 /**
  * Sidebar Component
- * 
+ *
  * This component displays:
  * - A list of all available users
  * - Each user's avatar, name, and online status
  * - Highlights the currently selected user for chatting
  * - Shows status indicators (online/away/offline)
- * 
+ *
  * Props:
  * - selectedUserId: The currently selected user to chat with
  * - onSelectUser: Callback function when user clicks on a user to chat
@@ -95,7 +95,9 @@ export default function Sidebar({
                 </p>
                 <p className="text-xs text-gray-500 capitalize">
                   {user.status === "offline" && user.lastSeen
-                    ? `Last seen ${new Date(user.lastSeen).toLocaleTimeString()}`
+                    ? `Last seen ${new Date(
+                        user.lastSeen
+                      ).toLocaleTimeString()}`
                     : user.status}
                 </p>
               </div>

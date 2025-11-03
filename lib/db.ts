@@ -30,20 +30,63 @@ function getDatabase(): Database.Database {
 export function initializeDatabase() {
   const database = getDatabase();
 
-  // Create messages table
-  // Stores all chat messages with sender and receiver information
+  // Create users table (NEW - Feature 6)
+  // Stores user account information, passwords, and profiles
+  database.exec(`
+    CREATE TABLE IF NOT EXISTS users (
+      id TEXT PRIMARY KEY,
+      username TEXT UNIQUE NOT NULL,
+      email TEXT UNIQUE NOT NULL,
+      passwordHash TEXT NOT NULL,
+      avatar TEXT,
+      status TEXT DEFAULT 'offline',
+      createdAt TEXT NOT NULL
+    )
+  `);
+
+  // Create channels table (NEW - Feature 7)
+  // Stores chat channels/rooms information
+  database.exec(`
+    CREATE TABLE IF NOT EXISTS channels (
+      id TEXT PRIMARY KEY,
+      name TEXT NOT NULL,
+      description TEXT,
+      isPrivate INTEGER DEFAULT 0,
+      createdBy TEXT NOT NULL,
+      createdAt TEXT NOT NULL,
+      FOREIGN KEY(createdBy) REFERENCES users(id)
+    )
+  `);
+
+  // Create channel members table (NEW)
+  // Maps users to private channels
+  database.exec(`
+    CREATE TABLE IF NOT EXISTS channelMembers (
+      channelId TEXT NOT NULL,
+      userId TEXT NOT NULL,
+      joinedAt TEXT NOT NULL,
+      PRIMARY KEY(channelId, userId),
+      FOREIGN KEY(channelId) REFERENCES channels(id),
+      FOREIGN KEY(userId) REFERENCES users(id)
+    )
+  `);
+
+  // Create messages table (UPDATED)
+  // Now includes userId and channelId references
   database.exec(`
     CREATE TABLE IF NOT EXISTS messages (
       id TEXT PRIMARY KEY,
       text TEXT NOT NULL,
-      senderId TEXT NOT NULL,
-      receiverId TEXT NOT NULL,
+      userId TEXT NOT NULL,
+      channelId TEXT NOT NULL,
       createdAt TEXT NOT NULL,
-      updatedAt TEXT NOT NULL
+      editedAt TEXT,
+      FOREIGN KEY(userId) REFERENCES users(id),
+      FOREIGN KEY(channelId) REFERENCES channels(id)
     )
   `);
 
-  // Create conversations table
+  // Create conversations table (kept for compatibility)
   // Stores metadata about conversations between two users
   database.exec(`
     CREATE TABLE IF NOT EXISTS conversations (
@@ -56,7 +99,53 @@ export function initializeDatabase() {
     )
   `);
 
+  // Create default channels if they don't exist
+  createDefaultChannels();
+
   console.log("✓ Database initialized successfully");
+}
+
+/**
+ * Create default channels (#general, #random, #announcements)
+ */
+function createDefaultChannels() {
+  const database = getDatabase();
+  const now = new Date().toISOString();
+  const systemId = "system-user";
+
+  try {
+    // Create system user if doesn't exist
+    database
+      .prepare(
+        `
+      INSERT OR IGNORE INTO users (id, username, email, passwordHash, createdAt)
+      VALUES (?, ?, ?, ?, ?)
+    `
+      )
+      .run(systemId, "System", "system@webchat.local", "N/A", now);
+
+    // Create default channels
+    const defaultChannels = [
+      { id: "general", name: "general", description: "General discussion" },
+      { id: "random", name: "random", description: "Off-topic chat" },
+      {
+        id: "announcements",
+        name: "announcements",
+        description: "Important announcements",
+      },
+    ];
+
+    const stmt = database.prepare(`
+      INSERT OR IGNORE INTO channels (id, name, description, createdBy, createdAt)
+      VALUES (?, ?, ?, ?, ?)
+    `);
+
+    for (const channel of defaultChannels) {
+      stmt.run(channel.id, channel.name, channel.description, systemId, now);
+    }
+  } catch (error) {
+    console.error("Error creating default channels:", error);
+  }
 }
 
 /**
@@ -169,4 +258,277 @@ export function closeDatabase() {
     db.close();
     db = null;
   }
+}
+
+// ============================================================================
+// USER FUNCTIONS
+// ============================================================================
+
+/**
+ * Create a new user
+ */
+export function createUser(
+  id: string,
+  username: string,
+  email: string,
+  passwordHash: string,
+  avatar?: string
+) {
+  const database = getDatabase();
+  const stmt = database.prepare(`
+    INSERT INTO users (id, username, email, passwordHash, avatar, status, createdAt)
+    VALUES (?, ?, ?, ?, ?, 'offline', ?)
+  `);
+  const now = new Date().toISOString();
+  stmt.run(id, username, email, passwordHash, avatar || null, now);
+  return { id, username, email, avatar: avatar || null };
+}
+
+/**
+ * Get user by email
+ */
+export function getUserByEmail(email: string) {
+  const database = getDatabase();
+  const stmt = database.prepare(`
+    SELECT * FROM users WHERE email = ?
+  `);
+  return stmt.get(email) as any;
+}
+
+/**
+ * Get user by username
+ */
+export function getUserByUsername(username: string) {
+  const database = getDatabase();
+  const stmt = database.prepare(`
+    SELECT * FROM users WHERE username = ?
+  `);
+  return stmt.get(username) as any;
+}
+
+/**
+ * Get user by ID
+ */
+export function getUserById(id: string) {
+  const database = getDatabase();
+  const stmt = database.prepare(`
+    SELECT id, username, email, avatar, status, createdAt FROM users WHERE id = ?
+  `);
+  return stmt.get(id) as any;
+}
+
+/**
+ * Get all users
+ */
+export function getAllUsers() {
+  const database = getDatabase();
+  const stmt = database.prepare(`
+    SELECT id, username, email, avatar, status, createdAt FROM users ORDER BY username
+  `);
+  return stmt.all() as any[];
+}
+
+/**
+ * Update user status (online/offline/idle)
+ */
+export function updateUserStatus(userId: string, status: string) {
+  const database = getDatabase();
+  const stmt = database.prepare(`
+    UPDATE users SET status = ? WHERE id = ?
+  `);
+  stmt.run(status, userId);
+}
+
+/**
+ * Update user profile
+ */
+export function updateUserProfile(
+  userId: string,
+  updates: { username?: string; avatar?: string }
+) {
+  const database = getDatabase();
+  const fields = [];
+  const values = [];
+
+  if (updates.username) {
+    fields.push("username = ?");
+    values.push(updates.username);
+  }
+  if (updates.avatar) {
+    fields.push("avatar = ?");
+    values.push(updates.avatar);
+  }
+
+  if (fields.length === 0) return;
+
+  values.push(userId);
+  const stmt = database.prepare(`
+    UPDATE users SET ${fields.join(", ")} WHERE id = ?
+  `);
+  stmt.run(...values);
+}
+
+// ============================================================================
+// CHANNEL FUNCTIONS
+// ============================================================================
+
+/**
+ * Create a new channel
+ */
+export function createChannel(
+  id: string,
+  name: string,
+  description: string,
+  createdBy: string,
+  isPrivate: boolean = false
+) {
+  const database = getDatabase();
+  const stmt = database.prepare(`
+    INSERT INTO channels (id, name, description, createdBy, isPrivate, createdAt)
+    VALUES (?, ?, ?, ?, ?, ?)
+  `);
+  const now = new Date().toISOString();
+  stmt.run(id, name, description, createdBy, isPrivate ? 1 : 0, now);
+  return { id, name, description, createdBy, isPrivate, createdAt: now };
+}
+
+/**
+ * Get all public channels
+ */
+export function getAllChannels() {
+  const database = getDatabase();
+  const stmt = database.prepare(`
+    SELECT id, name, description, createdBy, isPrivate, createdAt FROM channels 
+    WHERE isPrivate = 0
+    ORDER BY name
+  `);
+  return stmt.all() as any[];
+}
+
+/**
+ * Get channel by ID
+ */
+export function getChannelById(channelId: string) {
+  const database = getDatabase();
+  const stmt = database.prepare(`
+    SELECT * FROM channels WHERE id = ?
+  `);
+  return stmt.get(channelId) as any;
+}
+
+/**
+ * Get channels for a user (including private channels they're members of)
+ */
+export function getUserChannels(userId: string) {
+  const database = getDatabase();
+  const stmt = database.prepare(`
+    SELECT DISTINCT c.id, c.name, c.description, c.createdBy, c.isPrivate, c.createdAt
+    FROM channels c
+    LEFT JOIN channelMembers cm ON c.id = cm.channelId
+    WHERE c.isPrivate = 0 OR cm.userId = ?
+    ORDER BY c.name
+  `);
+  return stmt.all(userId) as any[];
+}
+
+/**
+ * Add user to channel
+ */
+export function addUserToChannel(channelId: string, userId: string) {
+  const database = getDatabase();
+  const stmt = database.prepare(`
+    INSERT OR IGNORE INTO channelMembers (channelId, userId, joinedAt)
+    VALUES (?, ?, ?)
+  `);
+  const now = new Date().toISOString();
+  stmt.run(channelId, userId, now);
+}
+
+/**
+ * Get channel members
+ */
+export function getChannelMembers(channelId: string) {
+  const database = getDatabase();
+  const stmt = database.prepare(`
+    SELECT u.id, u.username, u.avatar, u.status
+    FROM users u
+    JOIN channelMembers cm ON u.id = cm.userId
+    WHERE cm.channelId = ?
+    ORDER BY u.username
+  `);
+  return stmt.all(channelId) as any[];
+}
+
+// ============================================================================
+// MESSAGE FUNCTIONS (UPDATED)
+// ============================================================================
+
+/**
+ * Get messages for a channel
+ */
+export function getChannelMessages(channelId: string, limit: number = 50) {
+  const database = getDatabase();
+  const stmt = database.prepare(`
+    SELECT m.id, m.text, m.userId, m.channelId, m.createdAt, m.editedAt,
+           u.username, u.avatar
+    FROM messages m
+    JOIN users u ON m.userId = u.id
+    WHERE m.channelId = ?
+    ORDER BY m.createdAt DESC
+    LIMIT ?
+  `);
+  const messages = stmt.all(channelId, limit) as any[];
+  return messages.reverse(); // Return in ascending order
+}
+
+/**
+ * Insert a new message to a channel
+ */
+export function insertChannelMessage(
+  id: string,
+  text: string,
+  userId: string,
+  channelId: string,
+  createdAt: string
+) {
+  const database = getDatabase();
+  const stmt = database.prepare(`
+    INSERT INTO messages (id, text, userId, channelId, createdAt)
+    VALUES (?, ?, ?, ?, ?)
+  `);
+  stmt.run(id, text, userId, channelId, createdAt);
+
+  // Return message with user info
+  const user = getUserById(userId);
+  return {
+    id,
+    text,
+    userId,
+    username: user?.username,
+    avatar: user?.avatar,
+    channelId,
+    createdAt,
+  };
+}
+
+/**
+ * Update a message
+ */
+export function updateMessage(id: string, text: string) {
+  const database = getDatabase();
+  const stmt = database.prepare(`
+    UPDATE messages SET text = ?, editedAt = ? WHERE id = ?
+  `);
+  const now = new Date().toISOString();
+  stmt.run(text, now, id);
+}
+
+/**
+ * Delete a message
+ */
+export function deleteChannelMessage(id: string): boolean {
+  const database = getDatabase();
+  const stmt = database.prepare("DELETE FROM messages WHERE id = ?");
+  const result = stmt.run(id);
+  return (result.changes as number) > 0;
 }

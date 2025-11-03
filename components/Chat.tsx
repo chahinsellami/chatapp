@@ -33,7 +33,9 @@ export default function Chat() {
   // Track which users are currently typing in the selected conversation
   const [typingUsers, setTypingUsers] = useState<string[]>([]);
   // Track connection status
-  const [connectionStatus, setConnectionStatus] = useState<"connecting" | "connected" | "disconnected">("disconnected");
+  const [connectionStatus, setConnectionStatus] = useState<
+    "connecting" | "connected" | "disconnected"
+  >("disconnected");
   // Track if we've sent a typing indicator recently (to avoid spam)
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const endRef = useRef<HTMLDivElement>(null);
@@ -47,12 +49,12 @@ export default function Chat() {
   // 3. Provides methods to send messages and typing indicators
   // 4. Automatically reconnects if connection drops
   // ============================================================================
-  
+
   const ws = useWebSocket(currentUserId, {
     // Called when new message arrives from another user
     onMessage: (messageData) => {
       console.log("📨 New message received via WebSocket:", messageData);
-      
+
       // Don't add our own messages (we already added them locally)
       if (messageData.senderId === currentUserId) {
         return;
@@ -163,7 +165,7 @@ export default function Chat() {
 
       if (res.ok) {
         const newMessage = await res.json();
-        
+
         // ====================================================================
         // IMPORTANT: Dual Update - Database + WebSocket
         // ====================================================================
@@ -171,16 +173,13 @@ export default function Chat() {
         // 2. Send message via WebSocket (broadcasts to all connected clients)
         // 3. Message also saved to database (by API route)
         // ====================================================================
-        
+
         // Update local state immediately
         setConversations((prev) => ({
           ...prev,
           [selectedUserId]: {
             userId: selectedUserId,
-            messages: [
-              ...(prev[selectedUserId]?.messages || []),
-              newMessage,
-            ],
+            messages: [...(prev[selectedUserId]?.messages || []), newMessage],
           },
         }));
 
@@ -189,7 +188,9 @@ export default function Chat() {
           ws.sendMessage(text, currentUserId, selectedUserId);
           console.log("📤 Message sent via WebSocket");
         } else {
-          console.warn("⚠️ WebSocket not connected - message saved to database only");
+          console.warn(
+            "⚠️ WebSocket not connected - message saved to database only"
+          );
         }
       }
     } catch (error) {
@@ -271,7 +272,7 @@ export default function Chat() {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       handleSendMessage();
-      
+
       // Clear typing indicator after sending
       // Send typing=false via WebSocket
       if (selectedUserId && ws.isConnected) {
@@ -312,21 +313,25 @@ export default function Chat() {
               <h1 className="text-xl font-bold">{selectedUser.name}</h1>
               <div className="flex items-center gap-2">
                 {/* Connection Status Indicator */}
-                <span className={`inline-block w-2 h-2 rounded-full ${
-                  ws.isConnected ? 'bg-green-400 animate-pulse' : 'bg-red-400'
-                }`}></span>
+                <span
+                  className={`inline-block w-2 h-2 rounded-full ${
+                    ws.isConnected ? "bg-green-400 animate-pulse" : "bg-red-400"
+                  }`}
+                ></span>
                 <p className="text-sm text-blue-100 capitalize">
                   {selectedUser.status}
                 </p>
                 <p className="text-xs text-blue-200">
-                  {ws.isConnected ? '(Real-time)' : '(Offline)'}
+                  {ws.isConnected ? "(Real-time)" : "(Offline)"}
                 </p>
               </div>
             </div>
           </div>
         ) : (
           <div className="bg-linear-to-r from-blue-600 to-indigo-600 text-white px-6 py-4">
-            <h1 className="text-xl font-bold">Select a user to start chatting</h1>
+            <h1 className="text-xl font-bold">
+              Select a user to start chatting
+            </h1>
           </div>
         )}
 
@@ -342,7 +347,9 @@ export default function Chat() {
               return (
                 <div
                   key={message.id}
-                  className={`flex ${isFromCurrentUser ? "justify-end" : "justify-start"}`}
+                  className={`flex ${
+                    isFromCurrentUser ? "justify-end" : "justify-start"
+                  }`}
                 >
                   <div
                     className={`max-w-xs px-4 py-2 rounded-lg ${
@@ -377,7 +384,7 @@ export default function Chat() {
               );
             })
           )}
-          
+
           {/* Typing Indicator - Shows which users are currently typing */}
           {typingUsers.length > 0 && (
             <div className="flex justify-start">
@@ -402,7 +409,7 @@ export default function Chat() {
               </div>
             </div>
           )}
-          
+
           <div ref={endRef} />
         </div>
 

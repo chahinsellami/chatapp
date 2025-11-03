@@ -5,6 +5,7 @@ Thanks for your interest in contributing to WebChat! This document provides guid
 ## 🎯 How to Contribute
 
 ### 1. **Report Bugs**
+
 - Check if the bug already exists in [Issues](https://github.com/chahinsellami/chatapp/issues)
 - If not, create a new issue with:
   - Clear description of the bug
@@ -13,6 +14,7 @@ Thanks for your interest in contributing to WebChat! This document provides guid
   - Your environment (OS, Node version, etc.)
 
 ### 2. **Suggest Features**
+
 - Check if the feature is already in the [Roadmap](#roadmap)
 - Create an issue with:
   - Feature description
@@ -23,6 +25,7 @@ Thanks for your interest in contributing to WebChat! This document provides guid
 ### 3. **Submit Code Changes**
 
 #### Setup Development Environment
+
 ```bash
 # Clone the repository
 git clone https://github.com/chahinsellami/chatapp.git
@@ -36,6 +39,7 @@ npm run dev
 ```
 
 #### Create a Feature Branch
+
 ```bash
 # Create and switch to new branch
 git checkout -b feature/your-feature-name
@@ -45,6 +49,7 @@ git checkout -b bugfix/bug-description
 ```
 
 #### Commit Guidelines
+
 - Use clear, descriptive commit messages
 - Reference issues when applicable
 - Follow conventional commits:
@@ -56,6 +61,7 @@ git checkout -b bugfix/bug-description
   - `test:` for test additions
 
 Example:
+
 ```bash
 git commit -m "feat: add message search functionality
 
@@ -67,6 +73,7 @@ Closes #42"
 ```
 
 #### Push and Create Pull Request
+
 ```bash
 # Push your branch
 git push origin feature/your-feature-name
@@ -90,6 +97,7 @@ Before submitting a PR, ensure:
 ## 🎨 Code Style
 
 ### TypeScript
+
 - Use explicit type annotations
 - Avoid `any` type when possible
 - Use interfaces for object types
@@ -113,6 +121,7 @@ function getUser(id: any): any {
 ```
 
 ### React Components
+
 - Use functional components with hooks
 - Keep components focused and reusable
 - Add JSDoc comments
@@ -134,6 +143,7 @@ export function Chat({ userId, onMessageSend }: ChatProps) {
 ```
 
 ### Database
+
 - Use prepared statements for queries
 - Add comments explaining SQL logic
 - Keep database utilities modular
@@ -158,12 +168,14 @@ export function getConversationMessages(userId1: string, userId2: string) {
 ## 🧪 Testing
 
 ### Manual Testing
+
 1. Test in development environment
 2. Check browser console for errors
 3. Verify database operations
 4. Test with different browsers
 
 ### Test Coverage
+
 - Test happy paths
 - Test edge cases
 - Test error handling
@@ -171,12 +183,14 @@ export function getConversationMessages(userId1: string, userId2: string) {
 ## 📚 Documentation
 
 Update documentation for:
+
 - New features
 - API changes
 - Database schema changes
 - Configuration additions
 
 Update files:
+
 - `README.md` - User-facing documentation
 - `DATABASE_SETUP.md` - Database documentation
 - Code comments - Implementation details
@@ -194,24 +208,28 @@ Update files:
 Prioritized features for contribution:
 
 ### Phase 2 (Real-time Features)
+
 - [ ] WebSocket implementation for real-time messages
 - [ ] Real-time typing indicators
 - [ ] User online/offline status updates
 - [ ] Message notifications
 
 ### Phase 3 (Authentication & Security)
+
 - [ ] User authentication (login/signup)
 - [ ] Password hashing with bcrypt
 - [ ] Session management
 - [ ] Rate limiting on API endpoints
 
 ### Phase 4 (Advanced Features)
+
 - [ ] Message search with full-text search
 - [ ] Multiple chat channels
 - [ ] User profiles & settings
 - [ ] Message reactions/emojis
 
 ### Phase 5 (User Experience)
+
 - [ ] Dark mode toggle
 - [ ] Settings page
 - [ ] Message persistence improvements

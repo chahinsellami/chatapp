@@ -47,7 +47,10 @@ export async function GET(request: Request) {
     return NextResponse.json({ typingUsers });
   } catch (error) {
     console.error("Error in GET /api/typing:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    );
   }
 }
 
@@ -99,7 +102,10 @@ export async function POST(request: Request) {
     return NextResponse.json({ typingUsers });
   } catch (error) {
     console.error("Error in POST /api/typing:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    );
   }
 }
 
@@ -132,6 +138,9 @@ export async function DELETE(request: Request) {
     return NextResponse.json({ typingUsers });
   } catch (error) {
     console.error("Error in DELETE /api/typing:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    );
   }
 }

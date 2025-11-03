@@ -6,9 +6,9 @@
 // receive instant updates when messages are sent or typing indicators change.
 // ============================================================================
 
-import { WebSocket, WebSocketServer } from 'ws';
-import { IncomingMessage } from 'http';
-import { Server as HTTPServer } from 'http';
+import { WebSocket, WebSocketServer } from "ws";
+import { IncomingMessage } from "http";
+import { Server as HTTPServer } from "http";
 
 // ============================================================================
 // Type Definitions
@@ -54,7 +54,7 @@ const typingUsers = new Map<string, number>();
 /**
  * Initialize the WebSocket server
  * This is called once when the server starts
- * 
+ *
  * @param server - The HTTP server to attach WebSocket to
  */
 export function initializeWebSocketServer(server: HTTPServer | any) {
@@ -67,70 +67,73 @@ export function initializeWebSocketServer(server: HTTPServer | any) {
   wss = new WebSocketServer({ server });
 
   // Handle new client connections
-  wss.on('connection', (ws: WebSocket, req: IncomingMessage) => {
-    console.log('[WebSocket] New client connection from:', req.socket.remoteAddress);
+  wss.on("connection", (ws: WebSocket, req: IncomingMessage) => {
+    console.log(
+      "[WebSocket] New client connection from:",
+      req.socket.remoteAddress
+    );
 
     // Initial message to confirm connection
     ws.send(
       JSON.stringify({
-        type: 'connection-established',
-        message: 'Connected to chat server',
+        type: "connection-established",
+        message: "Connected to chat server",
         timestamp: new Date().toISOString(),
       })
     );
 
     // Handle incoming messages from client
-    ws.on('message', (data: string) => {
+    ws.on("message", (data: string) => {
       try {
         // Parse the incoming message
         const message = JSON.parse(data);
-        console.log('[WebSocket] Received event:', message.type);
+        console.log("[WebSocket] Received event:", message.type);
 
         // Route message to appropriate handler
         switch (message.type) {
           // Client identifies itself with a user ID
-          case 'register':
+          case "register":
             handleClientRegister(ws, message.userId);
             break;
 
           // New chat message from client
-          case 'message':
+          case "message":
             handleNewMessage(ws, message);
             break;
 
           // User is typing
-          case 'typing':
+          case "typing":
             handleTypingIndicator(ws, message);
             break;
 
           // Client is checking connection (heartbeat/ping)
-          case 'ping':
-            ws.send(JSON.stringify({ type: 'pong' }));
+          case "ping":
+            ws.send(JSON.stringify({ type: "pong" }));
             break;
 
           default:
-            console.log('[WebSocket] Unknown event type:', message.type);
+            console.log("[WebSocket] Unknown event type:", message.type);
         }
       } catch (error) {
-        console.error('[WebSocket] Error processing message:', error);
+        console.error("[WebSocket] Error processing message:", error);
         ws.send(
           JSON.stringify({
-            type: 'error',
-            message: 'Failed to process message',
+            type: "error",
+            message: "Failed to process message",
           })
         );
       }
     });
 
     // Handle client disconnection
-    ws.on('close', () => {
-      console.log('[WebSocket] Client disconnected');
+    ws.on("close", () => {
+      console.log("[WebSocket] Client disconnected");
       handleClientDisconnect(ws);
     });
 
     // Handle WebSocket errors
-    ws.on('error', (error: Error) => {
-      console.error('[WebSocket] Error:', error.message);
+    ws.on("error", (error: Error) => {
+      console.error("[WebSocket] Error:", error.message);
     });
   });
 
@@ -146,7 +149,7 @@ export function initializeWebSocketServer(server: HTTPServer | any) {
   }, 30000);
 
   // Cleanup when server closes
-  wss.on('close', () => {
+  wss.on("close", () => {
     clearInterval(heartbeat);
   });
 
@@ -173,7 +176,7 @@ function handleClientRegister(ws: WebSocket, userId: string) {
 
   // Notify all clients that a user joined
   broadcastToAll({
-    type: 'user-joined',
+    type: "user-joined",
     userId,
     timestamp: new Date().toISOString(),
   });
@@ -181,7 +184,7 @@ function handleClientRegister(ws: WebSocket, userId: string) {
   // Send confirmation to the client
   ws.send(
     JSON.stringify({
-      type: 'registration-confirmed',
+      type: "registration-confirmed",
       userId,
       connectedUsers: Array.from(clients.keys()),
     })
@@ -193,10 +196,10 @@ function handleClientRegister(ws: WebSocket, userId: string) {
  * Save to database AND broadcast to all connected clients
  */
 function handleNewMessage(ws: WebSocket, data: any) {
-  console.log('[WebSocket] Broadcasting new message from:', data.senderId);
+  console.log("[WebSocket] Broadcasting new message from:", data.senderId);
 
   // Find which user sent this message
-  let senderId = '';
+  let senderId = "";
   for (const [userId, client] of clients.entries()) {
     if (client.ws === ws) {
       senderId = userId;
@@ -215,7 +218,7 @@ function handleNewMessage(ws: WebSocket, data: any) {
 
   // Broadcast to all connected clients
   broadcastToAll({
-    type: 'message',
+    type: "message",
     data: message,
   });
 
@@ -229,7 +232,7 @@ function handleNewMessage(ws: WebSocket, data: any) {
  */
 function handleTypingIndicator(ws: WebSocket, data: any) {
   // Find which user is typing
-  let userId = '';
+  let userId = "";
   for (const [uid, client] of clients.entries()) {
     if (client.ws === ws) {
       userId = uid;
@@ -253,7 +256,7 @@ function handleTypingIndicator(ws: WebSocket, data: any) {
 
   // Broadcast current typing users to all clients
   broadcastToAll({
-    type: 'typing-update',
+    type: "typing-update",
     typingUsers: Array.from(typingUsers.keys()),
     timestamp: now,
   });
@@ -264,7 +267,7 @@ function handleTypingIndicator(ws: WebSocket, data: any) {
  * Remove client from connections and notify others
  */
 function handleClientDisconnect(ws: WebSocket) {
-  let disconnectedUserId = '';
+  let disconnectedUserId = "";
 
   // Find which user this connection belonged to
   for (const [userId, client] of clients.entries()) {
@@ -281,7 +284,7 @@ function handleClientDisconnect(ws: WebSocket) {
 
     // Notify all remaining clients
     broadcastToAll({
-      type: 'user-left',
+      type: "user-left",
       userId: disconnectedUserId,
       timestamp: new Date().toISOString(),
     });
@@ -349,7 +352,7 @@ export function getTypingUsers(): string[] {
  */
 export function closeWebSocketServer() {
   if (wss) {
-    console.log('[WebSocket] Closing server');
+    console.log("[WebSocket] Closing server");
     wss.close();
     wss = null;
     clients.clear();

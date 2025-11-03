@@ -17,7 +17,10 @@ export async function GET() {
     return NextResponse.json(messages);
   } catch (error) {
     console.error("Error in GET /api/messages:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    );
   }
 }
 
@@ -51,16 +54,27 @@ export async function POST(request: Request) {
     }
 
     // Generate unique message ID
-    const messageId = `msg-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    const messageId = `msg-${Date.now()}-${Math.random()
+      .toString(36)
+      .substr(2, 9)}`;
     const createdAt = new Date().toISOString();
 
     // Insert message into database and return it
-    const newMessage = insertMessage(messageId, text, senderId, receiverId, createdAt);
+    const newMessage = insertMessage(
+      messageId,
+      text,
+      senderId,
+      receiverId,
+      createdAt
+    );
 
     return NextResponse.json(newMessage);
   } catch (error) {
     console.error("Error in POST /api/messages:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    );
   }
 }
 
@@ -82,10 +96,7 @@ export async function DELETE(request: Request) {
     const deleted = deleteMessage(id);
 
     if (!deleted) {
-      return NextResponse.json(
-        { error: "Message not found" },
-        { status: 404 }
-      );
+      return NextResponse.json({ error: "Message not found" }, { status: 404 });
     }
 
     // Return remaining messages
@@ -93,6 +104,9 @@ export async function DELETE(request: Request) {
     return NextResponse.json({ messages });
   } catch (error) {
     console.error("Error in DELETE /api/messages:", error);
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    );
   }
 }

@@ -1,9 +1,11 @@
 # Feature 5: Real-time Updates with WebSocket - Implementation Plan
 
 ## 📋 Overview
+
 Replace the current polling mechanism (checking every 500ms) with WebSocket for **instant real-time message delivery**.
 
 ## 🎯 Goals
+
 - ✅ Instant message updates (no delay)
 - ✅ Live typing indicators
 - ✅ Better performance (no constant polling)
@@ -14,6 +16,7 @@ Replace the current polling mechanism (checking every 500ms) with WebSocket for 
 ## 🏗️ Architecture
 
 ### Current (Polling) vs New (WebSocket)
+
 ```
 CURRENT (Polling):
 Client fetches every 500ms → Server → Response
@@ -29,34 +32,43 @@ Problem: None! (unless connection drops)
 ## 📦 Implementation Steps
 
 ### Step 1: Create WebSocket Server
+
 **File**: `app/api/websocket/route.ts`
+
 - Node.js WebSocket server
 - Manage client connections
 - Broadcast messages to all connected clients
 - Handle disconnections
 
 ### Step 2: Create WebSocket Hooks
+
 **File**: `lib/useWebSocket.ts`
+
 - React hook for WebSocket connection
 - Connection lifecycle management
 - Send/receive messages
 - Error handling & reconnection
 
 ### Step 3: Update Chat Component
+
 **File**: `components/Chat.tsx`
+
 - Replace polling with WebSocket hook
 - Instant message display
 - Real-time typing indicators
 - Keep database fallback for persistence
 
 ### Step 4: Update Typing API
+
 **File**: `app/api/typing/route.ts`
+
 - Keep REST API as backup
 - WebSocket handles real-time typing
 
 ## 🔧 Technical Details
 
 ### WebSocket Events
+
 ```
 CLIENT -> SERVER:
   - "connect" → Server registers client
@@ -72,19 +84,20 @@ SERVER -> CLIENT:
 ```
 
 ### Libraries Needed
+
 - `ws` - WebSocket server (npm install ws)
 - Built-in WebSocket client (browser API)
 
 ## 📊 Implementation Complexity
 
-| Task | Complexity | Time |
-|------|-----------|------|
-| WebSocket server setup | Medium | 30 min |
-| React hook | Medium | 20 min |
-| Chat component update | Low | 15 min |
-| Error handling | Medium | 20 min |
-| Testing | Low | 10 min |
-| **TOTAL** | **Medium** | **~95 min** |
+| Task                   | Complexity | Time        |
+| ---------------------- | ---------- | ----------- |
+| WebSocket server setup | Medium     | 30 min      |
+| React hook             | Medium     | 20 min      |
+| Chat component update  | Low        | 15 min      |
+| Error handling         | Medium     | 20 min      |
+| Testing                | Low        | 10 min      |
+| **TOTAL**              | **Medium** | **~95 min** |
 
 ## ✅ Success Criteria
 
@@ -101,6 +114,7 @@ SERVER -> CLIENT:
 ## 🚀 Execution Plan
 
 We'll build this step-by-step:
+
 1. Install `ws` package
 2. Create WebSocket utilities
 3. Build React hook

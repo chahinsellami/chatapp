@@ -1,11 +1,13 @@
 # Feature 4: SQLite Database - Complete ✅
 
 ## Overview
+
 We've successfully migrated the chat application from file-based JSON storage to a robust SQLite database. This provides better performance, data integrity, and scalability.
 
 ## What Was Implemented
 
 ### 1. **Database Setup**
+
 - **Package**: `better-sqlite3` (fast, synchronous SQLite for Node.js)
 - **Database File**: `.data/webchat.db` (created automatically)
 - **Location**: Project root in `.data` directory
@@ -13,6 +15,7 @@ We've successfully migrated the chat application from file-based JSON storage to
 ### 2. **Database Schema**
 
 #### Messages Table
+
 ```sql
 CREATE TABLE messages (
   id TEXT PRIMARY KEY,
@@ -23,11 +26,13 @@ CREATE TABLE messages (
   updatedAt TEXT NOT NULL
 )
 ```
+
 - Stores all chat messages
 - Tracks sender and receiver for multi-user conversations
 - Timestamps for creation and updates
 
 #### Conversations Table
+
 ```sql
 CREATE TABLE conversations (
   id TEXT PRIMARY KEY,
@@ -38,6 +43,7 @@ CREATE TABLE conversations (
   UNIQUE(userId, participantId)
 )
 ```
+
 - Stores conversation metadata
 - Prevents duplicate conversations between same users
 
@@ -46,32 +52,39 @@ CREATE TABLE conversations (
 **Core Functions:**
 
 1. **`initializeDatabase()`**
+
    - Creates tables if they don't exist
    - Called automatically on first API request
    - Enables foreign key constraints
 
 2. **`getAllMessages()`**
+
    - Retrieves all messages from database
    - Ordered by creation date (ASC)
 
 3. **`getConversationMessages(userId1, userId2)`**
+
    - Gets all messages between two specific users
    - Handles both sender and receiver relationships
 
 4. **`insertMessage(id, text, senderId, receiverId, createdAt)`**
+
    - Inserts new message into database
    - Automatically tracks `updatedAt` timestamp
    - Returns inserted message object
 
 5. **`deleteMessage(id)`**
+
    - Removes message by ID
    - Returns success boolean
 
 6. **`getUserConversations(userId)`**
+
    - Gets all unique conversation partners for a user
    - Returns array of participant IDs
 
 7. **`clearAllMessages()`**
+
    - Deletes all messages (for testing/reset)
 
 8. **`closeDatabase()`**
@@ -80,17 +93,20 @@ CREATE TABLE conversations (
 ### 4. **API Route Updates**
 
 #### `/api/messages` (route.ts)
+
 - **GET**: Returns all messages from SQLite database
 - **POST**: Inserts new message into database
 - **DELETE**: Removes message from database
 - All file I/O replaced with database queries
 
 #### `/api/conversations` (route.ts)
+
 - **GET**: Loads all messages from database
 - Groups by conversation partners
 - Returns conversations for current user
 
 ### 5. **Database Initialization**
+
 ```typescript
 // Automatically called on first request
 initializeDatabase();
@@ -101,14 +117,14 @@ initializeDatabase();
 
 ## Benefits Over File-Based Storage
 
-| Feature | JSON File | SQLite Database |
-|---------|-----------|-----------------|
-| **Query Speed** | ⏱️ Slow (reads entire file) | ⚡ Fast (indexed queries) |
-| **Concurrent Access** | ❌ Race conditions | ✅ ACID transactions |
-| **Data Integrity** | ❌ Lost on corruption | ✅ Referential integrity |
-| **Scalability** | ❌ Slow with many messages | ✅ Efficient at scale |
-| **Memory Usage** | ❌ Loads all data | ✅ Streams data |
-| **Backup/Recovery** | ⚠️ Manual | ✅ Built-in |
+| Feature               | JSON File                   | SQLite Database           |
+| --------------------- | --------------------------- | ------------------------- |
+| **Query Speed**       | ⏱️ Slow (reads entire file) | ⚡ Fast (indexed queries) |
+| **Concurrent Access** | ❌ Race conditions          | ✅ ACID transactions      |
+| **Data Integrity**    | ❌ Lost on corruption       | ✅ Referential integrity  |
+| **Scalability**       | ❌ Slow with many messages  | ✅ Efficient at scale     |
+| **Memory Usage**      | ❌ Loads all data           | ✅ Streams data           |
+| **Backup/Recovery**   | ⚠️ Manual                   | ✅ Built-in               |
 
 ## How It Works
 
@@ -177,12 +193,14 @@ webchat-app/
 ## Code Comments Learning Resources
 
 All database functions include detailed comments explaining:
+
 - Purpose of each function
 - Parameters and return values
 - SQL queries used
 - Data relationships
 
 Example:
+
 ```typescript
 /**
  * Get messages for a specific conversation
@@ -196,15 +214,18 @@ export function getConversationMessages(userId1: string, userId2: string) {
 ## Testing the Database
 
 ### Send a Message
+
 1. Open chat at http://localhost:3000
 2. Select a user from sidebar
 3. Type and send a message
 4. Check `.data/webchat.db` - message stored!
 
 ### View Database File
+
 The database file is automatically created at `c:\Users\chahi\Desktop\webchat\webchat-app\.data\webchat.db`
 
 You can inspect it with:
+
 ```bash
 npm install -g sqlite3
 sqlite3 .data/webchat.db
@@ -227,11 +248,12 @@ When you deploy to your friend's server:
 ✅ No JSON file corruption issues  
 ✅ Easy to scale to thousands of messages  
 ✅ Built-in data safety and recovery  
-✅ Can add automated backups easily  
+✅ Can add automated backups easily
 
 ## Summary
 
 **Changes Made:**
+
 - ✅ Installed `better-sqlite3` package
 - ✅ Created database utility functions (`/lib/db.ts`)
 - ✅ Updated `/api/messages` to use database

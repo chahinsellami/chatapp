@@ -10,20 +10,20 @@
 // WebSocket capabilities.
 // ============================================================================
 
-import { createServer } from 'http';
-import { parse } from 'url';
-import next from 'next';
-import { initializeWebSocketServer } from './lib/websocket';
+import { createServer } from "http";
+import { parse } from "url";
+import next from "next";
+import { initializeWebSocketServer } from "./lib/websocket";
 
 // ============================================================================
 // Configuration
 // ============================================================================
 
 // Port to run the server on
-const port = parseInt(process.env.PORT || '3000', 10);
+const port = parseInt(process.env.PORT || "3000", 10);
 
 // Check if we're in development mode (true) or production (false)
-const dev = process.env.NODE_ENV !== 'production';
+const dev = process.env.NODE_ENV !== "production";
 
 // ============================================================================
 // Initialize Next.js App
@@ -45,14 +45,14 @@ app.prepare().then(() => {
   const server = createServer(async (req, res) => {
     try {
       // Parse the URL
-      const parsedUrl = parse(req.url || '', true);
+      const parsedUrl = parse(req.url || "", true);
 
       // Handle all requests with Next.js
       await handle(req, res, parsedUrl);
     } catch (err) {
-      console.error('Error handling request', err);
+      console.error("Error handling request", err);
       res.statusCode = 500;
-      res.end('Internal server error');
+      res.end("Internal server error");
     }
   });
 
@@ -60,10 +60,10 @@ app.prepare().then(() => {
   // WebSocket Upgrade Handler
   // =========================================================================
 
-  server.on('upgrade', (req, socket, head) => {
+  server.on("upgrade", (req, socket, head) => {
     // Only upgrade WebSocket requests (ignore other upgrades like HTTP/2)
-    if (req.headers.upgrade === 'websocket') {
-      console.log('[Server] WebSocket upgrade request received');
+    if (req.headers.upgrade === "websocket") {
+      console.log("[Server] WebSocket upgrade request received");
 
       // Get WebSocket server instance and let it handle the upgrade
       const wss = initializeWebSocketServer(server);
@@ -72,7 +72,7 @@ app.prepare().then(() => {
         // Call the WebSocket server's handleUpgrade method
         // This internally creates a WebSocket instance and calls the 'connection' handler
         wss.handleUpgrade(req, socket, head, (ws) => {
-          wss.emit('connection', ws, req);
+          wss.emit("connection", ws, req);
         });
       }
     } else {
@@ -97,17 +97,17 @@ app.prepare().then(() => {
   // =========================================================================
 
   // Handle server shutdown (Ctrl+C)
-  process.on('SIGINT', () => {
-    console.log('\n\n📛 Shutting down server gracefully...');
+  process.on("SIGINT", () => {
+    console.log("\n\n📛 Shutting down server gracefully...");
 
     server.close(() => {
-      console.log('✅ Server closed');
+      console.log("✅ Server closed");
       process.exit(0);
     });
 
     // Force exit if graceful shutdown takes too long
     setTimeout(() => {
-      console.error('⚠️ Force closing server');
+      console.error("⚠️ Force closing server");
       process.exit(1);
     }, 5000);
   });

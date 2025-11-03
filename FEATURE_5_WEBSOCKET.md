@@ -14,6 +14,7 @@
 ## 🎯 What Changed From Feature 4 to Feature 5
 
 ### Before (Polling):
+
 ```
 Every 500ms:
   Client: "Are there new messages?"
@@ -27,6 +28,7 @@ Result: 2 requests per second, even if no messages!
 ```
 
 ### After (WebSocket):
+
 ```
 Connection established ONCE
 Server: "New message arrived!"
@@ -85,9 +87,11 @@ Result: Only messages sent = only network traffic!
 ## 📦 New Files Created
 
 ### 1. **`lib/websocket.ts`** - WebSocket Server Manager
+
 Purpose: Core WebSocket server logic and connection management
 
 Key Functions:
+
 - `initializeWebSocketServer(server)` - Start WebSocket server on HTTP server
 - `handleClientRegister(ws, userId)` - Register new client with user ID
 - `handleNewMessage(ws, data)` - Broadcast message to all clients
@@ -97,9 +101,11 @@ Key Functions:
 - `getConnectedUsers()` - Get list of online users
 
 ### 2. **`lib/useWebSocket.ts`** - React Hook
+
 Purpose: React hook for component-level WebSocket management
 
 Key Features:
+
 - `useWebSocket(userId, callbacks)` - Main hook
 - Automatic connection on mount, cleanup on unmount
 - Automatic reconnection with exponential backoff
@@ -107,19 +113,24 @@ Key Features:
 - Methods: `sendMessage()`, `sendTyping()`, `close()`, `reconnect()`
 
 ### 3. **`server.ts`** - Custom Next.js Server
+
 Purpose: Custom HTTP server with WebSocket upgrade capability
 
 Key Features:
+
 - Runs Next.js application normally
 - Handles WebSocket upgrade requests
 - Initializes WebSocket server on startup
 - Graceful shutdown handling
 
 ### 4. **`app/api/websocket/route.ts`** - WebSocket Endpoint
+
 Purpose: Placeholder endpoint for WebSocket connections
 
 ### 5. **Updated: `components/Chat.tsx`**
+
 Changes:
+
 - Removed polling logic (was fetching every 500ms)
 - Added `useWebSocket` hook integration
 - Updated `handleSendMessage()` to broadcast via WebSocket
@@ -130,25 +141,25 @@ Changes:
 
 ### Client → Server Events
 
-| Event | Data | Purpose |
-|-------|------|---------|
-| `register` | `{ userId }` | Register client with server |
-| `message` | `{ text, senderId, receiverId, id, createdAt }` | Send chat message |
-| `typing` | `{ isTyping: boolean }` | Notify typing status |
-| `ping` | - | Keep-alive / health check |
+| Event      | Data                                            | Purpose                     |
+| ---------- | ----------------------------------------------- | --------------------------- |
+| `register` | `{ userId }`                                    | Register client with server |
+| `message`  | `{ text, senderId, receiverId, id, createdAt }` | Send chat message           |
+| `typing`   | `{ isTyping: boolean }`                         | Notify typing status        |
+| `ping`     | -                                               | Keep-alive / health check   |
 
 ### Server → Client Events
 
-| Event | Data | Purpose |
-|-------|------|---------|
-| `connection-established` | `{ message, timestamp }` | Confirm connection |
+| Event                    | Data                         | Purpose              |
+| ------------------------ | ---------------------------- | -------------------- |
+| `connection-established` | `{ message, timestamp }`     | Confirm connection   |
 | `registration-confirmed` | `{ userId, connectedUsers }` | Confirm registration |
-| `message` | Message object | New message arrived |
-| `typing-update` | `{ typingUsers: string[] }` | Typing status update |
-| `user-joined` | `{ userId, timestamp }` | User came online |
-| `user-left` | `{ userId, timestamp }` | User went offline |
-| `pong` | - | Response to ping |
-| `error` | `{ message }` | Error notification |
+| `message`                | Message object               | New message arrived  |
+| `typing-update`          | `{ typingUsers: string[] }`  | Typing status update |
+| `user-joined`            | `{ userId, timestamp }`      | User came online     |
+| `user-left`              | `{ userId, timestamp }`      | User went offline    |
+| `pong`                   | -                            | Response to ping     |
+| `error`                  | `{ message }`                | Error notification   |
 
 ## 🚀 Running Feature 5
 
@@ -191,10 +202,10 @@ npm start
 ### Using the WebSocket Hook in Components
 
 ```tsx
-import { useWebSocket } from '@/lib/useWebSocket';
+import { useWebSocket } from "@/lib/useWebSocket";
 
 export default function Chat() {
-  const currentUserId = 'user-123';
+  const currentUserId = "user-123";
 
   // ========================================================================
   // Initialize WebSocket Connection
@@ -202,31 +213,31 @@ export default function Chat() {
   const ws = useWebSocket(currentUserId, {
     // Called when new message arrives
     onMessage: (messageData) => {
-      console.log('New message:', messageData);
+      console.log("New message:", messageData);
       // Add to UI
     },
 
     // Called when typing status updates
     onTyping: (typingUsers) => {
-      console.log('Users typing:', typingUsers);
+      console.log("Users typing:", typingUsers);
       // Update typing indicator
     },
 
     // Called on successful connection
     onConnect: () => {
-      console.log('Connected to real-time server');
+      console.log("Connected to real-time server");
       // Show connection status
     },
 
     // Called on disconnection
     onDisconnect: () => {
-      console.log('Disconnected from server');
+      console.log("Disconnected from server");
       // Show offline status
     },
 
     // Called on error
     onError: (error) => {
-      console.error('Connection error:', error);
+      console.error("Connection error:", error);
     },
   });
 
@@ -235,8 +246,8 @@ export default function Chat() {
   // ========================================================================
   const handleSendMessage = (text: string) => {
     // Broadcast to all connected clients
-    ws.sendMessage(text, currentUserId, 'user-456');
-    console.log('Message sent via WebSocket');
+    ws.sendMessage(text, currentUserId, "user-456");
+    console.log("Message sent via WebSocket");
   };
 
   // ========================================================================
@@ -266,10 +277,10 @@ export default function Chat() {
 
 ```tsx
 // Send custom event
-ws.send('message', {
-  text: 'Hello',
-  senderId: 'user-1',
-  receiverId: 'user-2',
+ws.send("message", {
+  text: "Hello",
+  senderId: "user-1",
+  receiverId: "user-2",
 });
 
 // Send typing indicator
@@ -278,7 +289,7 @@ ws.sendTyping(false); // I stopped typing
 
 // Check if connected
 if (ws.isConnected) {
-  console.log('Ready to send');
+  console.log("Ready to send");
 }
 
 // Manually disconnect
@@ -343,6 +354,7 @@ ws.reconnect();
 **Important**: Messages are saved in two places:
 
 1. **Database** - Persistent storage
+
    - Survives server restart
    - Loaded when app opens
    - For history/archive
@@ -353,6 +365,7 @@ ws.reconnect();
    - For current session
 
 This means:
+
 - ✅ Messages persist even if user closes browser
 - ✅ New messages appear instantly
 - ✅ Old messages load from database
@@ -361,6 +374,7 @@ This means:
 ## 📊 Performance Improvement
 
 ### Old Approach (Polling):
+
 ```
 Network Traffic:
 - 2 requests/second to check for messages
@@ -372,6 +386,7 @@ Latency: 500ms average
 ```
 
 ### New Approach (WebSocket):
+
 ```
 Network Traffic:
 - Only when messages actually sent
@@ -387,6 +402,7 @@ Latency: <50ms (near-instant)
 ## 🛡️ Error Handling & Recovery
 
 ### Connection Drops:
+
 1. Client detects loss: `onDisconnect()` called
 2. Auto-reconnect starts with delay:
    - Attempt 1: Wait 1 second
@@ -397,19 +413,20 @@ Latency: <50ms (near-instant)
    - After 5 attempts: Give up, call `onError()`
 
 ### Graceful Fallback:
+
 - If WebSocket fails, REST API still works
 - Messages stored in database
 - User can still chat, just slower
 
 ## 📚 Files Overview
 
-| File | Lines | Purpose |
-|------|-------|---------|
-| `lib/websocket.ts` | 340 | WebSocket server |
-| `lib/useWebSocket.ts` | 280 | React hook |
-| `server.ts` | 90 | Custom Next.js server |
-| `components/Chat.tsx` | 360 | Updated chat component |
-| `app/api/websocket/route.ts` | 30 | Endpoint placeholder |
+| File                         | Lines | Purpose                |
+| ---------------------------- | ----- | ---------------------- |
+| `lib/websocket.ts`           | 340   | WebSocket server       |
+| `lib/useWebSocket.ts`        | 280   | React hook             |
+| `server.ts`                  | 90    | Custom Next.js server  |
+| `components/Chat.tsx`        | 360   | Updated chat component |
+| `app/api/websocket/route.ts` | 30    | Endpoint placeholder   |
 
 Total: ~1,100 lines of code, fully commented
 
@@ -418,27 +435,32 @@ Total: ~1,100 lines of code, fully commented
 After building this feature, you've learned:
 
 ✅ **WebSocket Protocol**
+
 - How WebSocket differs from HTTP polling
 - Event-based communication
 - Real-time message delivery
 
 ✅ **Server Architecture**
+
 - Custom Node.js HTTP server
 - Connection upgrade handling
 - Broadcast patterns
 
 ✅ **React Hooks**
+
 - Managing WebSocket lifecycle in components
 - useEffect for connection management
 - useRef for persistent connections
 - useCallback for event handlers
 
 ✅ **Performance Optimization**
+
 - Reducing network overhead
 - Instant vs. polling updates
 - Bandwidth optimization
 
 ✅ **Error Handling**
+
 - Connection failure recovery
 - Automatic reconnection
 - Exponential backoff strategies
@@ -446,6 +468,7 @@ After building this feature, you've learned:
 ## ✅ Feature 5 Complete!
 
 **What You Can Do Now:**
+
 - ✅ Send messages in real-time (no delay)
 - ✅ See typing indicators instantly
 - ✅ Automatic reconnection if connection drops
@@ -454,6 +477,7 @@ After building this feature, you've learned:
 
 **Ready for Feature 6:**
 Next we can add:
+
 - User authentication & login
 - Private/protected conversations
 - User profiles

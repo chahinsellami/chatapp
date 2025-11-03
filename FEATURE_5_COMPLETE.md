@@ -10,43 +10,49 @@ You've successfully implemented **Feature 5: Real-time Updates with WebSocket** 
 
 ### Performance Metrics
 
-| Metric | Before (Polling) | After (WebSocket) | Improvement |
-|--------|------------------|-------------------|-------------|
-| **Latency** | 500ms average | <50ms | **90% faster** ⚡ |
-| **Bandwidth** | 86MB/day idle | <1MB/day idle | **99% reduction** 💰 |
-| **Requests/sec** | 2 (polling) | 0 (no polling) | **Instant only** 🎯 |
-| **Typing indicators** | 500ms delay | Real-time | **Instant** ✨ |
+| Metric                | Before (Polling) | After (WebSocket) | Improvement          |
+| --------------------- | ---------------- | ----------------- | -------------------- |
+| **Latency**           | 500ms average    | <50ms             | **90% faster** ⚡    |
+| **Bandwidth**         | 86MB/day idle    | <1MB/day idle     | **99% reduction** 💰 |
+| **Requests/sec**      | 2 (polling)      | 0 (no polling)    | **Instant only** 🎯  |
+| **Typing indicators** | 500ms delay      | Real-time         | **Instant** ✨       |
 
 ---
 
 ## 📁 Files Created (7 new files)
 
 ### 1. **`lib/websocket.ts`** (340 lines)
+
 **WebSocket Server Manager**
+
 - Manages all WebSocket connections
 - Handles client registration, messaging, typing indicators
 - Broadcasts to all connected clients
 - Auto-reconnection support
 
 Key Functions:
+
 ```typescript
-- initializeWebSocketServer(server)
-- handleClientRegister(ws, userId)
-- handleNewMessage(ws, data)
-- handleTypingIndicator(ws, data)
-- broadcastToAll(data)
-- sendToUser(userId, data)
-- getConnectedUsers()
+-initializeWebSocketServer(server) -
+  handleClientRegister(ws, userId) -
+  handleNewMessage(ws, data) -
+  handleTypingIndicator(ws, data) -
+  broadcastToAll(data) -
+  sendToUser(userId, data) -
+  getConnectedUsers();
 ```
 
 ### 2. **`lib/useWebSocket.ts`** (280 lines)
+
 **React Hook for Real-time Communication**
+
 - Custom hook managing WebSocket lifecycle
 - Automatic connection/disconnection
 - Event handlers for messages and typing
 - Automatic reconnection with exponential backoff
 
 API:
+
 ```typescript
 const ws = useWebSocket(userId, {
   onMessage: (data) => {},
@@ -62,19 +68,25 @@ ws.isConnected; // boolean
 ```
 
 ### 3. **`server.ts`** (90 lines)
+
 **Custom Next.js Server with WebSocket Support**
+
 - Replaces default `next dev` with custom server
 - Handles HTTP upgrades to WebSocket
 - Initializes WebSocket server on startup
 - Graceful shutdown on SIGINT (Ctrl+C)
 
 ### 4. **`app/api/websocket/route.ts`** (30 lines)
+
 **WebSocket Endpoint Placeholder**
+
 - Reserved endpoint for WebSocket upgrades
 - Documentation for future WebSocket support
 
 ### 5. **`FEATURE_5_WEBSOCKET.md`** (500+ lines)
+
 **Comprehensive Feature Documentation**
+
 - Architecture diagrams
 - Event specifications
 - Code examples
@@ -83,7 +95,9 @@ ws.isConnected; // boolean
 - Learning outcomes
 
 ### 6. **`test-websocket.js`** (300 lines)
+
 **WebSocket Test Suite**
+
 - Automated testing script
 - Tests multiple client connections
 - Verifies message broadcasting
@@ -91,7 +105,9 @@ ws.isConnected; // boolean
 - Validates real-time delivery
 
 ### 7. **Updated: `components/Chat.tsx`** (360 lines)
+
 **Chat Component with WebSocket**
+
 - Integrated `useWebSocket` hook
 - Removed 500ms polling loop
 - Real-time message delivery
@@ -103,6 +119,7 @@ ws.isConnected; // boolean
 ## 📁 Files Modified (3 files)
 
 ### 1. **`package.json`**
+
 ```diff
 + "ws": "^8.18.3"
 + "@types/ws": "^8.18.1"
@@ -116,6 +133,7 @@ ws.isConnected; // boolean
 ```
 
 ### 2. **`README.md`**
+
 - Updated features list (WebSocket marked as ✅ complete)
 - Added WebSocket to tech stack
 - Updated running instructions
@@ -124,6 +142,7 @@ ws.isConnected; // boolean
 - Added FEATURE_5_WEBSOCKET.md reference
 
 ### 3. **`.data/` directory** (created)
+
 - SQLite database directory created for persistence
 
 ---
@@ -131,6 +150,7 @@ ws.isConnected; // boolean
 ## 🔄 Architecture Flow
 
 ### Old Architecture (Polling - Feature 4)
+
 ```
 ┌─────────────────────────────────┐
 │ Browser                         │
@@ -148,6 +168,7 @@ ws.isConnected; // boolean
 ```
 
 ### New Architecture (WebSocket - Feature 5)
+
 ```
 ┌─────────────────────────────────┐
 │ Browser                         │
@@ -217,30 +238,35 @@ node test-websocket.js
 ## 💡 Key Concepts Learned
 
 ### 1. **WebSocket Protocol**
+
 - Persistent TCP connection
 - Bidirectional communication
 - Event-based messaging
 - Lower overhead than HTTP polling
 
 ### 2. **Real-time Architecture**
+
 - Client-server with persistent connection
 - Broadcast patterns (send to all clients)
 - Event-driven design
 - Connection management
 
 ### 3. **React Hooks Advanced**
+
 - useRef for persistent values
 - useCallback for event handlers
 - Custom hooks for complex logic
 - Cleanup in useEffect returns
 
 ### 4. **Error Handling**
+
 - Connection failures
 - Automatic reconnection
 - Exponential backoff strategy
 - Graceful degradation (fallback to REST API)
 
 ### 5. **Server Architecture**
+
 - Custom Next.js server
 - HTTP upgrade handling
 - Socket lifecycle management
@@ -267,41 +293,46 @@ node test-websocket.js
 
 ## 📈 Statistics
 
-| Category | Count |
-|----------|-------|
-| **New lines of code** | 1,100+ |
-| **New files** | 7 |
-| **Modified files** | 3 |
-| **Documentation** | 800+ lines |
-| **Comments** | 250+ lines |
-| **Tests** | 5 test scenarios |
-| **Time to implement** | ~2 hours |
+| Category              | Count            |
+| --------------------- | ---------------- |
+| **New lines of code** | 1,100+           |
+| **New files**         | 7                |
+| **Modified files**    | 3                |
+| **Documentation**     | 800+ lines       |
+| **Comments**          | 250+ lines       |
+| **Tests**             | 5 test scenarios |
+| **Time to implement** | ~2 hours         |
 
 ---
 
 ## 🎯 What Works Now
 
 ✅ **Real-time Messaging**
+
 - Send message → Instantly appears on all clients
 - No 500ms delay
 - No polling overhead
 
 ✅ **Real-time Typing**
+
 - Type → Others see "typing..." immediately
 - Auto-expires after 2 seconds of inactivity
 - No REST API calls needed
 
 ✅ **Automatic Reconnection**
+
 - Connection drops? Auto-reconnect in 1-2 seconds
 - Exponential backoff (1s, 2s, 4s, 8s, 16s)
 - Fallback to REST API if WebSocket unavailable
 
 ✅ **Connection Status**
+
 - 🟢 Green indicator = Connected (real-time)
 - ❌ Red indicator = Offline (database only)
 - Shows in chat header
 
 ✅ **Persistent Data**
+
 - Messages still saved to SQLite
 - History loads on app start
 - Works even if disconnected
@@ -322,6 +353,7 @@ Message Flow:
 ```
 
 **Result**: Best of both worlds!
+
 - Persistence ✅
 - Real-time delivery ✅
 - Scalability ✅
@@ -331,6 +363,7 @@ Message Flow:
 ## 🌟 Next Features (Ready to Build)
 
 ### Feature 6: Authentication & Login
+
 - User registration
 - Password hashing (bcrypt)
 - Session management
@@ -338,12 +371,14 @@ Message Flow:
 - User identity verification
 
 ### Feature 7: Multiple Channels
+
 - Create chat rooms/channels
 - Subscribe to channels
 - Channel-specific messages
 - Leave/join functionality
 
 ### Feature 8: Message Search
+
 - Full-text search
 - Search UI
 - Highlight results
@@ -354,6 +389,7 @@ Message Flow:
 ## 📚 Documentation
 
 For detailed information, see:
+
 - **`FEATURE_5_WEBSOCKET.md`** - Complete WebSocket guide (500+ lines)
 - **`README.md`** - Project overview (updated)
 - **Code comments** - Every function explained
@@ -368,6 +404,7 @@ For detailed information, see:
 4. ✅ Feature 5: WebSocket (Real-time systems) ← **You are here**
 
 ### What's Next?
+
 - Feature 6: Authentication (Security)
 - Feature 7: Channels (Advanced features)
 - Feature 8: Search (Query optimization)
@@ -377,6 +414,7 @@ For detailed information, see:
 ## 🚀 Ready for Production?
 
 Your app is now ready for:
+
 - ✅ Deployment to hosting (Railway, Vercel, friend's server)
 - ✅ Multiple users chatting real-time
 - ✅ Persistent message storage
@@ -387,6 +425,7 @@ Your app is now ready for:
 ## 🎉 Congratulations!
 
 You've successfully implemented:
+
 - ✅ Real-time WebSocket communication
 - ✅ Instant message delivery
 - ✅ Automatic error recovery
@@ -399,6 +438,7 @@ You've successfully implemented:
 **GitHub Repository**: https://github.com/chahinsellami/chatapp.git
 
 **Latest Commits**:
+
 1. `c60948e` - feat: Implement Feature 5 - Real-time WebSocket support
 2. `48153a0` - docs: Add WebSocket test script and update README
 
