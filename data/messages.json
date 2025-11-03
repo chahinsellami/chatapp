@@ -1,0 +1,23 @@
+[
+  {
+    "id": "msg-1762178028621-drpdkpmn5",
+    "text": "hello",
+    "senderId": "current-user-1",
+    "receiverId": "user-1",
+    "createdAt": "2025-11-03T13:53:48.621Z"
+  },
+  {
+    "id": "msg-1762178035420-rsqcahpes",
+    "text": "hello",
+    "senderId": "current-user-1",
+    "receiverId": "user-2",
+    "createdAt": "2025-11-03T13:53:55.420Z"
+  },
+  {
+    "id": "msg-1762178043286-qs9p4c3f1",
+    "text": "testtttt",
+    "senderId": "current-user-1",
+    "receiverId": "user-3",
+    "createdAt": "2025-11-03T13:54:03.286Z"
+  }
+]
