@@ -30,7 +30,7 @@ export default function SignupPage() {
 
   return (
     <div 
-      className="min-h-screen flex items-center justify-center p-4"
+      className="min-h-screen flex items-center justify-center p-4 relative"
       style={{
         background: 'linear-gradient(to bottom right, #36393F, #2F3136, #202225)'
       }}
