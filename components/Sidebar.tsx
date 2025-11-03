@@ -75,6 +75,7 @@ export default function Sidebar({
                   alt={user.name}
                   width={48}
                   height={48}
+                  unoptimized
                   className="w-12 h-12 rounded-full object-cover"
                 />
 

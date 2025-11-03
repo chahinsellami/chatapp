@@ -305,6 +305,7 @@ export default function Chat() {
               alt={selectedUser.name}
               width={48}
               height={48}
+              unoptimized
               className="w-12 h-12 rounded-full object-cover"
             />
             <div className="flex-1">
