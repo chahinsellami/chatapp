@@ -10,10 +10,8 @@ import ChatArea from "@/components/Chat/ChatArea";
 
 export default function ChannelsLayout({
   children,
-  params,
 }: {
   children: React.ReactNode;
-  params: { channelId?: string };
 }) {
   const router = useRouter();
   const { user, isLoading } = useAuth();
