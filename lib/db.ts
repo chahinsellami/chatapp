@@ -99,6 +99,51 @@ export function initializeDatabase() {
     )
   `);
 
+  // Create friends table (NEW - Feature 8)
+  // Stores friend relationships between users
+  database.exec(`
+    CREATE TABLE IF NOT EXISTS friends (
+      id TEXT PRIMARY KEY,
+      userId TEXT NOT NULL,
+      friendId TEXT NOT NULL,
+      status TEXT DEFAULT 'accepted',
+      createdAt TEXT NOT NULL,
+      UNIQUE(userId, friendId),
+      FOREIGN KEY(userId) REFERENCES users(id),
+      FOREIGN KEY(friendId) REFERENCES users(id)
+    )
+  `);
+
+  // Create friend requests table (NEW - Feature 8)
+  // Stores pending friend requests
+  database.exec(`
+    CREATE TABLE IF NOT EXISTS friendRequests (
+      id TEXT PRIMARY KEY,
+      senderId TEXT NOT NULL,
+      receiverId TEXT NOT NULL,
+      status TEXT DEFAULT 'pending',
+      createdAt TEXT NOT NULL,
+      UNIQUE(senderId, receiverId),
+      FOREIGN KEY(senderId) REFERENCES users(id),
+      FOREIGN KEY(receiverId) REFERENCES users(id)
+    )
+  `);
+
+  // Create direct messages table (NEW - Feature 8)
+  // Stores 1-on-1 messages between users
+  database.exec(`
+    CREATE TABLE IF NOT EXISTS directMessages (
+      id TEXT PRIMARY KEY,
+      senderId TEXT NOT NULL,
+      receiverId TEXT NOT NULL,
+      text TEXT NOT NULL,
+      createdAt TEXT NOT NULL,
+      editedAt TEXT,
+      FOREIGN KEY(senderId) REFERENCES users(id),
+      FOREIGN KEY(receiverId) REFERENCES users(id)
+    )
+  `);
+
   // Create default channels if they don't exist
   createDefaultChannels();
 
@@ -531,4 +576,206 @@ export function deleteChannelMessage(id: string): boolean {
   const stmt = database.prepare("DELETE FROM messages WHERE id = ?");
   const result = stmt.run(id);
   return (result.changes as number) > 0;
+}
+
+// ============================================================================
+// FRIENDS & FRIEND REQUESTS FUNCTIONS (Feature 8)
+// ============================================================================
+
+/**
+ * Send a friend request
+ */
+export function sendFriendRequest(senderId: string, receiverId: string) {
+  const database = getDatabase();
+  const id = crypto.randomUUID();
+  const now = new Date().toISOString();
+  const statement = database.prepare(
+    `INSERT INTO friendRequests (id, senderId, receiverId, status, createdAt) 
+     VALUES (?, ?, ?, 'pending', ?)`
+  );
+  try {
+    statement.run(id, senderId, receiverId, now);
+    return { id, senderId, receiverId, status: "pending", createdAt: now };
+  } catch (error: any) {
+    if (error.message.includes("UNIQUE constraint failed")) {
+      throw new Error("Friend request already exists");
+    }
+    throw error;
+  }
+}
+
+/**
+ * Accept a friend request
+ */
+export function acceptFriendRequest(requestId: string) {
+  const database = getDatabase();
+  const request = database
+    .prepare("SELECT * FROM friendRequests WHERE id = ?")
+    .get(requestId) as any;
+
+  if (!request) throw new Error("Friend request not found");
+  if (request.status !== "pending") throw new Error("Friend request already processed");
+
+  const id1 = crypto.randomUUID();
+  const id2 = crypto.randomUUID();
+  const now = new Date().toISOString();
+
+  // Add friend relationship both directions
+  database
+    .prepare(
+      `INSERT INTO friends (id, userId, friendId, status, createdAt) 
+       VALUES (?, ?, ?, 'accepted', ?)`
+    )
+    .run(id1, request.senderId, request.receiverId, now);
+
+  database
+    .prepare(
+      `INSERT INTO friends (id, userId, friendId, status, createdAt) 
+       VALUES (?, ?, ?, 'accepted', ?)`
+    )
+    .run(id2, request.receiverId, request.senderId, now);
+
+  // Update request status
+  database
+    .prepare("UPDATE friendRequests SET status = ? WHERE id = ?")
+    .run("accepted", requestId);
+
+  return { status: "accepted" };
+}
+
+/**
+ * Reject a friend request
+ */
+export function rejectFriendRequest(requestId: string) {
+  const database = getDatabase();
+  const request = database
+    .prepare("SELECT * FROM friendRequests WHERE id = ?")
+    .get(requestId) as any;
+
+  if (!request) throw new Error("Friend request not found");
+  if (request.status !== "pending") throw new Error("Friend request already processed");
+
+  database
+    .prepare("UPDATE friendRequests SET status = ? WHERE id = ?")
+    .run("rejected", requestId);
+
+  return { status: "rejected" };
+}
+
+/**
+ * Get all friends of a user
+ */
+export function getUserFriends(userId: string) {
+  const database = getDatabase();
+  const statement = database.prepare(`
+    SELECT u.id, u.username, u.avatar, u.status, u.createdAt 
+    FROM friends f
+    JOIN users u ON f.friendId = u.id
+    WHERE f.userId = ? AND f.status = 'accepted'
+    ORDER BY u.username
+  `);
+  return statement.all(userId) as any[];
+}
+
+/**
+ * Remove a friend relationship
+ */
+export function removeFriend(userId: string, friendId: string) {
+  const database = getDatabase();
+  database
+    .prepare(`
+      DELETE FROM friends 
+      WHERE (userId = ? AND friendId = ?) OR (userId = ? AND friendId = ?)
+    `)
+    .run(userId, friendId, friendId, userId);
+
+  return { deleted: true };
+}
+
+/**
+ * Get pending friend requests for a user
+ */
+export function getPendingFriendRequests(userId: string) {
+  const database = getDatabase();
+  const statement = database.prepare(`
+    SELECT f.id, f.senderId, u.username, u.avatar, f.createdAt 
+    FROM friendRequests f
+    JOIN users u ON f.senderId = u.id
+    WHERE f.receiverId = ? AND f.status = 'pending'
+    ORDER BY f.createdAt DESC
+  `);
+  return statement.all(userId) as any[];
+}
+
+/**
+ * Check if two users are friends
+ */
+export function checkFriendship(userId: string, friendId: string) {
+  const database = getDatabase();
+  const statement = database.prepare(
+    `SELECT * FROM friends WHERE userId = ? AND friendId = ? AND status = 'accepted'`
+  );
+  return statement.get(userId, friendId) as any | undefined;
+}
+
+// ============================================================================
+// DIRECT MESSAGES FUNCTIONS (Feature 8)
+// ============================================================================
+
+/**
+ * Insert a new direct message
+ */
+export function insertDirectMessage(
+  senderId: string,
+  receiverId: string,
+  text: string
+) {
+  const database = getDatabase();
+  const id = crypto.randomUUID();
+  const now = new Date().toISOString();
+  const statement = database.prepare(
+    `INSERT INTO directMessages (id, senderId, receiverId, text, createdAt) 
+     VALUES (?, ?, ?, ?, ?)`
+  );
+  statement.run(id, senderId, receiverId, text, now);
+  return { id, senderId, receiverId, text, createdAt: now, editedAt: null };
+}
+
+/**
+ * Get direct messages between two users
+ */
+export function getDirectMessages(userId1: string, userId2: string) {
+  const database = getDatabase();
+  const statement = database.prepare(`
+    SELECT d.id, d.senderId, d.receiverId, d.text, d.createdAt, d.editedAt,
+           u.username, u.avatar
+    FROM directMessages d
+    JOIN users u ON d.senderId = u.id
+    WHERE (d.senderId = ? AND d.receiverId = ?) OR (d.senderId = ? AND d.receiverId = ?)
+    ORDER BY d.createdAt ASC
+  `);
+  return statement.all(userId1, userId2, userId2, userId1) as any[];
+}
+
+/**
+ * Update a direct message
+ */
+export function updateDirectMessage(messageId: string, text: string) {
+  const database = getDatabase();
+  const now = new Date().toISOString();
+  const statement = database.prepare(
+    `UPDATE directMessages SET text = ?, editedAt = ? WHERE id = ?`
+  );
+  statement.run(text, now, messageId);
+  return { updated: true };
+}
+
+/**
+ * Delete a direct message
+ */
+export function deleteDirectMessage(messageId: string) {
+  const database = getDatabase();
+  const statement = database.prepare("DELETE FROM directMessages WHERE id = ?");
+  statement.run(messageId);
+  return { deleted: true };
 }
