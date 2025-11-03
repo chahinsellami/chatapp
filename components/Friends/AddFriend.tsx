@@ -47,7 +47,7 @@ export default function AddFriend({ userId, onFriendAdded }: AddFriendProps) {
         return;
       }
 
-      const res = await fetch("/api/auth/me", {
+      const res = await fetch(`/api/users/search?q=${encodeURIComponent(searchTerm)}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -55,12 +55,8 @@ export default function AddFriend({ userId, onFriendAdded }: AddFriendProps) {
         throw new Error("Failed to search users");
       }
 
-      // For now, fetch all users and filter client-side
-      // In production, create a /api/users/search endpoint
-      const allUsers = await fetch("/api/auth/me").then((r) => r.json());
-
-      // Mock search - in production, use a real search API
-      setUsers([]);
+      const data = await res.json();
+      setUsers(data.users || []);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Error searching users");
       console.error("Error searching users:", err);
