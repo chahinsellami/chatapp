@@ -82,7 +82,10 @@ export default function MembersList({ channelId }: MembersListProps) {
 
               {/* Actions (on hover) */}
               <div className="opacity-0 group-hover:opacity-100 transition smooth transform group-hover:scale-110">
-                <button className="p-1 hover:bg-[#5B65F5] hover:bg-opacity-30 rounded-lg text-lg transition smooth" title="Direct message">
+                <button
+                  className="p-1 hover:bg-[#5B65F5] hover:bg-opacity-30 rounded-lg text-lg transition smooth"
+                  title="Direct message"
+                >
                   💬
                 </button>
               </div>

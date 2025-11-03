@@ -28,9 +28,7 @@ export default function Message({ message, isOwnMessage }: MessageProps) {
         <div className="relative shrink-0">
           <div
             className={`w-12 h-12 rounded-full flex items-center justify-center shrink-0 transition smooth group-hover:shadow-xl group-hover:scale-110 ${
-              isOwnMessage
-                ? "bg-[#7289DA] shadow-md"
-                : "bg-[#5B65F5] shadow-md"
+              isOwnMessage ? "bg-[#7289DA] shadow-md" : "bg-[#5B65F5] shadow-md"
             }`}
           >
             <span className="text-white font-bold text-base">
@@ -61,10 +59,16 @@ export default function Message({ message, isOwnMessage }: MessageProps) {
         {/* Actions (on hover) */}
         {isOwnMessage && (
           <div className="opacity-0 group-hover:opacity-100 transition smooth flex gap-1 ml-2 shrink-0">
-            <button className="p-2 hover:bg-[#5B65F5] hover:bg-opacity-50 rounded-lg text-base transition smooth transform hover:scale-110" title="Edit message">
+            <button
+              className="p-2 hover:bg-[#5B65F5] hover:bg-opacity-50 rounded-lg text-base transition smooth transform hover:scale-110"
+              title="Edit message"
+            >
               ✏️
             </button>
-            <button className="p-2 hover:bg-[#F04747] hover:bg-opacity-50 rounded-lg text-base transition smooth transform hover:scale-110" title="Delete message">
+            <button
+              className="p-2 hover:bg-[#F04747] hover:bg-opacity-50 rounded-lg text-base transition smooth transform hover:scale-110"
+              title="Delete message"
+            >
               🗑️
             </button>
           </div>

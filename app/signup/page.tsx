@@ -52,8 +52,12 @@ export default function SignupPage() {
             <div className="inline-block p-5 bg-[#5B65F5] rounded-full mb-6 shadow-lg">
               <span className="text-4xl">✨</span>
             </div>
-            <h1 className="text-6xl font-bold text-white mb-4 tracking-tight">Create Account</h1>
-            <p className="text-[#B0BEC5] text-xl">Join WebChat and start chatting!</p>
+            <h1 className="text-6xl font-bold text-white mb-4 tracking-tight">
+              Create Account
+            </h1>
+            <p className="text-[#B0BEC5] text-xl">
+              Join WebChat and start chatting!
+            </p>
           </div>
 
           {/* Error message */}
@@ -178,7 +182,9 @@ export default function SignupPage() {
           {/* Divider */}
           <div className="my-10 flex items-center">
             <div className="flex-1 h-px bg-[#202225]"></div>
-            <div className="px-6 text-[#72767D] text-sm font-bold uppercase tracking-wider">Or</div>
+            <div className="px-6 text-[#72767D] text-sm font-bold uppercase tracking-wider">
+              Or
+            </div>
             <div className="flex-1 h-px bg-[#202225]"></div>
           </div>
 

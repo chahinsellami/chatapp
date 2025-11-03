@@ -107,10 +107,7 @@ export default function ChatArea({ channelId, user }: ChatAreaProps) {
         ) : (
           messages.map((msg, index) => (
             <div key={msg.id} style={{ animationDelay: `${index * 50}ms` }}>
-              <Message
-                message={msg}
-                isOwnMessage={msg.userId === user?.id}
-              />
+              <Message message={msg} isOwnMessage={msg.userId === user?.id} />
             </div>
           ))
         )}
