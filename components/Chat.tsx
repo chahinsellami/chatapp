@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from "react";
 import Sidebar from "./Sidebar";
 import Image from "next/image";
 import { MOCK_USERS, getUserById } from "../lib/users";
+import { useWebSocket } from "../lib/useWebSocket";
 import type { User } from "../lib/users";
 
 // Message type for our chat
@@ -31,9 +32,74 @@ export default function Chat() {
   const [loading, setLoading] = useState(false);
   // Track which users are currently typing in the selected conversation
   const [typingUsers, setTypingUsers] = useState<string[]>([]);
+  // Track connection status
+  const [connectionStatus, setConnectionStatus] = useState<"connecting" | "connected" | "disconnected">("disconnected");
   // Track if we've sent a typing indicator recently (to avoid spam)
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const endRef = useRef<HTMLDivElement>(null);
+
+  // ============================================================================
+  // WebSocket Hook - Real-time Communication
+  // ============================================================================
+  // This hook handles all WebSocket communication:
+  // 1. Connects to the server automatically on component mount
+  // 2. Listens for incoming messages and typing updates
+  // 3. Provides methods to send messages and typing indicators
+  // 4. Automatically reconnects if connection drops
+  // ============================================================================
+  
+  const ws = useWebSocket(currentUserId, {
+    // Called when new message arrives from another user
+    onMessage: (messageData) => {
+      console.log("📨 New message received via WebSocket:", messageData);
+      
+      // Don't add our own messages (we already added them locally)
+      if (messageData.senderId === currentUserId) {
+        return;
+      }
+
+      // Add message to the conversation
+      const otherUserId =
+        messageData.senderId === currentUserId
+          ? messageData.receiverId
+          : messageData.senderId;
+
+      setConversations((prev) => ({
+        ...prev,
+        [otherUserId]: {
+          userId: otherUserId,
+          messages: [...(prev[otherUserId]?.messages || []), messageData],
+        },
+      }));
+    },
+
+    // Called when typing status updates
+    onTyping: (typingUsersList) => {
+      console.log("⌨️ Typing users:", typingUsersList);
+      // Filter out current user from the typing list
+      const otherUsersTyping = typingUsersList.filter(
+        (id) => id !== currentUserId
+      );
+      setTypingUsers(otherUsersTyping);
+    },
+
+    // Called when successfully connected to server
+    onConnect: () => {
+      console.log("✅ WebSocket connected!");
+      setConnectionStatus("connected");
+    },
+
+    // Called when disconnected from server
+    onDisconnect: () => {
+      console.log("❌ WebSocket disconnected");
+      setConnectionStatus("disconnected");
+    },
+
+    // Called when error occurs
+    onError: (error) => {
+      console.error("⚠️ WebSocket error:", error);
+    },
+  });
 
   // Load conversations on mount
   useEffect(() => {
@@ -68,41 +134,13 @@ export default function Chat() {
     endRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [selectedUserId, conversations]);
 
-  // Poll for typing status updates
-  // This effect runs when selectedUserId changes and sets up a polling interval
-  useEffect(() => {
-    if (!selectedUserId) return;
-
-    // Create a conversation ID based on current user and selected user
-    const conversationId = [currentUserId, selectedUserId].sort().join("-");
-
-    // Function to fetch current typing status
-    const fetchTypingStatus = async () => {
-      try {
-        const res = await fetch(
-          `/api/typing?conversationId=${conversationId}`
-        );
-        if (res.ok) {
-          const data = await res.json();
-          // Filter out current user from typing list
-          const otherUsersTyping = data.typingUsers.filter(
-            (id: string) => id !== currentUserId
-          );
-          setTypingUsers(otherUsersTyping);
-        }
-      } catch (error) {
-        console.error("Failed to fetch typing status:", error);
-      }
-    };
-
-    // Fetch typing status immediately and then every 500ms
-    fetchTypingStatus();
-    const typingInterval = setInterval(fetchTypingStatus, 500);
-
-    return () => {
-      clearInterval(typingInterval);
-    };
-  }, [selectedUserId, currentUserId]);
+  // ============================================================================
+  // Removed: Polling for typing status
+  // ============================================================================
+  // Before: We polled every 500ms: setInterval(fetchTypingStatus, 500)
+  // Now: WebSocket automatically pushes typing updates in real-time
+  // Result: Instant typing indicators, 0 wasted requests! ⚡
+  // ============================================================================
 
   // Send message
   const handleSendMessage = async () => {
@@ -125,6 +163,16 @@ export default function Chat() {
 
       if (res.ok) {
         const newMessage = await res.json();
+        
+        // ====================================================================
+        // IMPORTANT: Dual Update - Database + WebSocket
+        // ====================================================================
+        // 1. Add message to local state immediately (for UI responsiveness)
+        // 2. Send message via WebSocket (broadcasts to all connected clients)
+        // 3. Message also saved to database (by API route)
+        // ====================================================================
+        
+        // Update local state immediately
         setConversations((prev) => ({
           ...prev,
           [selectedUserId]: {
@@ -135,6 +183,14 @@ export default function Chat() {
             ],
           },
         }));
+
+        // Broadcast message via WebSocket to all connected clients
+        if (ws.isConnected) {
+          ws.sendMessage(text, currentUserId, selectedUserId);
+          console.log("📤 Message sent via WebSocket");
+        } else {
+          console.warn("⚠️ WebSocket not connected - message saved to database only");
+        }
       }
     } catch (error) {
       console.error("Failed to send message:", error);
@@ -170,7 +226,7 @@ export default function Chat() {
     }
   };
 
-  // Handle typing - sends typing indicator to server
+  // Handle typing - sends typing indicator via WebSocket
   // This function is called when user types in the input field
   const handleTyping = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const text = e.target.value;
@@ -178,44 +234,35 @@ export default function Chat() {
 
     if (!selectedUserId) return;
 
-    // Create a conversation ID based on current user and selected user
-    const conversationId = [currentUserId, selectedUserId].sort().join("-");
-
     // Clear previous timeout if it exists
     if (typingTimeoutRef.current) {
       clearTimeout(typingTimeoutRef.current);
     }
 
+    // ========================================================================
+    // WebSocket Typing Indicator
+    // ========================================================================
+    // When user types:
+    // 1. Send typing=true via WebSocket (broadcast to all clients)
+    // 2. Set 2-second timeout (if no more typing, send typing=false)
+    // Result: Others see typing indicator instantly! ⚡
+    // ========================================================================
+
     // Only send typing indicator if user actually typed something
     if (text.trim()) {
-      try {
-        await fetch("/api/typing", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            userId: currentUserId,
-            conversationId,
-            isTyping: true,
-          }),
-        });
-      } catch (error) {
-        console.error("Failed to send typing indicator:", error);
+      if (ws.isConnected) {
+        // Send typing indicator via WebSocket to all clients
+        ws.sendTyping(true);
+        console.log("⌨️ Sent: User is typing");
       }
     }
 
     // Set a timeout to clear typing indicator after 2 seconds of inactivity
     typingTimeoutRef.current = setTimeout(async () => {
-      try {
-        await fetch("/api/typing", {
-          method: "DELETE",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            userId: currentUserId,
-            conversationId,
-          }),
-        });
-      } catch (error) {
-        console.error("Failed to clear typing indicator:", error);
+      if (ws.isConnected) {
+        // Send typing=false to indicate we stopped typing
+        ws.sendTyping(false);
+        console.log("⌨️ Sent: User stopped typing");
       }
     }, 2000);
   };
@@ -226,18 +273,9 @@ export default function Chat() {
       handleSendMessage();
       
       // Clear typing indicator after sending
-      if (selectedUserId) {
-        const conversationId = [currentUserId, selectedUserId]
-          .sort()
-          .join("-");
-        fetch("/api/typing", {
-          method: "DELETE",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            userId: currentUserId,
-            conversationId,
-          }),
-        }).catch(console.error);
+      // Send typing=false via WebSocket
+      if (selectedUserId && ws.isConnected) {
+        ws.sendTyping(false);
       }
     }
   };
@@ -271,9 +309,18 @@ export default function Chat() {
             />
             <div className="flex-1">
               <h1 className="text-xl font-bold">{selectedUser.name}</h1>
-              <p className="text-sm text-blue-100 capitalize">
-                {selectedUser.status}
-              </p>
+              <div className="flex items-center gap-2">
+                {/* Connection Status Indicator */}
+                <span className={`inline-block w-2 h-2 rounded-full ${
+                  ws.isConnected ? 'bg-green-400 animate-pulse' : 'bg-red-400'
+                }`}></span>
+                <p className="text-sm text-blue-100 capitalize">
+                  {selectedUser.status}
+                </p>
+                <p className="text-xs text-blue-200">
+                  {ws.isConnected ? '(Real-time)' : '(Offline)'}
+                </p>
+              </div>
             </div>
           </div>
         ) : (
