@@ -44,36 +44,36 @@ export default function SignupPage() {
       </div>
 
       {/* Form container */}
-      <div className="relative w-full max-w-2xl z-10 fade-in">
+      <div className="relative w-full max-w-md z-10 fade-in">
         {/* Card with enhanced styling */}
-        <div className="bg-[#36393F] rounded-2xl shadow-2xl p-12 border border-[#40444B] backdrop-blur-sm">
+        <div className="bg-[#36393F] rounded-xl shadow-2xl p-6 border border-[#40444B] backdrop-blur-sm">
           {/* Header */}
-          <div className="text-center mb-12 slide-in">
-            <div className="inline-block p-5 bg-[#5B65F5] rounded-full mb-6 shadow-lg">
-              <span className="text-4xl">✨</span>
+          <div className="text-center mb-6 slide-in">
+            <div className="inline-block p-3 bg-[#5B65F5] rounded-full mb-3 shadow-lg">
+              <span className="text-2xl">✨</span>
             </div>
-            <h1 className="text-6xl font-bold text-white mb-4 tracking-tight">
+            <h1 className="text-4xl font-bold text-white mb-2 tracking-tight">
               Create Account
             </h1>
-            <p className="text-[#B0BEC5] text-xl">
+            <p className="text-[#B0BEC5] text-base">
               Join WebChat and start chatting!
             </p>
           </div>
 
           {/* Error message */}
           {error && (
-            <div className="mb-8 p-5 bg-[#F04747] bg-opacity-20 border border-[#F04747] rounded-xl slide-in-up">
-              <p className="text-[#FF6B6B] text-base font-medium">⚠️ {error}</p>
+            <div className="mb-4 p-3 bg-[#F04747] bg-opacity-20 border border-[#F04747] rounded-lg slide-in-up">
+              <p className="text-[#FF6B6B] text-sm font-medium">⚠️ {error}</p>
             </div>
           )}
 
           {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-8">
+          <form onSubmit={handleSubmit} className="space-y-4">
             {/* Username field */}
             <div className="scale-in">
               <label
                 htmlFor="username"
-                className="block text-base font-bold text-[#DCDDDE] mb-4"
+                className="block text-sm font-bold text-[#DCDDDE] mb-2"
               >
                 👤 Username
               </label>
@@ -84,9 +84,9 @@ export default function SignupPage() {
                 onChange={(e) => setUsername(e.target.value)}
                 placeholder="your_username"
                 required
-                className="w-full px-6 py-4 bg-[#40444B] border-2 border-[#202225] text-[#DCDDDE] rounded-xl focus:outline-none focus:border-[#5B65F5] focus:ring-4 focus:ring-[#5B65F5] focus:ring-opacity-30 transition placeholder-[#72767D] text-lg"
+                className="w-full px-4 py-2.5 bg-[#40444B] border border-[#202225] text-[#DCDDDE] rounded-lg focus:outline-none focus:border-[#5B65F5] focus:ring-2 focus:ring-[#5B65F5] focus:ring-opacity-50 transition placeholder-[#72767D] text-sm"
               />
-              <p className="text-[#72767D] text-sm mt-3">
+              <p className="text-[#72767D] text-xs mt-1">
                 3-20 characters, letters, numbers, underscores
               </p>
             </div>
@@ -95,7 +95,7 @@ export default function SignupPage() {
             <div className="scale-in">
               <label
                 htmlFor="email"
-                className="block text-base font-bold text-[#DCDDDE] mb-4"
+                className="block text-sm font-bold text-[#DCDDDE] mb-2"
               >
                 📧 Email Address
               </label>
@@ -106,7 +106,7 @@ export default function SignupPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="you@example.com"
                 required
-                className="w-full px-6 py-4 bg-[#40444B] border-2 border-[#202225] text-[#DCDDDE] rounded-xl focus:outline-none focus:border-[#5B65F5] focus:ring-4 focus:ring-[#5B65F5] focus:ring-opacity-30 transition placeholder-[#72767D] text-lg"
+                className="w-full px-4 py-2.5 bg-[#40444B] border border-[#202225] text-[#DCDDDE] rounded-lg focus:outline-none focus:border-[#5B65F5] focus:ring-2 focus:ring-[#5B65F5] focus:ring-opacity-50 transition placeholder-[#72767D] text-sm"
               />
             </div>
 
@@ -114,7 +114,7 @@ export default function SignupPage() {
             <div className="scale-in">
               <label
                 htmlFor="password"
-                className="block text-base font-bold text-[#DCDDDE] mb-4"
+                className="block text-sm font-bold text-[#DCDDDE] mb-2"
               >
                 🔒 Password
               </label>
@@ -126,17 +126,17 @@ export default function SignupPage() {
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
                   required
-                  className="w-full px-6 py-4 bg-[#40444B] border-2 border-[#202225] text-[#DCDDDE] rounded-xl focus:outline-none focus:border-[#5B65F5] focus:ring-4 focus:ring-[#5B65F5] focus:ring-opacity-30 transition placeholder-[#72767D] text-lg"
+                  className="w-full px-4 py-2.5 bg-[#40444B] border border-[#202225] text-[#DCDDDE] rounded-lg focus:outline-none focus:border-[#5B65F5] focus:ring-2 focus:ring-[#5B65F5] focus:ring-opacity-50 transition placeholder-[#72767D] text-sm"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-6 top-1/2 -translate-y-1/2 text-[#72767D] hover:text-[#5B65F5] transition text-base font-semibold"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[#72767D] hover:text-[#5B65F5] transition text-xs font-semibold"
                 >
                   {showPassword ? "Hide" : "Show"}
                 </button>
               </div>
-              <p className="text-[#72767D] text-sm mt-3">
+              <p className="text-[#72767D] text-xs mt-1">
                 Min 8 chars: uppercase, lowercase, number
               </p>
             </div>
@@ -145,7 +145,7 @@ export default function SignupPage() {
             <div className="scale-in">
               <label
                 htmlFor="passwordConfirm"
-                className="block text-base font-bold text-[#DCDDDE] mb-4"
+                className="block text-sm font-bold text-[#DCDDDE] mb-2"
               >
                 🔐 Confirm Password
               </label>
@@ -157,12 +157,12 @@ export default function SignupPage() {
                   onChange={(e) => setPasswordConfirm(e.target.value)}
                   placeholder="••••••••"
                   required
-                  className="w-full px-6 py-4 bg-[#40444B] border-2 border-[#202225] text-[#DCDDDE] rounded-xl focus:outline-none focus:border-[#5B65F5] focus:ring-4 focus:ring-[#5B65F5] focus:ring-opacity-30 transition placeholder-[#72767D] text-lg"
+                  className="w-full px-4 py-2.5 bg-[#40444B] border border-[#202225] text-[#DCDDDE] rounded-lg focus:outline-none focus:border-[#5B65F5] focus:ring-2 focus:ring-[#5B65F5] focus:ring-opacity-50 transition placeholder-[#72767D] text-sm"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPasswordConfirm(!showPasswordConfirm)}
-                  className="absolute right-6 top-1/2 -translate-y-1/2 text-[#72767D] hover:text-[#5B65F5] transition text-base font-semibold"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[#72767D] hover:text-[#5B65F5] transition text-xs font-semibold"
                 >
                   {showPasswordConfirm ? "Hide" : "Show"}
                 </button>
@@ -173,23 +173,23 @@ export default function SignupPage() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full py-5 bg-[#5B65F5] text-white font-bold rounded-xl hover:bg-[#4752C4] transition disabled:opacity-50 disabled:cursor-not-allowed mt-10 text-xl shadow-2xl hover:shadow-[#5B65F5]/50 transform hover:scale-105 smooth"
+              className="w-full py-3 bg-[#5B65F5] text-white font-bold rounded-lg hover:bg-[#4752C4] transition disabled:opacity-50 disabled:cursor-not-allowed mt-6 text-base shadow-lg hover:shadow-xl transform hover:scale-105 smooth"
             >
               {isLoading ? "🔄 Creating account..." : "Create Account"}
             </button>
           </form>
 
           {/* Divider */}
-          <div className="my-10 flex items-center">
+          <div className="my-6 flex items-center">
             <div className="flex-1 h-px bg-[#202225]"></div>
-            <div className="px-6 text-[#72767D] text-sm font-bold uppercase tracking-wider">
+            <div className="px-3 text-[#72767D] text-xs font-bold uppercase tracking-wider">
               Or
             </div>
             <div className="flex-1 h-px bg-[#202225]"></div>
           </div>
 
           {/* Login link */}
-          <p className="text-center text-[#B0BEC5] text-lg">
+          <p className="text-center text-[#B0BEC5] text-sm">
             Already have an account?{" "}
             <Link
               href="/login"
