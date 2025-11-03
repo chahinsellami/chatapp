@@ -33,12 +33,12 @@ export default function Sidebar({
     <div
       className={`flex flex-col bg-[#2F3136] border-r border-[#202225] ${
         isOpen ? "w-72" : "w-20"
-      } transition-all duration-300`}
+      } transition-all duration-300 depth-2`}
     >
       {/* Server header */}
-      <div className="h-16 border-b border-[#202225] flex items-center justify-between px-4">
+      <div className="h-16 border-b border-[#202225] flex items-center justify-between px-4 hover:bg-[#35373B] transition">
         <div className={`flex items-center gap-3 ${!isOpen && "hidden"}`}>
-          <div className="w-8 h-8 rounded-full bg-[#5B65F5] flex items-center justify-center">
+          <div className="w-10 h-10 rounded-full bg-[#5B65F5] flex items-center justify-center">
             <span className="text-white font-bold text-sm">W</span>
           </div>
           <div>
@@ -48,7 +48,7 @@ export default function Sidebar({
         </div>
         <button
           onClick={() => setIsOpen(!isOpen)}
-          className="p-2 hover:bg-[#35373B] rounded transition"
+          className="p-2 hover:bg-[#5B65F5] rounded-lg transition smooth"
         >
           <svg
             className="w-4 h-4 text-[#DCDDDE]"
@@ -67,11 +67,11 @@ export default function Sidebar({
       </div>
 
       {/* Channels list */}
-      <div className="flex-1 overflow-y-auto p-3 space-y-2">
+      <div className="flex-1 overflow-y-auto p-3 space-y-2 scrollbar-hide">
         {isOpen && (
-          <div className="px-2 mb-4">
-            <p className="text-xs font-bold text-[#72767D] uppercase">
-              Channels
+          <div className="px-2 mb-4 mt-2">
+            <p className="text-xs font-bold text-[#72767D] uppercase tracking-wider">
+              📌 Channels
             </p>
           </div>
         )}
@@ -80,15 +80,22 @@ export default function Sidebar({
           <button
             key={channel.id}
             onClick={() => onChannelSelect(channel.id)}
-            className={`w-full px-3 py-2 rounded-lg text-left transition ${
+            className={`w-full px-3 py-2 rounded-lg text-left transition smooth group ${
               selectedChannelId === channel.id
-                ? "bg-[#5B65F5] text-white"
+                ? "bg-[#5B65F5] text-white shadow-lg"
                 : "text-[#DCDDDE] hover:bg-[#35373B]"
             } ${!isOpen && "flex justify-center"}`}
             title={channel.name}
           >
-            <span className={`text-sm font-medium ${!isOpen && "hidden"}`}>
-              # {channel.name}
+            <span
+              className={`text-sm font-medium ${
+                !isOpen && "hidden"
+              } flex items-center gap-2`}
+            >
+              <span className="text-lg">
+                {selectedChannelId === channel.id ? "📍" : "#"}
+              </span>
+              {channel.name}
             </span>
             {!isOpen && <span className="text-xs font-bold">#</span>}
           </button>
@@ -96,33 +103,35 @@ export default function Sidebar({
       </div>
 
       {/* User profile section */}
-      <div className="border-t border-[#202225] p-3">
+      <div className="border-t border-[#202225] p-3 bg-[#36393F] depth-1">
         <div
-          className={`flex items-center gap-3 p-2 rounded hover:bg-[#35373B] transition cursor-pointer ${
+          className={`flex items-center gap-3 p-3 rounded-lg hover:bg-[#5B65F5] hover:bg-opacity-20 transition smooth cursor-pointer group ${
             !isOpen && "flex-col"
           }`}
         >
-          <div className="w-8 h-8 rounded-full bg-[#5B65F5] flex items-center justify-center flex-shrink-0">
+          <div className="w-10 h-10 rounded-full bg-[#5B65F5] flex items-center justify-center shrink-0">
             <span className="text-white font-bold text-sm">
               {user?.username?.charAt(0).toUpperCase() || "U"}
             </span>
           </div>
           {isOpen && (
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-semibold text-[#DCDDDE] truncate">
-                {user?.username}
-              </p>
-              <p className="text-xs text-[#72767D] truncate">Online</p>
-            </div>
-          )}
-          {isOpen && (
-            <Link
-              href="/login"
-              className="p-1 hover:bg-[#5B65F5] rounded transition text-xs"
-              title="Logout"
-            >
-              🚪
-            </Link>
+            <>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-semibold text-[#DCDDDE] truncate">
+                  {user?.username}
+                </p>
+                <p className="text-xs text-[#43B581] truncate font-semibold">
+                  🟢 Online
+                </p>
+              </div>
+              <Link
+                href="/login"
+                className="p-2 hover:bg-[#F04747] rounded-lg transition text-lg group-hover:scale-110 transform"
+                title="Logout"
+              >
+                🚪
+              </Link>
+            </>
           )}
         </div>
       </div>

@@ -5,6 +5,7 @@
 **Server**: http://localhost:3000 ✅ RUNNING
 
 Dev server is running on Turbopack (Next.js 16)
+
 - Local: http://localhost:3000
 - Network: http://192.168.1.13:3000
 
@@ -17,6 +18,7 @@ Dev server is running on Turbopack (Next.js 16)
 **URL**: http://localhost:3000/signup
 
 **What to look for**:
+
 - [ ] Beautiful dark Discord theme
 - [ ] Form with all fields visible
 - [ ] Username, Email, Password fields
@@ -25,6 +27,7 @@ Dev server is running on Turbopack (Next.js 16)
 - [ ] "Show/Hide" password toggle
 
 **Form Validation**:
+
 - [ ] Username: 3-20 characters minimum
 - [ ] Email: Valid email format required
 - [ ] Password: Minimum 8 chars, uppercase, lowercase, number
@@ -33,6 +36,7 @@ Dev server is running on Turbopack (Next.js 16)
 ### Step 2: Create Test Account
 
 Fill in the form:
+
 ```
 Username:           testuser
 Email:              test@example.com
@@ -43,6 +47,7 @@ Confirm Password:   TestPass123
 Click "Create Account"
 
 **Expected Result**:
+
 - ✅ Account created successfully
 - ✅ Redirects to chat interface
 - ✅ Or shows error message if validation fails
@@ -54,6 +59,7 @@ Click "Create Account"
 **URL**: http://localhost:3000/login
 
 **What to look for**:
+
 - [ ] Beautiful dark Discord theme
 - [ ] Email and Password fields
 - [ ] "Login" button
@@ -64,6 +70,7 @@ Click "Create Account"
 ### Step 4: Test Login
 
 Use the account you just created:
+
 ```
 Email:    test@example.com
 Password: TestPass123
@@ -72,6 +79,7 @@ Password: TestPass123
 Click "Sign In"
 
 **Expected Result**:
+
 - ✅ Successfully logs in
 - ✅ Redirects to chat interface
 - ✅ Or shows error if credentials wrong
@@ -83,6 +91,7 @@ Click "Sign In"
 After successful login, you should see:
 
 **Sidebar** (Left side):
+
 - [ ] Server name "WebChat"
 - [ ] Channel list:
   - #general
@@ -93,16 +102,19 @@ After successful login, you should see:
 - [ ] User profile with username
 
 **Header** (Top):
+
 - [ ] Channel name (#general, #random, etc.)
 - [ ] User info (username, profile icon)
 - [ ] Logout button
 
 **Chat Area** (Center):
+
 - [ ] Empty message area (no messages yet)
 - [ ] Message input at bottom
 - [ ] Ready to send messages
 
 **Members List** (Right side):
+
 - [ ] Online members displayed
 - [ ] Status indicators (online, idle, DND, offline)
 - [ ] Member avatars
@@ -112,6 +124,7 @@ After successful login, you should see:
 ## 🧪 Test Scenarios
 
 ### Scenario 1: Valid Signup
+
 ```
 Username: john_doe
 Email: john@example.com
@@ -120,6 +133,7 @@ Result: ✅ Account created, login succeeds
 ```
 
 ### Scenario 2: Invalid Username (Too Short)
+
 ```
 Username: ab
 Email: test@example.com
@@ -128,6 +142,7 @@ Result: ✅ Shows validation error
 ```
 
 ### Scenario 3: Invalid Email
+
 ```
 Username: testuser
 Email: notanemail
@@ -136,6 +151,7 @@ Result: ✅ Shows email validation error
 ```
 
 ### Scenario 4: Weak Password
+
 ```
 Username: testuser
 Email: test@example.com
@@ -144,6 +160,7 @@ Result: ✅ Shows password requirement error
 ```
 
 ### Scenario 5: Passwords Don't Match
+
 ```
 Username: testuser
 Email: test@example.com
@@ -153,6 +170,7 @@ Result: ✅ Shows mismatch error
 ```
 
 ### Scenario 6: Duplicate Username
+
 ```
 Username: testuser (already created)
 Email: different@example.com
@@ -161,6 +179,7 @@ Result: ✅ Shows "Username already taken" error
 ```
 
 ### Scenario 7: Duplicate Email
+
 ```
 Username: newuser
 Email: test@example.com (already used)
@@ -177,6 +196,7 @@ Result: ✅ Shows "Email already registered" error
 **Location**: `.data/webchat.db`
 
 **Verify**:
+
 - [ ] File exists after first signup
 - [ ] File size increases after each signup
 - [ ] File persists between page refreshes
@@ -194,17 +214,20 @@ Result: ✅ Shows "Email already registered" error
 ## 🔒 Security Testing
 
 ### Password Hashing
+
 - [ ] Passwords are hashed (check database)
 - [ ] Plain text passwords never stored
 - [ ] Same password creates different hash each time
 
 ### JWT Token
+
 - [ ] Token generated on login
 - [ ] Token stored in localStorage
 - [ ] Token sent in API requests
 - [ ] Token verified on protected routes
 
 ### Protected Routes
+
 - [ ] Cannot access /channels without login
 - [ ] Redirects to /login if not authenticated
 - [ ] Token required for API endpoints
@@ -214,6 +237,7 @@ Result: ✅ Shows "Email already registered" error
 ## 🎨 UI/UX Testing
 
 ### Login Page
+
 - [ ] Beautiful gradient background
 - [ ] Form centered on screen
 - [ ] All text readable (good contrast)
@@ -221,6 +245,7 @@ Result: ✅ Shows "Email already registered" error
 - [ ] Responsive on different screen sizes
 
 ### Signup Page
+
 - [ ] Beautiful gradient background
 - [ ] Form centered on screen
 - [ ] All fields clearly labeled
@@ -229,6 +254,7 @@ Result: ✅ Shows "Email already registered" error
 - [ ] Success messages appear
 
 ### Chat Interface
+
 - [ ] Sidebar visible and collapsible
 - [ ] Header shows current channel
 - [ ] Chat area displays correctly
@@ -240,12 +266,14 @@ Result: ✅ Shows "Email already registered" error
 ## ⚡ Performance Testing
 
 ### Load Time
+
 - [ ] Signup page loads in <2 seconds
 - [ ] Login page loads in <2 seconds
 - [ ] Chat interface loads in <1 second
 - [ ] No lag on form interaction
 
 ### Database Speed
+
 - [ ] Signup completes in <1 second
 - [ ] Login completes in <500ms
 - [ ] Database queries are fast
@@ -255,17 +283,20 @@ Result: ✅ Shows "Email already registered" error
 ## 🐛 Error Handling
 
 ### Network Errors
+
 - [ ] Shows error message if signup fails
 - [ ] Shows error message if login fails
 - [ ] Error messages are clear and helpful
 
 ### Validation Errors
+
 - [ ] Username validation messages appear
 - [ ] Email validation messages appear
 - [ ] Password validation messages appear
 - [ ] All errors clearly explain what's wrong
 
 ### Server Errors
+
 - [ ] Graceful error handling
 - [ ] No white screens of death
 - [ ] Error messages help user understand issue
@@ -275,16 +306,19 @@ Result: ✅ Shows "Email already registered" error
 ## 📱 Responsive Design
 
 ### Desktop (1920x1080)
+
 - [ ] All elements visible
 - [ ] Proper spacing
 - [ ] Readable text
 
 ### Tablet (768x1024)
+
 - [ ] Layout adapts properly
 - [ ] Touch-friendly buttons
 - [ ] Forms still usable
 
 ### Mobile (375x667)
+
 - [ ] Layout stacks vertically
 - [ ] Form takes full width
 - [ ] Buttons large enough to tap
@@ -394,21 +428,25 @@ SECURITY:
 ## 🆘 Troubleshooting
 
 ### Pages not loading
+
 - Check server is running: http://localhost:3000
 - Check console for errors (F12)
 - Restart dev server: Stop with Ctrl+C, then `npx next dev --webpack`
 
 ### Signup fails
+
 - Check database file exists at `.data/webchat.db`
 - Check password meets requirements
 - Look at server logs for detailed error
 
 ### Can't login
+
 - Check username/email and password are correct
 - Check account was created successfully
 - Verify database file is not corrupted
 
 ### Styling looks weird
+
 - Clear browser cache (Ctrl+Shift+Delete)
 - Hard refresh page (Ctrl+Shift+R)
 - Restart dev server

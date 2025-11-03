@@ -22,33 +22,49 @@ export default function Message({ message, isOwnMessage }: MessageProps) {
   });
 
   return (
-    <div className="group hover:bg-[#35373B] rounded-lg p-2 transition -mx-2 px-4">
-      <div className="flex items-start gap-4">
-        {/* Avatar */}
-        <div className="w-10 h-10 rounded-full bg-[#5B65F5] flex items-center justify-center flex-shrink-0">
-          <span className="text-white font-bold text-sm">
-            {message.username.charAt(0).toUpperCase()}
-          </span>
+    <div className="group hover:bg-[#2F3136] rounded-lg p-3 mx-2 transition smooth slide-in-up">
+      <div className="flex items-start gap-3">
+        {/* Avatar with glow effect */}
+        <div className="relative shrink-0">
+          <div
+            className={`w-12 h-12 rounded-full flex items-center justify-center shrink-0 transition smooth ${
+              isOwnMessage
+                ? "bg-[#7289DA]"
+                : "bg-[#5B65F5]"
+            } shadow-lg`}
+          >
+            <span className="text-white font-bold text-base">
+              {message.username
+                ? message.username.charAt(0).toUpperCase()
+                : "?"}
+            </span>
+          </div>
+          {/* Online indicator */}
+          <div className="absolute bottom-0 right-0 w-4 h-4 bg-[#43B581] rounded-full border-2 border-[#36393F] shadow-md"></div>
         </div>
 
         {/* Message content */}
         <div className="flex-1 min-w-0">
           <div className="flex items-baseline gap-2 mb-1">
-            <p className="font-semibold text-[#DCDDDE]">{message.username}</p>
-            <p className="text-xs text-[#72767D]">{timeString}</p>
+            <p className="font-bold text-[#DCDDDE] text-sm hover:underline cursor-pointer">
+              {message.username || "Unknown User"}
+            </p>
+            <p className="text-xs text-[#72767D] hover:text-[#B0BEC5] transition cursor-help">
+              {timeString}
+            </p>
           </div>
-          <p className="text-[#DCDDDE] break-words whitespace-pre-wrap">
+          <p className="text-[#DCDDDE] break-words text-sm leading-relaxed">
             {message.text}
           </p>
         </div>
 
         {/* Actions (on hover) */}
         {isOwnMessage && (
-          <div className="opacity-0 group-hover:opacity-100 transition flex gap-1">
-            <button className="p-1 hover:bg-[#5B65F5] rounded text-[#DCDDDE] text-xs hover:text-white">
+          <div className="opacity-0 group-hover:opacity-100 transition flex gap-1 ml-2 shrink-0">
+            <button className="p-2 hover:bg-[#5B65F5] rounded text-base hover:text-white transition smooth">
               ✏️
             </button>
-            <button className="p-1 hover:bg-[#F04747] rounded text-[#DCDDDE] text-xs hover:text-white">
+            <button className="p-2 hover:bg-[#F04747] rounded text-base hover:text-white transition smooth">
               🗑️
             </button>
           </div>

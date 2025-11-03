@@ -1,12 +1,14 @@
 # 🔧 Deployment Note - Database Configuration
 
 ## Current Status
+
 - ✅ Local development: Works perfectly with SQLite
 - ⚠️ Vercel deployment: Database storage issue
 
 ## Why Vercel Has Issues
 
 Vercel's serverless environment has **ephemeral storage** - files created during execution are deleted after the request completes. This means:
+
 - SQLite database files cannot persist between requests
 - Each request gets a fresh filesystem
 - Data written during one request is lost in the next request
@@ -14,14 +16,17 @@ Vercel's serverless environment has **ephemeral storage** - files created during
 ## Solutions
 
 ### Option 1: Use PostgreSQL (Recommended) ✅
+
 Deploy to Vercel with PostgreSQL for production:
 
 1. **Create PostgreSQL Database**:
+
    - Use Supabase (free tier: supabase.com)
    - Or use Railway (railway.app)
    - Or use Vercel Postgres (vercel.com/postgres)
 
 2. **Update `.env.local`**:
+
 ```env
 DATABASE_URL=postgresql://user:password@host:port/dbname
 ```
@@ -29,7 +34,9 @@ DATABASE_URL=postgresql://user:password@host:port/dbname
 3. **Modify `lib/db.ts`** to use `pg` instead of `better-sqlite3`
 
 ### Option 2: Deploy Locally/VPS ✅
+
 Deploy to a server with persistent storage:
+
 - Railway with SQLite support
 - DigitalOcean droplet
 - Linode
@@ -43,16 +50,19 @@ railway up
 ```
 
 ### Option 3: Use In-Memory Database (Testing Only) ⚠️
+
 For demo purposes, we can use an in-memory SQLite database that works on Vercel but resets on each deployment.
 
 ## Recommended Path Forward
 
 1. **For Local Testing** (RIGHT NOW):
+
    - Keep using current setup
    - Everything works perfectly locally
    - Test at http://localhost:3000
 
 2. **For Production** (NEXT):
+
    - Set up Supabase PostgreSQL (5 min)
    - Update database connection (15 min)
    - Redeploy to Vercel (2 min)
@@ -66,6 +76,7 @@ For demo purposes, we can use an in-memory SQLite database that works on Vercel 
 ## Quick Setup - Supabase PostgreSQL
 
 ### Step 1: Create Supabase Project
+
 ```
 1. Go to supabase.com
 2. Sign up (free)
@@ -74,16 +85,19 @@ For demo purposes, we can use an in-memory SQLite database that works on Vercel 
 ```
 
 ### Step 2: Update Code
+
 ```bash
 npm install pg
 ```
 
 ### Step 3: Update Environment
+
 ```env
 DATABASE_URL=postgresql://...
 ```
 
 ### Step 4: Redeploy
+
 ```bash
 git push  # Vercel auto-deploys
 ```
@@ -99,6 +113,7 @@ npm run dev
 ```
 
 All features work:
+
 - ✅ Signup/Login
 - ✅ Authentication
 - ✅ Database persistence

@@ -82,19 +82,26 @@ export default function ChatArea({ channelId, user }: ChatAreaProps) {
   return (
     <div className="flex-1 flex flex-col bg-[#36393F]">
       {/* Messages area */}
-      <div className="flex-1 overflow-y-auto p-6 space-y-4">
+      <div className="flex-1 overflow-y-auto p-4 space-y-0.5 scrollbar-hide">
         {isLoading ? (
           <div className="flex items-center justify-center h-full">
             <div className="text-center">
-              <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-[#5B65F5] mx-auto mb-2"></div>
+              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#5B65F5] mx-auto mb-4"></div>
               <p className="text-[#72767D] text-sm">Loading messages...</p>
             </div>
           </div>
         ) : messages.length === 0 ? (
           <div className="flex items-center justify-center h-full">
             <div className="text-center">
-              <p className="text-[#72767D] text-lg">No messages yet</p>
-              <p className="text-[#72767D] text-sm">Start the conversation!</p>
+              <div className="w-16 h-16 rounded-full bg-[#5B65F5] opacity-10 mx-auto mb-4 flex items-center justify-center">
+                <span className="text-4xl">💬</span>
+              </div>
+              <p className="text-[#DCDDDE] text-lg font-semibold">
+                No messages yet
+              </p>
+              <p className="text-[#72767D] text-sm mt-2">
+                Be the first to say something!
+              </p>
             </div>
           </div>
         ) : (
@@ -110,7 +117,7 @@ export default function ChatArea({ channelId, user }: ChatAreaProps) {
       </div>
 
       {/* Message input */}
-      <div className="border-t border-[#202225] p-6">
+      <div className="border-t border-[#202225] p-4 bg-[#2F3136]">
         <MessageInput onSend={handleSendMessage} />
       </div>
     </div>

@@ -26,44 +26,49 @@ export default function LoginPage() {
   };
 
   return (
-    <div 
-      className="min-h-screen flex items-center justify-center p-4 relative"
+    <div
+      className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden"
       style={{
-        background: 'linear-gradient(to bottom right, #36393F, #2F3136, #202225)'
+        background:
+          "linear-gradient(135deg, #1a1d23 0%, #2F3136 50%, #202225 100%)",
       }}
     >
-      {/* Background decoration */}
+      {/* Animated background decoration */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-[#5B65F5] opacity-5 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-[#5B65F5] opacity-5 rounded-full blur-3xl"></div>
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-[#5B65F5] opacity-10 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-[#5B65F5] opacity-10 rounded-full blur-3xl animate-pulse"></div>
+        <div className="absolute top-1/2 left-1/2 w-80 h-80 bg-[#7289DA] opacity-5 rounded-full blur-3xl"></div>
       </div>
 
       {/* Form container */}
-      <div className="relative w-full max-w-md">
-        {/* Card */}
-        <div className="bg-[#36393F] rounded-lg shadow-2xl p-8 border border-[#202225]">
+      <div className="relative w-full max-w-md z-10 fade-in">
+        {/* Card with enhanced styling */}
+        <div className="bg-[#36393F] rounded-xl shadow-2xl p-8 border border-[#40444B] backdrop-blur-sm">
           {/* Header */}
-          <div className="text-center mb-8">
-            <h1 className="text-4xl font-bold text-white mb-2">Welcome Back</h1>
-            <p className="text-[#72767D]">Login to your WebChat account</p>
+          <div className="text-center mb-8 slide-in">
+            <div className="inline-block p-3 bg-[#5B65F5] rounded-full mb-4">
+              <span className="text-2xl">💬</span>
+            </div>
+            <h1 className="text-5xl font-bold text-white mb-3 tracking-tight">Welcome Back</h1>
+            <p className="text-[#B0BEC5] text-lg">Access your WebChat community</p>
           </div>
 
           {/* Error message */}
           {error && (
-            <div className="mb-6 p-4 bg-[#F04747] bg-opacity-20 border border-[#F04747] rounded-lg">
-              <p className="text-[#F04747] text-sm">{error}</p>
+            <div className="mb-6 p-4 bg-[#F04747] bg-opacity-20 border border-[#F04747] rounded-lg slide-in-up">
+              <p className="text-[#FF6B6B] text-sm font-medium">⚠️ {error}</p>
             </div>
           )}
 
           {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-5">
+          <form onSubmit={handleSubmit} className="space-y-6">
             {/* Email field */}
-            <div>
+            <div className="scale-in">
               <label
                 htmlFor="email"
-                className="block text-sm font-semibold text-[#DCDDDE] mb-2"
+                className="block text-sm font-bold text-[#DCDDDE] mb-3"
               >
-                Email Address
+                📧 Email Address
               </label>
               <input
                 id="email"
@@ -72,17 +77,17 @@ export default function LoginPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="you@example.com"
                 required
-                className="w-full px-4 py-3 bg-[#40444B] border border-[#202225] text-[#DCDDDE] rounded-lg focus:outline-none focus:border-[#5B65F5] transition placeholder-[#72767D]"
+                className="w-full px-4 py-3 bg-[#40444B] border border-[#202225] text-[#DCDDDE] rounded-lg focus:outline-none focus:border-[#5B65F5] focus:ring-2 focus:ring-[#5B65F5] focus:ring-opacity-50 transition placeholder-[#72767D] text-base"
               />
             </div>
 
             {/* Password field */}
-            <div>
+            <div className="scale-in">
               <label
                 htmlFor="password"
-                className="block text-sm font-semibold text-[#DCDDDE] mb-2"
+                className="block text-sm font-bold text-[#DCDDDE] mb-3"
               >
-                Password
+                🔒 Password
               </label>
               <div className="relative">
                 <input
@@ -92,12 +97,12 @@ export default function LoginPage() {
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
                   required
-                  className="w-full px-4 py-3 bg-[#40444B] border border-[#202225] text-[#DCDDDE] rounded-lg focus:outline-none focus:border-[#5B65F5] transition placeholder-[#72767D]"
+                  className="w-full px-4 py-3 bg-[#40444B] border border-[#202225] text-[#DCDDDE] rounded-lg focus:outline-none focus:border-[#5B65F5] focus:ring-2 focus:ring-[#5B65F5] focus:ring-opacity-50 transition placeholder-[#72767D] text-base"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[#72767D] hover:text-[#DCDDDE] transition"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-[#72767D] hover:text-[#5B65F5] transition text-sm font-medium"
                 >
                   {showPassword ? "Hide" : "Show"}
                 </button>
@@ -108,25 +113,25 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full py-3 bg-[#5B65F5] text-white font-semibold rounded-lg hover:bg-[#4752C4] transition disabled:opacity-50 disabled:cursor-not-allowed mt-6"
+              className="w-full py-4 bg-[#5B65F5] text-white font-bold rounded-lg hover:bg-[#4752C4] transition disabled:opacity-50 disabled:cursor-not-allowed mt-8 text-lg shadow-lg hover:shadow-xl transform hover:scale-105 smooth"
             >
-              {isLoading ? "Logging in..." : "Login"}
+              {isLoading ? "🔄 Logging in..." : "Login"}
             </button>
           </form>
 
           {/* Divider */}
-          <div className="my-6 flex items-center">
+          <div className="my-8 flex items-center">
             <div className="flex-1 h-px bg-[#202225]"></div>
-            <div className="px-3 text-[#72767D] text-sm">OR</div>
+            <div className="px-4 text-[#72767D] text-xs font-bold uppercase">Or</div>
             <div className="flex-1 h-px bg-[#202225]"></div>
           </div>
 
           {/* Signup link */}
-          <p className="text-center text-[#DCDDDE]">
+          <p className="text-center text-[#B0BEC5]">
             Don't have an account?{" "}
             <Link
               href="/signup"
-              className="text-[#5B65F5] hover:underline font-semibold"
+              className="text-[#5B65F5] hover:text-[#7289DA] font-bold transition"
             >
               Create one
             </Link>
@@ -134,18 +139,22 @@ export default function LoginPage() {
         </div>
 
         {/* Demo credentials */}
-        <div className="mt-8 p-4 bg-[#36393F] rounded-lg border border-[#202225] text-center">
-          <p className="text-[#72767D] text-sm mb-2">Want to try it out?</p>
-          <p className="text-[#DCDDDE] text-xs mb-3">
-            Email:{" "}
-            <code className="bg-[#2F3136] px-2 py-1 rounded">
-              demo@example.com
-            </code>
-          </p>
-          <p className="text-[#DCDDDE] text-xs">
-            Password:{" "}
-            <code className="bg-[#2F3136] px-2 py-1 rounded">Demo1234</code>
-          </p>
+        <div className="mt-8 p-6 bg-[#2F3136] rounded-xl border border-[#40444B] text-center relative z-10 scale-in shadow-lg">
+          <p className="text-[#72767D] text-sm mb-4 font-semibold">✨ Demo Account:</p>
+          <div className="space-y-2">
+            <p className="text-[#DCDDDE] text-sm">
+              <span className="text-[#5B65F5] font-bold">Email:</span>{" "}
+              <code className="bg-[#36393F] px-2 py-1 rounded text-[#7289DA]">
+                demo@example.com
+              </code>
+            </p>
+            <p className="text-[#DCDDDE] text-sm">
+              <span className="text-[#5B65F5] font-bold">Password:</span>{" "}
+              <code className="bg-[#36393F] px-2 py-1 rounded text-[#7289DA]">
+                Demo1234
+              </code>
+            </p>
+          </div>
         </div>
       </div>
     </div>
