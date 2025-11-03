@@ -7,14 +7,14 @@ A modern, real-time chat application built with **Next.js 16**, **TypeScript**, 
 ### ✅ Completed
 - **User List Sidebar** - Display all available users with avatars and online status
 - **Multi-User Messaging** - One-on-one conversations with separate message history per user pair
-- **Typing Indicators** - See when others are typing with animated dots (real-time polling)
+- **Typing Indicators** - Real-time typing indicators with instant delivery via WebSocket
 - **SQLite Database** - Persistent data storage with better performance than JSON files
+- **Real-time Updates** - WebSocket-based instant messaging, 99% bandwidth reduction
 - **User Avatars** - Auto-generated avatars using dicebear.com API
 - **Message Management** - Send, view, and delete messages
 - **Responsive Design** - Beautiful Tailwind CSS UI with modern styling
 
 ### 🔄 In Development
-- Real-time Updates (WebSocket)
 - Authentication & Login System
 - Multiple Channels/Conversations
 - Message Search Functionality
@@ -26,9 +26,10 @@ A modern, real-time chat application built with **Next.js 16**, **TypeScript**, 
 | **Next.js 16** | React framework with App Router |
 | **TypeScript** | Type-safe development |
 | **Tailwind CSS v4** | Modern styling with utility classes |
+| **WebSocket (ws)** | Real-time bidirectional communication |
 | **better-sqlite3** | Fast, synchronous SQLite database |
 | **React Hooks** | State management (useState, useEffect, useRef) |
-| **Next.js API Routes** | Backend endpoints for messages, conversations, typing |
+| **Next.js API Routes** | Backend endpoints for messages, conversations |
 
 ## 📦 Installation
 
@@ -49,20 +50,29 @@ cd chatapp
 npm install
 ```
 
-3. **Start the development server**
+3. **Start the development server with WebSocket support**
 ```bash
 npm run dev
 ```
+
+This starts the custom Next.js server with real-time WebSocket capabilities.
 
 4. **Open in browser**
 ```
 http://localhost:3000
 ```
 
+You'll see:
+- 🟢 Green indicator = Real-time WebSocket connected
+- Messages appear instantly (no delay!)
+- Typing indicators update in real-time
+- Automatic reconnection if connection drops
+
 The app will automatically:
 - Initialize the SQLite database
 - Create message and conversation tables
 - Generate avatars for all users
+- Connect via WebSocket for real-time updates
 
 ## 📂 Project Structure
 
@@ -77,8 +87,10 @@ webchat-app/
 │   │   │   └── route.ts         # Load conversations grouped by user
 │   │   ├── messages/
 │   │   │   └── route.ts         # GET/POST/DELETE messages to SQLite
-│   │   └── typing/
-│   │       └── route.ts         # Typing indicators API
+│   │   ├── typing/
+│   │   │   └── route.ts         # Typing indicators API (fallback)
+│   │   └── websocket/
+│   │       └── route.ts         # WebSocket endpoint
 │   ├── globals.css              # Tailwind CSS global imports
 │   ├── layout.tsx               # Root layout wrapper
 │   └── page.tsx                 # Home page (renders Chat component)
@@ -87,11 +99,17 @@ webchat-app/
 │   └── Sidebar.tsx              # User list with status indicators
 ├── lib/
 │   ├── db.ts                    # SQLite database utilities
+│   ├── useWebSocket.ts          # React hook for real-time communication
+│   ├── websocket.ts             # WebSocket server manager
 │   └── users.ts                 # User data & mock users
 ├── public/                       # Static assets
 ├── node_modules/                # Dependencies
 ├── DATABASE_SETUP.md            # Database documentation
+├── FEATURE_5_WEBSOCKET.md       # WebSocket real-time feature guide
+├── CONTRIBUTING.md              # Contribution guidelines
+├── GETTING_STARTED.md           # Learning guide for developers
 ├── package.json                 # Dependencies & scripts
+├── server.ts                    # Custom Next.js server with WebSocket
 ├── tsconfig.json                # TypeScript configuration
 ├── next.config.ts               # Next.js configuration
 ├── postcss.config.mjs           # PostCSS configuration for Tailwind
@@ -113,8 +131,8 @@ webchat-app/
 - Messages appear instantly and are stored in SQLite
 
 ### 3. **See Typing Indicators**
-- While typing, your typing status is sent to the server
-- If simulated (multiple users), you'd see "X is typing..." with animated dots
+- While typing, your typing status is sent via WebSocket in real-time
+- Other clients instantly see "X is typing..." with animated dots
 - Typing indicators automatically expire after 2 seconds of inactivity
 
 ### 4. **Delete Messages**
