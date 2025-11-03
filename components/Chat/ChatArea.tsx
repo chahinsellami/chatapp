@@ -82,42 +82,43 @@ export default function ChatArea({ channelId, user }: ChatAreaProps) {
   return (
     <div className="flex-1 flex flex-col bg-[#36393F]">
       {/* Messages area */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-0.5 scrollbar-hide">
+      <div className="flex-1 overflow-y-auto p-4 space-y-1 scrollbar-hide">
         {isLoading ? (
           <div className="flex items-center justify-center h-full">
-            <div className="text-center">
+            <div className="text-center fade-in">
               <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#5B65F5] mx-auto mb-4"></div>
               <p className="text-[#72767D] text-sm">Loading messages...</p>
             </div>
           </div>
         ) : messages.length === 0 ? (
           <div className="flex items-center justify-center h-full">
-            <div className="text-center">
-              <div className="w-16 h-16 rounded-full bg-[#5B65F5] opacity-10 mx-auto mb-4 flex items-center justify-center">
-                <span className="text-4xl">💬</span>
+            <div className="text-center fade-in">
+              <div className="w-16 h-16 rounded-full bg-[#5B65F5] opacity-10 mx-auto mb-4 flex items-center justify-center scale-in">
+                <span className="text-4xl animate-pulse">💬</span>
               </div>
               <p className="text-[#DCDDDE] text-lg font-semibold">
                 No messages yet
               </p>
               <p className="text-[#72767D] text-sm mt-2">
-                Be the first to say something!
+                Be the first to start the conversation! 🎉
               </p>
             </div>
           </div>
         ) : (
-          messages.map((msg) => (
-            <Message
-              key={msg.id}
-              message={msg}
-              isOwnMessage={msg.userId === user?.id}
-            />
+          messages.map((msg, index) => (
+            <div key={msg.id} style={{ animationDelay: `${index * 50}ms` }}>
+              <Message
+                message={msg}
+                isOwnMessage={msg.userId === user?.id}
+              />
+            </div>
           ))
         )}
         <div ref={messagesEndRef} />
       </div>
 
       {/* Message input */}
-      <div className="border-t border-[#202225] p-4 bg-[#2F3136]">
+      <div className="border-t border-[#202225] p-4 bg-[#2F3136] depth-1">
         <MessageInput onSend={handleSendMessage} />
       </div>
     </div>

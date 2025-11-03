@@ -35,32 +35,34 @@ export default function Header({ channelId, user }: HeaderProps) {
   };
 
   return (
-    <div className="h-16 border-b border-[#202225] bg-[#36393F] flex items-center justify-between px-6">
+    <div className="h-16 border-b border-[#202225] bg-[#36393F] flex items-center justify-between px-6 smooth depth-1">
       <div className="flex items-center gap-4">
-        <div>
-          <h2 className="text-lg font-bold text-[#DCDDDE]">#{channel.name}</h2>
+        <div className="fade-in">
+          <h2 className="text-lg font-bold text-[#DCDDDE] flex items-center gap-2">
+            <span className="text-2xl">📍</span>#{channel.name}
+          </h2>
           <p className="text-xs text-[#72767D]">{channel.description}</p>
         </div>
       </div>
 
       <div className="flex items-center gap-4">
         {/* User info */}
-        <div className="flex items-center gap-3 px-4 py-2 rounded hover:bg-[#35373B] transition">
-          <div className="w-8 h-8 rounded-full bg-[#5B65F5] flex items-center justify-center">
+        <div className="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-[#35373B] transition smooth group cursor-pointer">
+          <div className="w-8 h-8 rounded-full bg-[#5B65F5] flex items-center justify-center shadow-md group-hover:shadow-lg group-hover:scale-110 transform transition smooth">
             <span className="text-white font-bold text-sm">
               {user?.username?.charAt(0).toUpperCase() || "U"}
             </span>
           </div>
           <div className="text-sm">
             <p className="text-[#DCDDDE] font-medium">{user?.username}</p>
-            <p className="text-[#72767D] text-xs">Online</p>
+            <p className="text-[#43B581] text-xs font-semibold">🟢 Online</p>
           </div>
         </div>
 
         {/* Logout button */}
         <button
           onClick={handleLogout}
-          className="p-2 hover:bg-[#F04747] hover:bg-opacity-20 rounded transition text-[#F04747]"
+          className="p-2 hover:bg-[#F04747] hover:bg-opacity-30 rounded-lg transition smooth text-[#F04747] hover:scale-110 transform shadow-md hover:shadow-lg"
           title="Logout"
         >
           <svg

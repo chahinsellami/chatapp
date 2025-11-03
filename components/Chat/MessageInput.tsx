@@ -32,15 +32,15 @@ export default function MessageInput({ onSend }: MessageInputProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="flex gap-3 items-end">
+    <form onSubmit={handleSubmit} className="flex gap-3 items-end scale-in">
       {/* Input area with depth */}
-      <div className="flex-1 bg-[#40444B] rounded-lg border border-[#202225] focus-within:border-[#5B65F5] focus-within:shadow-lg transition smooth overflow-hidden">
+      <div className="flex-1 bg-[#40444B] rounded-lg border border-[#202225] focus-within:border-[#5B65F5] focus-within:shadow-lg focus-within:shadow-[#5B65F5]/20 transition smooth overflow-hidden depth-1">
         <textarea
           value={text}
           onChange={(e) => setText(e.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder="Message #channel..."
-          className="w-full px-4 py-3 bg-[#40444B] text-[#DCDDDE] placeholder-[#72767D] outline-none resize-none max-h-32 smooth text-sm"
+          placeholder="Message #channel... (press Enter to send)"
+          className="w-full px-4 py-3 bg-[#40444B] text-[#DCDDDE] placeholder-[#72767D] outline-none resize-none max-h-32 smooth text-sm hover:bg-[#45494E] transition"
           rows={1}
           style={{ minHeight: "44px" }}
           disabled={isSending}
@@ -51,7 +51,7 @@ export default function MessageInput({ onSend }: MessageInputProps) {
       <button
         type="submit"
         disabled={!text.trim() || isSending}
-        className="p-3 bg-[#5B65F5] hover:bg-[#4752C4] disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-lg transition smooth flex items-center justify-center font-semibold"
+        className="p-3 bg-[#5B65F5] hover:bg-[#4752C4] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-[#5B65F5] text-white rounded-lg transition smooth flex items-center justify-center font-semibold shadow-md hover:shadow-lg hover:scale-110 transform depth-1"
         title="Send message (Enter)"
       >
         {isSending ? (
