@@ -61,7 +61,11 @@ export default function MembersList({ channelId }: MembersListProps) {
                     {member.username.charAt(0).toUpperCase()}
                   </span>
                 </div>
-                <div className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-[#2F3136] ${statusColors[member.status]}`}></div>
+                <div
+                  className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-[#2F3136] ${
+                    statusColors[member.status]
+                  }`}
+                ></div>
               </div>
 
               {/* Username */}
@@ -70,7 +74,8 @@ export default function MembersList({ channelId }: MembersListProps) {
                   {member.username}
                 </p>
                 <p className="text-xs text-[#72767D]">
-                  {member.status.charAt(0).toUpperCase() + member.status.slice(1)}
+                  {member.status.charAt(0).toUpperCase() +
+                    member.status.slice(1)}
                 </p>
               </div>
 

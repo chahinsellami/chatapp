@@ -9,16 +9,25 @@ interface HeaderProps {
 }
 
 const channelInfo: Record<string, { name: string; description: string }> = {
-  general: { name: "general", description: "General discussion about anything" },
+  general: {
+    name: "general",
+    description: "General discussion about anything",
+  },
   random: { name: "random", description: "Off-topic chat and memes" },
-  announcements: { name: "announcements", description: "Important server announcements" },
+  announcements: {
+    name: "announcements",
+    description: "Important server announcements",
+  },
   tech: { name: "tech", description: "Technology and programming discussions" },
   gaming: { name: "gaming", description: "Video games and gaming content" },
 };
 
 export default function Header({ channelId, user }: HeaderProps) {
   const router = useRouter();
-  const channel = channelInfo[channelId] || { name: channelId, description: "Channel" };
+  const channel = channelInfo[channelId] || {
+    name: channelId,
+    description: "Channel",
+  };
 
   const handleLogout = () => {
     localStorage.removeItem("auth_token");
@@ -29,12 +38,8 @@ export default function Header({ channelId, user }: HeaderProps) {
     <div className="h-16 border-b border-[#202225] bg-[#36393F] flex items-center justify-between px-6">
       <div className="flex items-center gap-4">
         <div>
-          <h2 className="text-lg font-bold text-[#DCDDDE]">
-            #{channel.name}
-          </h2>
-          <p className="text-xs text-[#72767D]">
-            {channel.description}
-          </p>
+          <h2 className="text-lg font-bold text-[#DCDDDE]">#{channel.name}</h2>
+          <p className="text-xs text-[#72767D]">{channel.description}</p>
         </div>
       </div>
 

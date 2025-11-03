@@ -11,9 +11,9 @@ html {
 }
 
 body {
-  background-color: #36393F;
-  color: #DCDDDE;
-  font-family: 'Inter', 'Segoe UI', 'Helvetica Neue', sans-serif;
+  background-color: #36393f;
+  color: #dcddde;
+  font-family: "Inter", "Segoe UI", "Helvetica Neue", sans-serif;
 }
 
 /* Custom scrollbar */
@@ -23,16 +23,16 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: #2F3136;
+  background: #2f3136;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #40444B;
+  background: #40444b;
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #5B65F5;
+  background: #5b65f5;
 }
 
 /* Discord-like utilities */
@@ -81,4 +81,3 @@ body {
 .slide-in {
   animation: slideIn 0.3s ease-in-out;
 }
-

@@ -99,7 +99,11 @@ export default function ChatArea({ channelId, user }: ChatAreaProps) {
           </div>
         ) : (
           messages.map((msg) => (
-            <Message key={msg.id} message={msg} isOwnMessage={msg.userId === user?.id} />
+            <Message
+              key={msg.id}
+              message={msg}
+              isOwnMessage={msg.userId === user?.id}
+            />
           ))
         )}
         <div ref={messagesEndRef} />

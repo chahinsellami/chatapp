@@ -26,7 +26,12 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-[#36393F] via-[#2F3136] to-[#202225] flex items-center justify-center p-4">
+    <div 
+      className="min-h-screen flex items-center justify-center p-4"
+      style={{
+        background: 'linear-gradient(to bottom right, #36393F, #2F3136, #202225)'
+      }}
+    >
       {/* Background decoration */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-0 left-1/4 w-96 h-96 bg-[#5B65F5] opacity-5 rounded-full blur-3xl"></div>

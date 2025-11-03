@@ -34,12 +34,8 @@ export default function Message({ message, isOwnMessage }: MessageProps) {
         {/* Message content */}
         <div className="flex-1 min-w-0">
           <div className="flex items-baseline gap-2 mb-1">
-            <p className="font-semibold text-[#DCDDDE]">
-              {message.username}
-            </p>
-            <p className="text-xs text-[#72767D]">
-              {timeString}
-            </p>
+            <p className="font-semibold text-[#DCDDDE]">{message.username}</p>
+            <p className="text-xs text-[#72767D]">{timeString}</p>
           </div>
           <p className="text-[#DCDDDE] break-words whitespace-pre-wrap">
             {message.text}

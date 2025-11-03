@@ -13,7 +13,11 @@ interface SidebarProps {
 const channels = [
   { id: "general", name: "general", description: "General discussion" },
   { id: "random", name: "random", description: "Off-topic chat" },
-  { id: "announcements", name: "announcements", description: "Important updates" },
+  {
+    id: "announcements",
+    name: "announcements",
+    description: "Important updates",
+  },
   { id: "tech", name: "tech", description: "Tech discussions" },
   { id: "gaming", name: "gaming", description: "Gaming talk" },
 ];
@@ -26,10 +30,14 @@ export default function Sidebar({
   const [isOpen, setIsOpen] = useState(true);
 
   return (
-    <div className={`flex flex-col bg-[#2F3136] border-r border-[#202225] ${isOpen ? 'w-72' : 'w-20'} transition-all duration-300`}>
+    <div
+      className={`flex flex-col bg-[#2F3136] border-r border-[#202225] ${
+        isOpen ? "w-72" : "w-20"
+      } transition-all duration-300`}
+    >
       {/* Server header */}
       <div className="h-16 border-b border-[#202225] flex items-center justify-between px-4">
-        <div className={`flex items-center gap-3 ${!isOpen && 'hidden'}`}>
+        <div className={`flex items-center gap-3 ${!isOpen && "hidden"}`}>
           <div className="w-8 h-8 rounded-full bg-[#5B65F5] flex items-center justify-center">
             <span className="text-white font-bold text-sm">W</span>
           </div>
@@ -48,7 +56,12 @@ export default function Sidebar({
             stroke="currentColor"
             viewBox="0 0 24 24"
           >
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16m-7 6h7" />
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M4 6h16M4 12h16m-7 6h7"
+            />
           </svg>
         </button>
       </div>
@@ -57,7 +70,9 @@ export default function Sidebar({
       <div className="flex-1 overflow-y-auto p-3 space-y-2">
         {isOpen && (
           <div className="px-2 mb-4">
-            <p className="text-xs font-bold text-[#72767D] uppercase">Channels</p>
+            <p className="text-xs font-bold text-[#72767D] uppercase">
+              Channels
+            </p>
           </div>
         )}
 
@@ -69,22 +84,24 @@ export default function Sidebar({
               selectedChannelId === channel.id
                 ? "bg-[#5B65F5] text-white"
                 : "text-[#DCDDDE] hover:bg-[#35373B]"
-            } ${!isOpen && 'flex justify-center'}`}
+            } ${!isOpen && "flex justify-center"}`}
             title={channel.name}
           >
-            <span className={`text-sm font-medium ${!isOpen && 'hidden'}`}>
+            <span className={`text-sm font-medium ${!isOpen && "hidden"}`}>
               # {channel.name}
             </span>
-            {!isOpen && (
-              <span className="text-xs font-bold">#</span>
-            )}
+            {!isOpen && <span className="text-xs font-bold">#</span>}
           </button>
         ))}
       </div>
 
       {/* User profile section */}
       <div className="border-t border-[#202225] p-3">
-        <div className={`flex items-center gap-3 p-2 rounded hover:bg-[#35373B] transition cursor-pointer ${!isOpen && 'flex-col'}`}>
+        <div
+          className={`flex items-center gap-3 p-2 rounded hover:bg-[#35373B] transition cursor-pointer ${
+            !isOpen && "flex-col"
+          }`}
+        >
           <div className="w-8 h-8 rounded-full bg-[#5B65F5] flex items-center justify-center flex-shrink-0">
             <span className="text-white font-bold text-sm">
               {user?.username?.charAt(0).toUpperCase() || "U"}
@@ -95,9 +112,7 @@ export default function Sidebar({
               <p className="text-sm font-semibold text-[#DCDDDE] truncate">
                 {user?.username}
               </p>
-              <p className="text-xs text-[#72767D] truncate">
-                Online
-              </p>
+              <p className="text-xs text-[#72767D] truncate">Online</p>
             </div>
           )}
           {isOpen && (
