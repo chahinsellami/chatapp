@@ -45,7 +45,10 @@ export async function PUT(
     return NextResponse.json(result);
   } catch (error: any) {
     console.error("Friend request action error:", error);
-    return createErrorResponse(error.message || "Failed to process friend request", 500);
+    return createErrorResponse(
+      error.message || "Failed to process friend request",
+      500
+    );
   }
 }
 

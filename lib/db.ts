@@ -584,15 +584,29 @@ export function deleteChannelMessage(id: string): boolean {
 
 /**
  * Send a friend request
+ * OPTIMIZATION: Check for existing relationship first, provide clear error
  */
 export function sendFriendRequest(senderId: string, receiverId: string) {
   const database = getDatabase();
+
+  // Check if already friends
+  const existingFriendship = database
+    .prepare(
+      "SELECT * FROM friends WHERE userId = ? AND friendId = ? AND status = 'accepted'"
+    )
+    .get(senderId, receiverId);
+
+  if (existingFriendship) {
+    throw new Error("Already friends with this user");
+  }
+
   const id = crypto.randomUUID();
   const now = new Date().toISOString();
   const statement = database.prepare(
     `INSERT INTO friendRequests (id, senderId, receiverId, status, createdAt) 
      VALUES (?, ?, ?, 'pending', ?)`
   );
+
   try {
     statement.run(id, senderId, receiverId, now);
     return { id, senderId, receiverId, status: "pending", createdAt: now };
@@ -606,6 +620,7 @@ export function sendFriendRequest(senderId: string, receiverId: string) {
 
 /**
  * Accept a friend request
+ * OPTIMIZATION: Use transaction to ensure atomic operation (all or nothing)
  */
 export function acceptFriendRequest(requestId: string) {
   const database = getDatabase();
@@ -614,31 +629,31 @@ export function acceptFriendRequest(requestId: string) {
     .get(requestId) as any;
 
   if (!request) throw new Error("Friend request not found");
-  if (request.status !== "pending") throw new Error("Friend request already processed");
+  if (request.status !== "pending")
+    throw new Error("Friend request already processed");
 
   const id1 = crypto.randomUUID();
   const id2 = crypto.randomUUID();
   const now = new Date().toISOString();
 
-  // Add friend relationship both directions
-  database
-    .prepare(
+  // Use transaction to ensure atomic operation
+  const transaction = database.transaction(() => {
+    // Add friend relationship both directions
+    const insertFriend = database.prepare(
       `INSERT INTO friends (id, userId, friendId, status, createdAt) 
        VALUES (?, ?, ?, 'accepted', ?)`
-    )
-    .run(id1, request.senderId, request.receiverId, now);
+    );
 
-  database
-    .prepare(
-      `INSERT INTO friends (id, userId, friendId, status, createdAt) 
-       VALUES (?, ?, ?, 'accepted', ?)`
-    )
-    .run(id2, request.receiverId, request.senderId, now);
+    insertFriend.run(id1, request.senderId, request.receiverId, now);
+    insertFriend.run(id2, request.receiverId, request.senderId, now);
 
-  // Update request status
-  database
-    .prepare("UPDATE friendRequests SET status = ? WHERE id = ?")
-    .run("accepted", requestId);
+    // Update request status
+    database
+      .prepare("UPDATE friendRequests SET status = ? WHERE id = ?")
+      .run("accepted", requestId);
+  });
+
+  transaction();
 
   return { status: "accepted" };
 }
@@ -653,7 +668,8 @@ export function rejectFriendRequest(requestId: string) {
     .get(requestId) as any;
 
   if (!request) throw new Error("Friend request not found");
-  if (request.status !== "pending") throw new Error("Friend request already processed");
+  if (request.status !== "pending")
+    throw new Error("Friend request already processed");
 
   database
     .prepare("UPDATE friendRequests SET status = ? WHERE id = ?")
@@ -679,15 +695,34 @@ export function getUserFriends(userId: string) {
 
 /**
  * Remove a friend relationship
+ * OPTIMIZATION: Use transaction for atomic deletion, verify friendship exists first
  */
 export function removeFriend(userId: string, friendId: string) {
   const database = getDatabase();
-  database
-    .prepare(`
-      DELETE FROM friends 
-      WHERE (userId = ? AND friendId = ?) OR (userId = ? AND friendId = ?)
-    `)
-    .run(userId, friendId, friendId, userId);
+
+  // Verify friendship exists
+  const friendship = database
+    .prepare(
+      "SELECT * FROM friends WHERE userId = ? AND friendId = ? AND status = 'accepted'"
+    )
+    .get(userId, friendId);
+
+  if (!friendship) {
+    throw new Error("Not friends with this user");
+  }
+
+  // Use transaction to remove both directions atomically
+  const transaction = database.transaction(() => {
+    database
+      .prepare(`DELETE FROM friends WHERE userId = ? AND friendId = ?`)
+      .run(userId, friendId);
+
+    database
+      .prepare(`DELETE FROM friends WHERE userId = ? AND friendId = ?`)
+      .run(friendId, userId);
+  });
+
+  transaction();
 
   return { deleted: true };
 }
