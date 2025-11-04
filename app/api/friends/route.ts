@@ -56,12 +56,19 @@ export async function POST(request: NextRequest) {
     }
 
     const id = crypto.randomUUID();
-    const friendRequest = await insertFriendRequest(id, user.userId, receiverId);
+    const friendRequest = await insertFriendRequest(
+      id,
+      user.userId,
+      receiverId
+    );
 
     return NextResponse.json(friendRequest, { status: 201 });
   } catch (error: any) {
     console.error("Friends POST error:", error);
-    if (error.message.includes("already exists") || error.message.includes("duplicate")) {
+    if (
+      error.message.includes("already exists") ||
+      error.message.includes("duplicate")
+    ) {
       return createErrorResponse("Friend request already exists", 400);
     }
     return createErrorResponse("Failed to send friend request", 500);

@@ -42,7 +42,11 @@ export async function PUT(
 
     let result;
     if (action === "accept") {
-      result = await acceptFriendRequest(requestId, user.userId, friendRequest.sender_id);
+      result = await acceptFriendRequest(
+        requestId,
+        user.userId,
+        friendRequest.sender_id
+      );
     } else {
       result = await rejectFriendRequest(requestId);
     }

@@ -71,7 +71,12 @@ export async function POST(
     }
 
     const id = crypto.randomUUID();
-    const message = await insertDirectMessage(id, user.userId, receiverId, text);
+    const message = await insertDirectMessage(
+      id,
+      user.userId,
+      receiverId,
+      text
+    );
 
     return NextResponse.json(message, { status: 201 });
   } catch (error) {

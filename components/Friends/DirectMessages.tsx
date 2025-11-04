@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
+import { VoiceCallModal } from "@/components/VoiceCall/VoiceCallModal";
+import { FileSharePanel } from "@/components/FileSharing/FileSharePanel";
 
 interface DirectMessage {
   id: string;
@@ -33,6 +35,9 @@ export default function DirectMessages({
   const [error, setError] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editText, setEditText] = useState("");
+  const [isCallActive, setIsCallActive] = useState(false);
+  const [callType, setCallType] = useState<"incoming" | "outgoing" | null>(null);
+  const [showFileShare, setShowFileShare] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Fetch messages when component mounts or friendId changes
@@ -192,6 +197,25 @@ export default function DirectMessages({
     }
   };
 
+  const handleInitiateCall = () => {
+    setCallType("outgoing");
+    setIsCallActive(true);
+  };
+
+  const handleAcceptCall = () => {
+    setIsCallActive(true);
+  };
+
+  const handleRejectCall = () => {
+    setCallType(null);
+    setIsCallActive(false);
+  };
+
+  const handleHangupCall = () => {
+    setCallType(null);
+    setIsCallActive(false);
+  };
+
   if (loading) {
     return (
       <div className="flex flex-col h-full bg-[#36393F]">
@@ -219,6 +243,23 @@ export default function DirectMessages({
             ></span>
           </h2>
           <p className="text-xs text-[#72767D] capitalize">{friendStatus}</p>
+        </div>
+        <div className="flex gap-2">
+          <button
+            onClick={handleInitiateCall}
+            disabled={isCallActive}
+            className="px-3 py-2 bg-green-600 hover:bg-green-700 disabled:bg-gray-600 text-white text-sm rounded-lg transition"
+            title="Start voice call"
+          >
+            📞
+          </button>
+          <button
+            onClick={() => setShowFileShare(true)}
+            className="px-3 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm rounded-lg transition"
+            title="Share file"
+          >
+            📁
+          </button>
         </div>
       </div>
 
@@ -350,6 +391,26 @@ export default function DirectMessages({
           </button>
         </div>
       </div>
+
+      {/* Voice Call Modal */}
+      <VoiceCallModal
+        userId={userId}
+        recipientId={friendId}
+        recipientName={friendName}
+        isCallActive={isCallActive}
+        callType={callType}
+        onAccept={handleAcceptCall}
+        onReject={handleRejectCall}
+        onHangup={handleHangupCall}
+      />
+
+      {/* File Share Modal */}
+      <FileSharePanel
+        userId={userId}
+        recipientId={friendId}
+        isOpen={showFileShare}
+        onClose={() => setShowFileShare(false)}
+      />
     </div>
   );
 }

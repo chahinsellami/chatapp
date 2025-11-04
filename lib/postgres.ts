@@ -145,10 +145,9 @@ export async function getUserByEmail(email: string) {
 }
 
 export async function getUserByUsername(username: string) {
-  const result = await pool.query(
-    "SELECT * FROM users WHERE username = $1",
-    [username]
-  );
+  const result = await pool.query("SELECT * FROM users WHERE username = $1", [
+    username,
+  ]);
   return result.rows[0];
 }
 
@@ -371,10 +370,7 @@ export async function updateDirectMessage(messageId: string, text: string) {
 }
 
 export async function deleteDirectMessage(messageId: string) {
-  await pool.query(
-    `DELETE FROM direct_messages WHERE id = $1`,
-    [messageId]
-  );
+  await pool.query(`DELETE FROM direct_messages WHERE id = $1`, [messageId]);
   return { deleted: true };
 }
 

@@ -1,10 +1,6 @@
 # 💬 WebChat - Real-Time Messaging Application# � WebChat - Real-Time Messaging Application
 
-
-
 A modern, production-ready real-time chat application built with **Next.js 16**, **TypeScript**, **Tailwind CSS**, and **PostgreSQL on Railway**. Features direct messaging, friend management, user authentication, and a beautiful Discord-inspired UI.A modern, production-ready real-time chat application built with **Next.js 16**, **TypeScript**, **Tailwind CSS**, and **PostgreSQL on Railway**. Features direct messaging, friend management, user authentication, and a beautiful Discord-inspired UI.
-
-
 
 [![GitHub](https://img.shields.io/badge/GitHub-chahinsellami%2Fchatapp-blue?logo=github)](https://github.com/chahinsellami/chatapp)## ✨ Features
 
@@ -35,8 +31,6 @@ A modern, production-ready real-time chat application built with **Next.js 16**,
 - **Message Management** - Send, edit, and delete messages- CORS protection
 
 - **User Search** - Find and add new friends- Environment variable configuration
-
-
 
 ### 🔒 Security### � User Experience
 
@@ -108,7 +102,7 @@ git clone https://github.com/chahinsellami/chatapp.git
 
 ### Installationcd chatapp
 
-```
+````
 
 1. **Clone and setup**
 
@@ -120,15 +114,13 @@ cd chatapp/webchat-app```bash
 
 npm installnpm install
 
-``````
-
-
+````
 
 2. **Configure environment**3. **Start the development server with WebSocket support**
 
 Create `.env.local`:
 
-```env```bash
+`env`bash
 
 DATABASE_URL=postgresql://user:password@host:port/databasenpm run dev
 
@@ -136,7 +128,7 @@ JWT_SECRET=your_super_secret_key_here```
 
 NODE_ENV=development
 
-```This starts the custom Next.js server with real-time WebSocket capabilities.
+````This starts the custom Next.js server with real-time WebSocket capabilities.
 
 
 
@@ -148,11 +140,11 @@ npm run dev```
 
 ```http://localhost:3000
 
-```
+````
 
 4. **Open in browser**
 
-```You'll see:
+````You'll see:
 
 http://localhost:3000
 
@@ -184,45 +176,45 @@ http://localhost:3000
 
 - Save profile
 
-```
+````
 
 ### 3. Find Friendswebchat-app/
 
 - Go to Friends section├── .data/
 
-- Use search bar to find other users│   └── webchat.db              # SQLite database (auto-created)
+- Use search bar to find other users│ └── webchat.db # SQLite database (auto-created)
 
-- Click "Add Friend" to send request├── .next/                       # Next.js build cache
+- Click "Add Friend" to send request├── .next/ # Next.js build cache
 
 ├── app/
 
-### 4. Manage Requests│   ├── api/
+### 4. Manage Requests│ ├── api/
 
-- View pending friend requests│   │   ├── conversations/
+- View pending friend requests│ │ ├── conversations/
 
-- Accept or reject requests│   │   │   └── route.ts         # Load conversations grouped by user
+- Accept or reject requests│ │ │ └── route.ts # Load conversations grouped by user
 
-- Accepted friends appear in your friends list│   │   ├── messages/
+- Accepted friends appear in your friends list│ │ ├── messages/
 
-│   │   │   └── route.ts         # GET/POST/DELETE messages to SQLite
+│ │ │ └── route.ts # GET/POST/DELETE messages to SQLite
 
-### 5. Send Messages│   │   ├── typing/
+### 5. Send Messages│ │ ├── typing/
 
-- Select friend from friends list│   │   │   └── route.ts         # Typing indicators API (fallback)
+- Select friend from friends list│ │ │ └── route.ts # Typing indicators API (fallback)
 
-- Type message in input field│   │   └── websocket/
+- Type message in input field│ │ └── websocket/
 
-- Press Enter or click send button│   │       └── route.ts         # WebSocket endpoint
+- Press Enter or click send button│ │ └── route.ts # WebSocket endpoint
 
-- Messages appear instantly│   ├── globals.css              # Tailwind CSS global imports
+- Messages appear instantly│ ├── globals.css # Tailwind CSS global imports
 
-│   ├── layout.tsx               # Root layout wrapper
+│ ├── layout.tsx # Root layout wrapper
 
-## 📂 Project Structure│   └── page.tsx                 # Home page (renders Chat component)
+## 📂 Project Structure│ └── page.tsx # Home page (renders Chat component)
 
 ├── components/
 
-```│   ├── Chat.tsx                 # Main chat interface with multi-user support
+````│ ├── Chat.tsx                 # Main chat interface with multi-user support
 
 webchat-app/│   └── Sidebar.tsx              # User list with status indicators
 
@@ -400,13 +392,11 @@ CREATE TABLE friends (
 
 )curl http://localhost:3000/api/conversations?currentUserId=user-1
 
-``````
-
-
+````
 
 ### Friend Requests Table### POST /api/typing
 
-```sql
+````sql
 
 CREATE TABLE friend_requests (Updates typing status
 
@@ -446,7 +436,7 @@ CREATE TABLE direct_messages (
 
 )```
 
-```
+````
 
 ## 💾 Database
 
@@ -464,21 +454,21 @@ CREATE TABLE direct_messages (
 
 CREATE TABLE messages (
 
-## 🎨 Design System  id TEXT PRIMARY KEY,
+## 🎨 Design System id TEXT PRIMARY KEY,
 
-  text TEXT NOT NULL,
+text TEXT NOT NULL,
 
-### Colors  senderId TEXT NOT NULL,
+### Colors senderId TEXT NOT NULL,
 
-- **Primary**: #5B65F5 (Blurple - Discord style)  receiverId TEXT NOT NULL,
+- **Primary**: #5B65F5 (Blurple - Discord style) receiverId TEXT NOT NULL,
 
-- **Background**: #36393F (Dark gray)  createdAt TEXT NOT NULL,
+- **Background**: #36393F (Dark gray) createdAt TEXT NOT NULL,
 
-- **Text**: #DCDDDE (Light gray)  updatedAt TEXT NOT NULL
+- **Text**: #DCDDDE (Light gray) updatedAt TEXT NOT NULL
 
 - **Accent**: #F04747 (Red - for alerts))
 
-```
+````
 
 ### Components
 
@@ -510,7 +500,7 @@ git commit -m "Ready for deployment"
 
 git push origin master### View Database
 
-```
+````
 
 Using SQLite CLI:
 
@@ -520,13 +510,11 @@ Using SQLite CLI:
 
    - Create new project from GitHubsqlite3 .data/webchat.db
 
-   - Select this repositorysqlite> SELECT * FROM messages;
+   - Select this repositorysqlite> SELECT \* FROM messages;
 
-   - Add PostgreSQL databasesqlite> SELECT * FROM conversations;
+   - Add PostgreSQL databasesqlite> SELECT \* FROM conversations;
 
    - Configure environment variables```
-
-
 
 3. **Deploy**## 🔐 Current Users (Mock Data)
 
@@ -536,21 +524,19 @@ Using SQLite CLI:
 
    - Access app at railway domain
 
-| ID     | Name  | Email             | Status  |
+| ID | Name | Email | Status |
 
 ### Deploy to Vercel| ------ | ----- | ----------------- | ------- |
 
-| user-1 | Alice | alice@example.com | online  |
+| user-1 | Alice | alice@example.com | online |
 
-1. **Import project**| user-2 | Bob   | bob@example.com   | offline |
+1. **Import project**| user-2 | Bob | bob@example.com | offline |
 
-   - Go to vercel.com| user-3 | Carol | carol@example.com | online  |
+   - Go to vercel.com| user-3 | Carol | carol@example.com | online |
 
-   - Click "Import"| user-4 | David | david@example.com | away    |
+   - Click "Import"| user-4 | David | david@example.com | away |
 
-   - Select GitHub repository| user-5 | Eve   | eve@example.com   | offline |
-
-
+   - Select GitHub repository| user-5 | Eve | eve@example.com | offline |
 
 2. **Configure**Current logged-in user: `current-user-1` (you are acting as "Alice")
 
@@ -558,21 +544,17 @@ Using SQLite CLI:
 
    - Add JWT_SECRET env var## 🚀 Deployment Guide
 
-
-
 3. **Deploy**### Deploy to Friend's Server
 
    - Vercel auto-deploys
 
    - Connect custom domain if desired#### Option 1: Using Docker
 
-
-
 ## 🔧 Available Scripts```bash
 
 # Create Dockerfile (already included)
 
-```bashdocker build -t webchat .
+````bashdocker build -t webchat .
 
 # Developmentdocker run -p 3000:3000 -v ./data:/app/.data webchat
 
@@ -618,7 +600,7 @@ JWT_SECRET=your_super_secret_key_here# Push to GitHub (already done!)
 
 NODE_ENV=development|production```
 
-```
+````
 
 See `DATABASE_SETUP.md` for detailed database documentation.
 
@@ -628,13 +610,13 @@ See `DATABASE_SETUP.md` for detailed database documentation.
 
 ### Port Already in Use
 
-```bash```bash
+`bash`bash
 
 # Kill process on port 3000# Start development server with hot reload
 
 npx kill-port 3000npm run dev
 
-```
+````
 
 # Build for production
 
@@ -799,7 +781,7 @@ Get-Process node | Stop-Process -Force
 
 # Linux/Mac:
 lsof -i :3000 | grep LISTEN | awk '{print $2}' | xargs kill -9
-```
+````
 
 ### Database Issues
 
