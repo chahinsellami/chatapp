@@ -30,6 +30,8 @@ export async function GET(
 
     const messages = await getDirectMessages(user.userId, otherUserId);
 
+    console.log(`📨 Fetched ${messages.length} messages between ${user.userId} and ${otherUserId}`);
+
     return NextResponse.json({ messages });
   } catch (error) {
     console.error("Get direct messages error:", error);
@@ -41,6 +43,9 @@ export async function GET(
  * POST /api/messages/direct/[userId]
  * Send a direct message to another user
  * Body: { text: string }
+ *
+ * Note: Messages are stored regardless of whether the recipient is online or not.
+ * This allows for offline message delivery when they reconnect.
  */
 export async function POST(
   request: NextRequest,
@@ -70,15 +75,28 @@ export async function POST(
       return createErrorResponse("Cannot send message to yourself");
     }
 
-    const id = crypto.randomUUID();
-    const message = await insertDirectMessage(
-      id,
-      user.userId,
-      receiverId,
-      text
-    );
+    // Note: We don't check if receiver exists here because:
+    // 1. Messages should be stored for offline delivery
+    // 2. Users might be deleted but their message history should remain
+    // 3. We only check if they're a valid friend at the UI level
 
-    return NextResponse.json(message, { status: 201 });
+    const id = crypto.randomUUID();
+    try {
+      const message = await insertDirectMessage(
+        id,
+        user.userId,
+        receiverId,
+        text
+      );
+
+      return NextResponse.json(message, { status: 201 });
+    } catch (dbError: any) {
+      // If foreign key constraint fails, it means receiver doesn't exist in users table
+      if (dbError.code === "23503") {
+        return createErrorResponse("Recipient user not found", 404);
+      }
+      throw dbError;
+    }
   } catch (error) {
     console.error("Send direct message error:", error);
     return createErrorResponse("Failed to send message", 500);

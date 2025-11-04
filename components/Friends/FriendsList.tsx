@@ -20,7 +20,7 @@ interface PendingRequest {
 
 interface FriendsListProps {
   userId: string;
-  onSelectFriend?: (friendId: string) => void;
+  onSelectFriend?: (friendId: string, friendData?: Friend) => void;
   onRefresh?: () => void;
 }
 
@@ -257,7 +257,7 @@ export default function FriendsList({
             <div
               key={friend.id}
               className="p-2 rounded-lg hover:bg-[#35373B] transition cursor-pointer group"
-              onClick={() => onSelectFriend?.(friend.id)}
+              onClick={() => onSelectFriend?.(friend.id, friend)}
             >
               <div className="flex items-center gap-2 mb-1">
                 <div className="relative">

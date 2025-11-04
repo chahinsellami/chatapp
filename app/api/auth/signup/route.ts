@@ -87,10 +87,8 @@ export async function POST(request: NextRequest) {
     // Hash password
     const passwordHash = await hashPassword(password);
 
-    // Generate user ID
-    const userId = `user-${Date.now()}-${Math.random()
-      .toString(36)
-      .substr(2, 9)}`;
+    // Generate user ID using proper UUID
+    const userId = crypto.randomUUID();
 
     // Create user in database
     const newUser = await createUser(userId, username, email, passwordHash);

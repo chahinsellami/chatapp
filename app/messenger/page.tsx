@@ -120,16 +120,20 @@ export default function MessengerPage() {
   if (!user) return null;
 
   return (
-    <div className="flex h-screen bg-[#36393F]">
-      {/* Left Sidebar */}
-      <div className="w-72 bg-[#2F3136] flex flex-col border-r border-[#202225]">
+    <div className="flex h-screen bg-[#36393F] flex-col md:flex-row">
+      {/* Left Sidebar - Hidden on mobile unless selected friend is null */}
+      <div
+        className={`${
+          selectedFriend ? "hidden md:flex" : "flex"
+        } w-full md:w-72 bg-[#2F3136] flex-col border-r border-[#202225]`}
+      >
         {/* Header */}
-        <div className="h-16 bg-[#36393F] border-b border-[#202225] flex items-center justify-between px-4">
-          <div>
+        <div className="h-16 bg-[#36393F] border-b border-[#202225] flex items-center justify-between px-3 md:px-4">
+          <div className="min-w-0">
             <h1 className="text-white font-bold text-lg">WebChat</h1>
-            <p className="text-xs text-[#72767D]">{user.username}</p>
+            <p className="text-xs text-[#72767D] truncate">{user.username}</p>
           </div>
-          <div className="flex gap-2">
+          <div className="flex gap-2 flex-shrink-0">
             {/* Notification Bell */}
             <div className="relative">
               <button
@@ -202,8 +206,8 @@ export default function MessengerPage() {
         <div className="flex-1 overflow-hidden">
           <FriendsList
             userId={user.id}
-            onSelectFriend={(friendId) => {
-              handleSelectFriend(friendId);
+            onSelectFriend={(friendId, friendData) => {
+              handleSelectFriend(friendId, friendData);
               setShowRequests(false);
             }}
             onRefresh={fetchPendingRequests}

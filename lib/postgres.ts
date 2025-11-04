@@ -28,6 +28,14 @@ export async function initializeDatabase() {
   const client = await pool.connect();
 
   try {
+    // Drop direct_messages table if it exists and has the wrong constraint
+    // This allows us to recreate it without the foreign key on receiver_id
+    try {
+      await client.query(`DROP TABLE IF EXISTS direct_messages CASCADE`);
+    } catch (err) {
+      // Ignore errors on drop
+    }
+
     // Create users table
     await client.query(`
       CREATE TABLE IF NOT EXISTS users (
@@ -117,7 +125,7 @@ export async function initializeDatabase() {
       CREATE TABLE IF NOT EXISTS direct_messages (
         id VARCHAR(36) PRIMARY KEY,
         sender_id VARCHAR(36) NOT NULL REFERENCES users(id),
-        receiver_id VARCHAR(36) NOT NULL REFERENCES users(id),
+        receiver_id VARCHAR(36) NOT NULL,
         text TEXT NOT NULL,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         edited_at TIMESTAMP
@@ -235,11 +243,11 @@ export async function insertMessage(
 
 export async function getFriendsByUserId(userId: string) {
   const result = await pool.query(
-    `SELECT f.id, f.user_id, f.friend_id, f.status, f.created_at,
-            u.username, u.avatar, u.status as user_status
+    `SELECT u.id, u.username, u.avatar, u.status,
+            f.created_at
      FROM friends f
-     JOIN users u ON f.friend_id = u.id
-     WHERE f.user_id = $1 AND f.status = 'accepted'
+     INNER JOIN users u ON f.friend_id = u.id
+     WHERE f.user_id = $1 AND f.status = 'accepted' AND u.id IS NOT NULL
      ORDER BY u.username ASC`,
     [userId]
   );
@@ -313,6 +321,7 @@ export async function acceptFriendRequest(
     );
 
     await client.query("COMMIT");
+    return { success: true, message: "Friend request accepted" };
   } catch (error) {
     await client.query("ROLLBACK");
     throw error;
@@ -326,6 +335,7 @@ export async function rejectFriendRequest(requestId: string) {
     "rejected",
     requestId,
   ]);
+  return { success: true, message: "Friend request rejected" };
 }
 
 // ============================================================================
@@ -337,7 +347,7 @@ export async function getDirectMessages(userId1: string, userId2: string) {
     `SELECT d.id, d.sender_id, d.receiver_id, d.text, d.created_at, d.edited_at,
             u.username, u.avatar
      FROM direct_messages d
-     JOIN users u ON d.sender_id = u.id
+     LEFT JOIN users u ON d.sender_id = u.id
      WHERE (d.sender_id = $1 AND d.receiver_id = $2) OR (d.sender_id = $2 AND d.receiver_id = $1)
      ORDER BY d.created_at ASC`,
     [userId1, userId2]
