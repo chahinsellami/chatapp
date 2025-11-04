@@ -84,8 +84,10 @@ export default function DirectMessages({
 
   // Fetch messages on mount and friendId change
   useEffect(() => {
-    fetchMessages();
-  }, [friendId]);
+    if (friendId && userId) {
+      fetchMessages();
+    }
+  }, [friendId, userId]);
 
   // Listen for new messages from Socket.IO
   useEffect(() => {
@@ -462,7 +464,12 @@ export default function DirectMessages({
           )}
 
           {callType === "voice" && (
-            <div className="text-white text-6xl mb-8">📞</div>
+            <>
+              <div className="text-white text-6xl mb-8">📞</div>
+              {/* Hidden audio elements for voice calls */}
+              <audio ref={localVideoRef} autoPlay muted />
+              <audio ref={remoteVideoRef} autoPlay />
+            </>
           )}
 
           {/* Call Controls */}

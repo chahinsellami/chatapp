@@ -239,16 +239,6 @@ export default function ProfilePage() {
             >
               👥 Friends
             </button>
-            <button
-              onClick={() => setTab("requests")}
-              className={`w-full px-3 md:px-4 py-2 md:py-3 rounded-lg font-bold mt-2 transition text-sm md:text-base ${
-                tab === "requests"
-                  ? "bg-[#5B65F5] text-white"
-                  : "bg-[#40444B] text-[#DCDDDE]"
-              }`}
-            >
-              📬 Requests
-            </button>
             <Link
               href="/messenger"
               className="block px-3 md:px-4 py-2 md:py-3 rounded-lg font-bold bg-[#40444B] text-[#DCDDDE] text-center mt-2 hover:bg-[#35373B] transition text-sm md:text-base"

@@ -22,7 +22,7 @@ export default function SignupPage() {
 
     try {
       await signup(username, email, password, passwordConfirm);
-      router.push("/channels");
+      router.push("/profile");
     } catch (err: any) {
       setError(err.message || "Signup failed");
     }
