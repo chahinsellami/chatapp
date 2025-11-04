@@ -55,7 +55,7 @@ export default function DirectMessages({
 
   const fetchMessages = async () => {
     try {
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem("auth_token");
       if (!token) {
         setError("Not authenticated");
         return;
@@ -88,7 +88,7 @@ export default function DirectMessages({
       setSending(true);
       setError(null);
 
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem("auth_token");
       if (!token) {
         setError("Not authenticated");
         return;
@@ -128,7 +128,7 @@ export default function DirectMessages({
     }
 
     try {
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem("auth_token");
       if (!token) {
         setError("Not authenticated");
         return;
@@ -168,7 +168,7 @@ export default function DirectMessages({
     if (!confirm("Delete this message?")) return;
 
     try {
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem("auth_token");
       if (!token) {
         setError("Not authenticated");
         return;

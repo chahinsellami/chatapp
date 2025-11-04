@@ -41,7 +41,7 @@ export default function AddFriend({ userId, onFriendAdded }: AddFriendProps) {
       setSearching(true);
       setError(null);
 
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem("auth_token");
       if (!token) {
         setError("Not authenticated");
         return;
@@ -72,7 +72,7 @@ export default function AddFriend({ userId, onFriendAdded }: AddFriendProps) {
     try {
       setError(null);
 
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem("auth_token");
       if (!token) {
         setError("Not authenticated");
         return;

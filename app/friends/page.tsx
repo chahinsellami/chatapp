@@ -30,7 +30,7 @@ export default function FriendsPage() {
   useEffect(() => {
     const initializeAuth = async () => {
       try {
-        const token = localStorage.getItem("token");
+        const token = localStorage.getItem("auth_token");
         if (!token) {
           router.push("/login");
           return;

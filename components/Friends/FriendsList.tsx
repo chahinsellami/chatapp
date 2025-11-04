@@ -46,7 +46,7 @@ export default function FriendsList({
       setLoading(true);
       setError(null);
 
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem("auth_token");
       if (!token) {
         setError("Not authenticated");
         return;
@@ -75,7 +75,7 @@ export default function FriendsList({
     try {
       setActionLoading(requestId);
 
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem("auth_token");
       if (!token) {
         setError("Not authenticated");
         return;
@@ -108,7 +108,7 @@ export default function FriendsList({
     try {
       setActionLoading(requestId);
 
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem("auth_token");
       if (!token) {
         setError("Not authenticated");
         return;
@@ -143,7 +143,7 @@ export default function FriendsList({
     try {
       setActionLoading(friendId);
 
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem("auth_token");
       if (!token) {
         setError("Not authenticated");
         return;
