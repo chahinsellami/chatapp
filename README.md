@@ -1,146 +1,61 @@
-# 💬 WebChat - Real-Time Messaging Application# � WebChat - Real-Time Messaging Application
+# WebChat
 
-A modern, production-ready real-time chat application built with **Next.js 16**, **TypeScript**, **Tailwind CSS**, and **PostgreSQL on Railway**. Features direct messaging, friend management, user authentication, and a beautiful Discord-inspired UI.A modern, production-ready real-time chat application built with **Next.js 16**, **TypeScript**, **Tailwind CSS**, and **PostgreSQL on Railway**. Features direct messaging, friend management, user authentication, and a beautiful Discord-inspired UI.
+Real-time messaging application with direct messaging, friend management, and voice/video calls.
 
-[![GitHub](https://img.shields.io/badge/GitHub-chahinsellami%2Fchatapp-blue?logo=github)](https://github.com/chahinsellami/chatapp)## ✨ Features
+[![Next.js](https://img.shields.io/badge/Next.js-16-black?logo=next.js)](https://nextjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?logo=typescript)](https://www.typescriptlang.org/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Railway-336791?logo=postgresql)](https://railway.app/)
 
-[![Next.js](https://img.shields.io/badge/Next.js-16.0.1-black?logo=next.js)](https://nextjs.org/)
+## Features
 
-[![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?logo=typescript)](https://www.typescriptlang.org/)### 🎯 Core Features
+- **Authentication** - JWT-based secure login/signup with bcrypt password hashing
+- **Direct Messaging** - Real-time one-on-one messaging with Socket.IO
+- **Friend System** - Send, accept, and reject friend requests
+- **Voice & Video Calls** - WebRTC-based peer-to-peer calling
+- **User Profiles** - Customizable emoji avatars, status, and bio
+- **Presence Tracking** - Real-time online/offline status indicators
+- **Responsive Design** - Discord-inspired dark theme UI
 
-[![Tailwind CSS](https://img.shields.io/badge/Tailwind%20CSS-3.3.4-38B2AC?logo=tailwind-css)](https://tailwindcss.com/)- **User Authentication** - Secure JWT-based login and signup
+## Tech Stack
 
-[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Railway-336791?logo=postgresql)](https://railway.app/)- **Friend Management** - Send/accept/reject friend requests
+| Technology | Purpose |
+|-----------|---------|
+| Next.js 16 | React framework |
+| TypeScript 5 | Type safety |
+| Tailwind CSS | Styling |
+| PostgreSQL | Database |
+| Socket.IO | Real-time messaging |
+| WebRTC | Voice/video calls |
+| Railway | Hosting |
 
-- **Direct Messaging** - One-on-one encrypted messaging with friends only
+## Quick Start
 
-## ✨ Features- **User Profiles** - Customizable avatars, status, and bio
-
-- **Real-time Updates** - PostgreSQL-backed message delivery
-
-### 🎯 Core Features- **Responsive Design** - Beautiful Discord-inspired dark theme UI
-
-- **User Authentication** - Secure JWT-based login and signup
-
-- **Friend Management** - Send/accept/reject friend requests### 🔒 Security
-
-- **Direct Messaging** - One-on-one messaging with friends only- Password hashing with bcrypt
-
-- **User Profiles** - Customizable avatars, status, and bio- JWT token authentication
-
-- **Message Management** - Send, edit, and delete messages- CORS protection
-
-- **User Search** - Find and add new friends- Environment variable configuration
-
-### 🔒 Security### � User Experience
-
-- Password hashing with bcrypt- Emoji-based avatar picker (50+ options)
-
-- JWT token authentication- Status indicators (Online, Idle, DND, Invisible)
-
-- Environment variable configuration- Message timestamps
-
-- Secure database connections- User search functionality
-
-- Intuitive navigation
-
-### 📱 User Experience
-
-- Emoji-based avatar picker (50+ options)## 🛠️ Tech Stack
-
-- Status indicators (Online, Idle, DND, Invisible)
-
-- Message timestamps| Technology | Purpose |
-
-- Intuitive navigation|-----------|---------|
-
-- Responsive design| **Next.js 16** | React framework with App Router |
-
-| **TypeScript 5** | Type-safe development |
-
-## 🛠️ Tech Stack| **React 19.2** | UI library |
-
-| **Tailwind CSS 3.3.4** | Utility-first styling |
-
-| Technology | Purpose || **PostgreSQL** | Relational database |
-
-|-----------|---------|| **Railway.app** | Cloud hosting |
-
-| **Next.js 16** | React framework with App Router || **pg** | PostgreSQL client |
-
-| **TypeScript 5** | Type-safe development || **bcrypt** | Password hashing |
-
-| **React 19.2** | UI library || **jsonwebtoken** | Authentication |
-
-| **Tailwind CSS 3.3.4** | Utility-first styling |
-
-| **PostgreSQL** | Relational database |## 📦 Installation
-
-| **Railway.app** | Cloud hosting |
-
-| **pg** | PostgreSQL client |### Prerequisites
-
-| **bcrypt** | Password hashing |
-
-| **jsonwebtoken** | JWT authentication |- Node.js 18+ installed
-
-- Git installed
-
-## 🚀 Quick Start
-
-### Setup Steps
-
-### Prerequisites
-
-- Node.js 18+1. **Clone the repository**
-
-- npm or yarn
-
-- PostgreSQL database (Railway.app account recommended)```bash
-
+1. **Clone and install**
+```bash
 git clone https://github.com/chahinsellami/chatapp.git
+cd chatapp/webchat-app
+npm install
+```
 
-### Installationcd chatapp
-
-````
-
-1. **Clone and setup**
-
-```bash2. **Install dependencies**
-
-git clone https://github.com/chahinsellami/chatapp.git
-
-cd chatapp/webchat-app```bash
-
-npm installnpm install
-
-````
-
-2. **Configure environment**3. **Start the development server with WebSocket support**
+2. **Configure environment**
 
 Create `.env.local`:
-
-`env`bash
-
-DATABASE_URL=postgresql://user:password@host:port/databasenpm run dev
-
-JWT_SECRET=your_super_secret_key_here```
-
+```env
+DATABASE_URL=postgresql://user:password@host:port/database
+JWT_SECRET=your_secret_key_here
 NODE_ENV=development
+NEXT_PUBLIC_SOCKET_URL=http://localhost:3001
+```
 
-````This starts the custom Next.js server with real-time WebSocket capabilities.
-
-
-
-3. **Start development server**4. **Open in browser**
-
+3. **Start servers**
 ```bash
+# Terminal 1 - Next.js app
+npm run dev
 
-npm run dev```
-
-```http://localhost:3000
-
-````
+# Terminal 2 - Socket.IO server
+cd ../backend-server
+npm install
+npm start
 
 4. **Open in browser**
 
