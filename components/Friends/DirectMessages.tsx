@@ -3,7 +3,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useSocket } from "@/lib/useSocket";
 import { useWebRTC } from "@/lib/useWebRTC";
-import VoiceRecorder from "../Chat/VoiceRecorder";
 
 interface DirectMessage {
   id: string;
@@ -14,7 +13,6 @@ interface DirectMessage {
   avatar?: string;
   createdAt: string;
   editedAt?: string;
-  audioUrl?: string;
 }
 
 interface DirectMessagesProps {
@@ -46,7 +44,6 @@ export default function DirectMessages({
   const [sending, setSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
-  const [isRecordingVoice, setIsRecordingVoice] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const localVideoRef = useRef<HTMLVideoElement>(null);
   const remoteVideoRef = useRef<HTMLVideoElement>(null);
@@ -109,7 +106,6 @@ export default function DirectMessages({
           senderId: message.senderId,
           receiverId: message.receiverId,
           text: message.text,
-          audioUrl: message.audioUrl,
           createdAt: message.createdAt,
           username: message.senderId === userId ? "You" : friendName,
           avatar: message.senderId === userId ? undefined : friendAvatar,
@@ -167,7 +163,6 @@ export default function DirectMessages({
         senderId: msg.sender_id,
         receiverId: msg.receiver_id,
         text: msg.text,
-        audioUrl: msg.audio_url,
         createdAt: msg.created_at,
         editedAt: msg.edited_at,
         username: msg.sender_id === userId ? "You" : msg.username || friendName,
@@ -254,85 +249,6 @@ export default function DirectMessages({
         err instanceof Error ? err.message : "Error sending message";
       setError(errorMsg);
       console.error("Error sending message:", err);
-    } finally {
-      setSending(false);
-    }
-  };
-
-  const handleSendVoiceMessage = async (audioBlob: Blob) => {
-    try {
-      setSending(true);
-      setError(null);
-      setIsRecordingVoice(false);
-
-      const token = localStorage.getItem("auth_token");
-      if (!token) {
-        setError("Not authenticated");
-        return;
-      }
-
-      // Upload voice message
-      const formData = new FormData();
-      formData.append("file", audioBlob, "voice-message.webm");
-
-      const uploadRes = await fetch("/api/messages/voice", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        body: formData,
-      });
-
-      if (!uploadRes.ok) throw new Error("Failed to upload voice message");
-
-      const { audioUrl } = await uploadRes.json();
-
-      // Save to database
-      const res = await fetch(`/api/messages/direct/${friendId}`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ text: "🎙️ Voice message", audioUrl }),
-      });
-
-      if (!res.ok) throw new Error("Failed to send voice message");
-
-      const newMessage = await res.json();
-
-      // Format message
-      const formattedMessage: DirectMessage = {
-        id: newMessage.id,
-        senderId: userId,
-        receiverId: friendId,
-        text: "🎙️ Voice message",
-        audioUrl: audioUrl,
-        createdAt: newMessage.created_at || new Date().toISOString(),
-        username: "You",
-      };
-
-      // Add to local state
-      setMessages((prev) => [...prev, formattedMessage]);
-
-      // Send via Socket.IO
-      if (socket && isConnected) {
-        sendMessage({
-          messageId: newMessage.id,
-          senderId: userId,
-          receiverId: friendId,
-          text: "🎙️ Voice message",
-          audioUrl: audioUrl,
-          createdAt: formattedMessage.createdAt,
-        });
-      }
-
-      setError(null);
-    } catch (err) {
-      const errorMsg =
-        err instanceof Error ? err.message : "Error sending voice message";
-      setError(errorMsg);
-      console.error("Error sending voice message:", err);
     } finally {
       setSending(false);
     }
@@ -478,21 +394,7 @@ export default function DirectMessages({
 
       {/* Input Area */}
       <div className="p-2 md:p-4 border-t border-[#202225] relative">
-        {isRecordingVoice && (
-          <VoiceRecorder
-            onSend={handleSendVoiceMessage}
-            onCancel={() => setIsRecordingVoice(false)}
-          />
-        )}
         <div className="flex gap-2 md:gap-3">
-          <button
-            onClick={() => setIsRecordingVoice(true)}
-            disabled={sending || isRecordingVoice}
-            className="px-3 py-2 bg-[#40444B] text-white rounded-lg hover:bg-[#35373B] disabled:opacity-50 text-lg transition"
-            title="Send voice message"
-          >
-            🎙️
-          </button>
           <textarea
             value={messageText}
             onChange={handleTyping}
