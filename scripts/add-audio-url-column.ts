@@ -16,13 +16,23 @@ async function addAudioUrlColumn() {
     await client.connect();
     console.log("✓ Connected to PostgreSQL");
 
-    // Add audio_url column to direct_messages table
-    await client.query(`
-      ALTER TABLE direct_messages 
-      ADD COLUMN IF NOT EXISTS audio_url TEXT;
+    // Check if column already exists
+    const checkColumn = await client.query(`
+      SELECT column_name 
+      FROM information_schema.columns 
+      WHERE table_name='direct_messages' AND column_name='audio_url';
     `);
 
-    console.log("✓ Added audio_url column to direct_messages table");
+    if (checkColumn.rows.length > 0) {
+      console.log("✓ Column audio_url already exists, skipping...");
+    } else {
+      // Add audio_url column to direct_messages table
+      await client.query(`
+        ALTER TABLE direct_messages 
+        ADD COLUMN audio_url TEXT;
+      `);
+      console.log("✓ Added audio_url column to direct_messages table");
+    }
 
     console.log("\n✅ Migration complete!");
   } catch (error) {
