@@ -44,6 +44,7 @@ export default function DirectMessages({
   const [sending, setSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [userAvatar, setUserAvatar] = useState<string>("😊");
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const localVideoRef = useRef<HTMLVideoElement>(null);
   const remoteVideoRef = useRef<HTMLVideoElement>(null);
@@ -86,8 +87,32 @@ export default function DirectMessages({
   useEffect(() => {
     if (friendId && userId) {
       fetchMessages();
+      fetchUserAvatar();
     }
   }, [friendId, userId]);
+
+  // Fetch user's avatar
+  const fetchUserAvatar = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) return;
+
+      const response = await fetch("/api/auth/me", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data.user?.avatar) {
+          setUserAvatar(data.user.avatar);
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching user avatar:", error);
+    }
+  };
 
   // Listen for new messages from Socket.IO
   useEffect(() => {
@@ -291,31 +316,47 @@ export default function DirectMessages({
   }
 
   return (
-    <div className="flex-1 flex flex-col bg-[#36393F]">
-      {/* Header */}
-      <div className="flex justify-between items-center p-2 md:p-4 border-b border-[#202225] gap-2 md:gap-3">
+    <div className="flex-1 flex flex-col bg-gradient-to-br from-[#2F3136] to-[#36393F]">
+      {/* Header with enhanced styling */}
+      <div className="flex justify-between items-center p-4 border-b border-[#202225]/50 backdrop-blur-sm bg-[#2F3136]/80 gap-3">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-[#5B65F5] flex items-center justify-center overflow-hidden flex-shrink-0">
-            {friendAvatar?.startsWith("/avatars/") ? (
-              <img
-                src={friendAvatar}
-                alt={friendName}
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              <span className="text-xl">{friendAvatar || "👤"}</span>
+          <div className="relative hover-lift">
+            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#5B65F5] to-[#7289DA] flex items-center justify-center overflow-hidden flex-shrink-0 shadow-lg">
+              {friendAvatar?.startsWith("/avatars/") ? (
+                <img
+                  src={friendAvatar}
+                  alt={friendName}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <span className="text-2xl">{friendAvatar || "👤"}</span>
+              )}
+            </div>
+            {/* Enhanced online indicator */}
+            {isConnected && onlineUsers.has(friendId) && (
+              <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-[#43B581] rounded-full border-2 border-[#2F3136] animate-pulse shadow-lg"></div>
             )}
           </div>
           <div>
-            <h3 className="text-white font-bold text-sm md:text-base">
+            <h3 className="text-white font-bold text-base md:text-lg">
               {friendName}
             </h3>
-            <p className="text-[#72767D] text-xs">
-              {isConnected
-                ? onlineUsers.has(friendId)
-                  ? "🟢 Online"
-                  : "⚫ Offline"
-                : "Connecting..."}
+            <p className="text-[#72767D] text-xs flex items-center gap-1">
+              {isConnected ? (
+                onlineUsers.has(friendId) ? (
+                  <>
+                    <span className="w-2 h-2 bg-[#43B581] rounded-full animate-pulse"></span>
+                    <span>Online</span>
+                  </>
+                ) : (
+                  <>
+                    <span className="w-2 h-2 bg-[#747F8D] rounded-full"></span>
+                    <span>Offline</span>
+                  </>
+                )
+              ) : (
+                <span>Connecting...</span>
+              )}
             </p>
           </div>
         </div>
@@ -324,7 +365,7 @@ export default function DirectMessages({
           <button
             onClick={() => startCall(friendId, "voice")}
             disabled={isCallActive}
-            className="px-2 md:px-3 py-2 bg-[#5B65F5] text-white rounded-lg hover:bg-[#4752C4] disabled:opacity-50 text-sm md:text-base"
+            className="px-3 py-2 bg-gradient-to-r from-[#43B581] to-[#3BA55D] text-white rounded-xl hover:shadow-lg hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
             title="Voice Call"
           >
             📞
@@ -332,7 +373,7 @@ export default function DirectMessages({
           <button
             onClick={() => startCall(friendId, "video")}
             disabled={isCallActive}
-            className="px-2 md:px-3 py-2 bg-[#5B65F5] text-white rounded-lg hover:bg-[#4752C4] disabled:opacity-50 text-sm md:text-base"
+            className="px-3 py-2 bg-gradient-to-r from-[#5B65F5] to-[#4752C4] text-white rounded-xl hover:shadow-lg hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
             title="Video Call"
           >
             📹
@@ -340,32 +381,62 @@ export default function DirectMessages({
         </div>
       </div>
 
-      {/* Messages Area */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
-        {messages.length === 0 ? (
-          <div className="text-center text-[#72767D] py-8">
-            <p>No messages yet. Start the conversation!</p>
-          </div>
-        ) : (
-          messages.map((message) => (
+      {/* Messages area with enhanced scrollbar */}
+      <div
+        className="flex-1 overflow-y-auto p-4 space-y-3 custom-scrollbar"
+        style={{
+          scrollbarWidth: "thin",
+          scrollbarColor: "#5B65F5 #2F3136",
+        }}
+      >
+        {messages.map((message) => {
+          const isOwnMessage = message.senderId === userId;
+          return (
             <div
               key={message.id}
-              className={`flex ${
-                message.senderId === userId ? "justify-end" : "justify-start"
-              }`}
+              className={`flex items-end gap-2 ${
+                isOwnMessage ? "flex-row-reverse" : "flex-row"
+              } animate-fadeIn`}
             >
+              {/* Avatar with glow effect */}
+              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#5B65F5] to-[#7289DA] flex items-center justify-center overflow-hidden flex-shrink-0 shadow-lg hover-glow">
+                {isOwnMessage ? (
+                  userAvatar?.startsWith("/avatars/") ? (
+                    <img
+                      src={userAvatar}
+                      alt="You"
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <span className="text-lg">{userAvatar || "😊"}</span>
+                  )
+                ) : friendAvatar?.startsWith("/avatars/") ? (
+                  <img
+                    src={friendAvatar}
+                    alt={friendName}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <span className="text-lg">{friendAvatar || "👤"}</span>
+                )}
+              </div>
+
+              {/* Enhanced message bubble */}
               <div
-                className={`max-w-xs md:max-w-md px-4 py-2 rounded-lg ${
-                  message.senderId === userId
-                    ? "bg-[#5B65F5] text-white"
-                    : "bg-[#40444B] text-[#DCDDDE]"
+                className={`max-w-xs md:max-w-md lg:max-w-lg px-4 py-3 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-200 ${
+                  isOwnMessage
+                    ? "bg-gradient-to-br from-[#5B65F5] to-[#4752C4] text-white hover-lift"
+                    : "modern-card text-white"
                 }`}
               >
-                <p className="text-xs font-bold mb-1">{message.username}</p>
-                <p className="text-sm md:text-base break-words">
+                <p className="break-words whitespace-pre-wrap text-sm md:text-base leading-relaxed">
                   {message.text}
                 </p>
-                <p className="text-xs opacity-70 mt-1">
+                <p
+                  className={`text-xs mt-1 ${
+                    isOwnMessage ? "text-gray-200" : "text-[#72767D]"
+                  }`}
+                >
                   {new Date(message.createdAt).toLocaleTimeString([], {
                     hour: "2-digit",
                     minute: "2-digit",
@@ -373,15 +444,17 @@ export default function DirectMessages({
                 </p>
               </div>
             </div>
-          ))
-        )}
+          );
+        })}
+
+        {/* Typing Indicator */}
         {isTyping && (
-          <div className="flex justify-start">
-            <div className="bg-[#40444B] text-[#DCDDDE] px-4 py-2 rounded-lg">
-              <p className="text-sm">{friendName} is typing...</p>
-            </div>
+          <div className="flex items-center gap-2 text-[#72767D] text-sm animate-fadeIn">
+            <span className="text-lg">{friendAvatar || "👤"}</span>
+            <span className="italic">{friendName} is typing...</span>
           </div>
         )}
+
         <div ref={messagesEndRef} />
       </div>
 
@@ -392,24 +465,34 @@ export default function DirectMessages({
         </div>
       )}
 
-      {/* Input Area */}
-      <div className="p-2 md:p-4 border-t border-[#202225] relative">
-        <div className="flex gap-2 md:gap-3">
+      {/* Enhanced Input Area */}
+      <div className="p-4 border-t border-[#202225]/50 backdrop-blur-sm bg-[#2F3136]/80">
+        <div className="flex gap-3">
           <textarea
             value={messageText}
             onChange={handleTyping}
             onKeyPress={handleKeyPress}
             placeholder={`Message ${friendName}...`}
-            className="flex-1 bg-[#40444B] text-[#DCDDDE] rounded-lg px-3 py-2 text-xs md:text-sm resize-none"
+            className="flex-1 bg-[#40444B] text-[#DCDDDE] rounded-xl px-4 py-3 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-[#5B65F5]/50 transition-all duration-200 placeholder:text-[#72767D]"
             rows={2}
             disabled={sending}
           />
           <button
             onClick={handleSendMessage}
             disabled={sending || !messageText.trim()}
-            className="px-4 py-2 bg-[#5B65F5] text-white rounded-lg hover:bg-[#4752C4] disabled:opacity-50 text-sm md:text-base font-bold"
+            className="px-6 py-3 bg-gradient-to-r from-[#5B65F5] to-[#4752C4] text-white rounded-xl hover:shadow-lg hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 font-bold flex items-center gap-2"
           >
-            {sending ? "..." : "Send"}
+            {sending ? (
+              <>
+                <span className="animate-spin">⏳</span>
+                <span className="hidden md:inline">Sending...</span>
+              </>
+            ) : (
+              <>
+                <span>📨</span>
+                <span className="hidden md:inline">Send</span>
+              </>
+            )}
           </button>
         </div>
       </div>
