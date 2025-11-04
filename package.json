@@ -12,9 +12,9 @@
   "dependencies": {
     "@types/jsonwebtoken": "^9.0.10",
     "@types/ws": "^8.18.1",
-    "@vercel/blob": "^2.0.0",
     "bcrypt": "^6.0.0",
     "better-sqlite3": "^12.4.1",
+    "cloudinary": "^2.8.0",
     "jsonwebtoken": "^9.0.2",
     "next": "16.0.1",
     "pg": "^8.16.3",

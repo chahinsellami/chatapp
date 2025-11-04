@@ -1,8 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
-import { put } from "@vercel/blob";
+import { v2 as cloudinary } from "cloudinary";
 import jwt from "jsonwebtoken";
 
 const JWT_SECRET = process.env.JWT_SECRET || "your-secret-key";
+
+// Configure Cloudinary
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
 export const POST = async (request: NextRequest) => {
   try {
@@ -44,22 +51,24 @@ export const POST = async (request: NextRequest) => {
       );
     }
 
-    // Generate unique filename
-    const fileId = Date.now().toString(36) + Math.random().toString(36).substr(2);
-    const ext = "webm"; // We're recording in webm format
-    const filename = `voice-messages/${decoded.userId}-${fileId}.${ext}`;
+    // Convert file to base64 for Cloudinary upload
+    const bytes = await file.arrayBuffer();
+    const buffer = Buffer.from(bytes);
+    const base64 = buffer.toString("base64");
+    const dataURI = `data:${file.type};base64,${base64}`;
 
-    // Upload to Vercel Blob Storage
-    const blob = await put(filename, file, {
-      access: "public",
-      addRandomSuffix: false,
+    // Upload to Cloudinary
+    const result = await cloudinary.uploader.upload(dataURI, {
+      resource_type: "video", // Cloudinary treats audio as video
+      folder: "voice-messages",
+      public_id: `${decoded.userId}-${Date.now()}`,
     });
 
     return NextResponse.json(
       {
         success: true,
-        audioUrl: blob.url,
-        duration: 0, // You could calculate this if needed
+        audioUrl: result.secure_url,
+        duration: 0,
       },
       { status: 200 }
     );
