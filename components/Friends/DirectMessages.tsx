@@ -45,10 +45,22 @@ export default function DirectMessages({
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [userAvatar, setUserAvatar] = useState<string>("😊");
+  const [isMobile, setIsMobile] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const localVideoRef = useRef<HTMLVideoElement>(null);
   const remoteVideoRef = useRef<HTMLVideoElement>(null);
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Detect mobile device
+  useEffect(() => {
+    const checkMobile = () => {
+      const mobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+        navigator.userAgent
+      );
+      setIsMobile(mobile);
+    };
+    checkMobile();
+  }, []);
 
   // Socket.IO connection
   const { socket, isConnected, sendMessage, sendTypingIndicator, typingUsers, onlineUsers } =
@@ -307,6 +319,32 @@ export default function DirectMessages({
 
   const isTyping = typingUsers.has(friendId);
 
+  // Handle call with mobile-specific warnings
+  const handleStartCall = async (type: "voice" | "video") => {
+    if (isMobile && type === "video") {
+      const confirmed = confirm(
+        "Video calls on mobile devices may use more data and battery. Make sure you have a stable connection. Continue?"
+      );
+      if (!confirmed) return;
+    }
+
+    // Check permissions first
+    try {
+      const permissionStatus = await navigator.permissions?.query({ name: 'microphone' as PermissionName });
+      if (permissionStatus?.state === 'denied') {
+        alert("Microphone access is blocked. Please enable it in your browser settings:\n\n" +
+              "Chrome: Settings → Privacy and security → Site settings → Microphone\n" +
+              "Safari: Settings → Safari → Camera/Microphone");
+        return;
+      }
+    } catch (e) {
+      // Permissions API not supported, continue anyway
+      console.log("Permissions API not available");
+    }
+
+    startCall(friendId, type);
+  };
+
   if (loading) {
     return (
       <div className="flex-1 flex items-center justify-center bg-[#36393F]">
@@ -363,7 +401,7 @@ export default function DirectMessages({
 
         <div className="flex gap-2">
           <button
-            onClick={() => startCall(friendId, "voice")}
+            onClick={() => handleStartCall("voice")}
             disabled={isCallActive}
             className="px-3 py-2 bg-gradient-to-r from-[#43B581] to-[#3BA55D] text-white rounded-xl hover:shadow-lg hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
             title="Voice Call"
@@ -371,7 +409,7 @@ export default function DirectMessages({
             📞
           </button>
           <button
-            onClick={() => startCall(friendId, "video")}
+            onClick={() => handleStartCall("video")}
             disabled={isCallActive}
             className="px-3 py-2 bg-gradient-to-r from-[#5B65F5] to-[#4752C4] text-white rounded-xl hover:shadow-lg hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
             title="Video Call"
@@ -497,44 +535,57 @@ export default function DirectMessages({
         </div>
       </div>
 
-      {/* Incoming Call Modal */}
+      {/* Incoming Call Modal - Mobile Optimized */}
       {isIncomingCall && callerInfo && (
-        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
-          <div className="bg-[#36393F] rounded-xl p-8 max-w-md w-full text-center">
-            <h2 className="text-2xl font-bold text-white mb-4">
+        <div className="fixed inset-0 bg-black/90 flex items-center justify-center z-50 p-4">
+          <div className="bg-[#36393F] rounded-xl p-6 md:p-8 max-w-md w-full text-center">
+            <div className="text-5xl mb-4">
+              {callType === "video" ? "📹" : "📞"}
+            </div>
+            <h2 className="text-xl md:text-2xl font-bold text-white mb-2">
               Incoming {callType === "video" ? "Video" : "Voice"} Call
             </h2>
-            <p className="text-[#DCDDDE] mb-6">{friendName} is calling...</p>
-            <div className="flex gap-4 justify-center">
+            <p className="text-[#DCDDDE] mb-6 text-sm md:text-base">{friendName} is calling...</p>
+            {isMobile && (
+              <p className="text-[#72767D] text-xs mb-4">
+                💡 Make sure to allow microphone{callType === "video" ? " and camera" : ""} access when prompted
+              </p>
+            )}
+            <div className="flex gap-3 md:gap-4 justify-center">
               <button
                 onClick={acceptCall}
-                className="px-6 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 font-bold"
+                className="flex-1 md:flex-none px-6 py-3 bg-gradient-to-r from-[#43B581] to-[#3BA55D] text-white rounded-xl hover:shadow-lg transition-all duration-200 font-bold"
               >
-                Accept
+                ✓ Accept
               </button>
               <button
                 onClick={rejectCall}
-                className="px-6 py-3 bg-red-500 text-white rounded-lg hover:bg-red-600 font-bold"
+                className="flex-1 md:flex-none px-6 py-3 bg-gradient-to-r from-[#F04747] to-[#D84040] text-white rounded-xl hover:shadow-lg transition-all duration-200 font-bold"
               >
-                Decline
+                ✗ Decline
               </button>
             </div>
           </div>
         </div>
       )}
 
-      {/* Active Call Modal */}
+      {/* Active Call Modal - Mobile Optimized */}
       {isCallActive && (
-        <div className="fixed inset-0 bg-black/95 flex flex-col items-center justify-center z-50">
-          <div className="text-white text-center mb-4">
-            <h2 className="text-2xl font-bold mb-2">
-              {callType === "video" ? "Video" : "Voice"} Call with {friendName}
+        <div className="fixed inset-0 bg-black/95 flex flex-col items-center justify-center z-50 p-2 md:p-4">
+          <div className="text-white text-center mb-2 md:mb-4">
+            <h2 className="text-lg md:text-2xl font-bold mb-1 md:mb-2">
+              {callType === "video" ? "📹" : "📞"} {callType === "video" ? "Video" : "Voice"} Call with {friendName}
             </h2>
+            {isMobile && callType === "video" && (
+              <p className="text-xs text-[#72767D]">
+                Rotate your device for better view
+              </p>
+            )}
           </div>
 
           {/* Video Streams */}
           {callType === "video" && (
-            <div className="relative w-full max-w-4xl aspect-video bg-black rounded-lg overflow-hidden mb-4">
+            <div className="relative w-full max-w-4xl aspect-video bg-black rounded-lg overflow-hidden mb-2 md:mb-4">
               {/* Remote Video (Full Screen) */}
               <video
                 ref={remoteVideoRef}
@@ -543,8 +594,8 @@ export default function DirectMessages({
                 className="w-full h-full object-cover"
               />
 
-              {/* Local Video (Picture-in-Picture) */}
-              <div className="absolute bottom-4 right-4 w-48 h-36 bg-gray-800 rounded-lg overflow-hidden border-2 border-white">
+              {/* Local Video (Picture-in-Picture) - Responsive sizing */}
+              <div className="absolute bottom-2 right-2 md:bottom-4 md:right-4 w-24 h-18 md:w-48 md:h-36 bg-gray-800 rounded-lg overflow-hidden border-2 border-white">
                 <video
                   ref={localVideoRef}
                   autoPlay
@@ -558,34 +609,34 @@ export default function DirectMessages({
 
           {callType === "voice" && (
             <>
-              <div className="text-white text-6xl mb-8">📞</div>
+              <div className="text-white text-5xl md:text-6xl mb-6 md:mb-8">📞</div>
               {/* Hidden audio elements for voice calls */}
               <audio ref={localVideoRef} autoPlay muted />
               <audio ref={remoteVideoRef} autoPlay />
             </>
           )}
 
-          {/* Call Controls */}
-          <div className="flex gap-4">
+          {/* Call Controls - Mobile Optimized */}
+          <div className="flex flex-wrap gap-2 md:gap-4 justify-center">
             <button
               onClick={toggleAudio}
-              className="px-6 py-3 bg-[#5B65F5] text-white rounded-lg hover:bg-[#4752C4] font-bold"
+              className="px-4 md:px-6 py-2 md:py-3 bg-[#5B65F5] text-white rounded-xl hover:bg-[#4752C4] font-bold text-sm md:text-base transition-all duration-200"
             >
-              🎤 Mute
+              🎤 {isMobile ? "" : "Mute"}
             </button>
             {callType === "video" && (
               <button
                 onClick={toggleVideo}
-                className="px-6 py-3 bg-[#5B65F5] text-white rounded-lg hover:bg-[#4752C4] font-bold"
+                className="px-4 md:px-6 py-2 md:py-3 bg-[#5B65F5] text-white rounded-xl hover:bg-[#4752C4] font-bold text-sm md:text-base transition-all duration-200"
               >
-                📹 Camera
+                📹 {isMobile ? "" : "Camera"}
               </button>
             )}
             <button
               onClick={endCall}
-              className="px-6 py-3 bg-red-500 text-white rounded-lg hover:bg-red-600 font-bold"
+              className="px-4 md:px-6 py-2 md:py-3 bg-gradient-to-r from-[#F04747] to-[#D84040] text-white rounded-xl hover:shadow-lg font-bold text-sm md:text-base transition-all duration-200"
             >
-              End Call
+              📵 {isMobile ? "" : "End Call"}
             </button>
           </div>
         </div>

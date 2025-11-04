@@ -91,11 +91,28 @@ export function useWebRTC({ socket, userId }: UseWebRTCProps) {
         setCallType(type);
         otherUserIdRef.current = receiverId; // Store receiver ID
 
+        // Check if getUserMedia is supported
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+          alert("Your browser does not support audio/video calls. Please use a modern browser like Chrome, Firefox, or Safari.");
+          return;
+        }
+
+        // Mobile-friendly media constraints
+        const constraints: MediaStreamConstraints = {
+          audio: {
+            echoCancellation: true,
+            noiseSuppression: true,
+            autoGainControl: true,
+          },
+          video: type === "video" ? {
+            width: { ideal: 640, max: 1280 },
+            height: { ideal: 480, max: 720 },
+            facingMode: "user", // Front camera on mobile
+          } : false,
+        };
+
         // Get media stream
-        const stream = await navigator.mediaDevices.getUserMedia({
-          video: type === "video" ? { width: 640, height: 480 } : false,
-          audio: true,
-        });
+        const stream = await navigator.mediaDevices.getUserMedia(constraints);
 
         localStreamRef.current = stream;
         setLocalStream(stream);
@@ -142,9 +159,22 @@ export function useWebRTC({ socket, userId }: UseWebRTCProps) {
 
         peerRef.current = peer;
         setIsCallActive(true);
-      } catch (error) {
+      } catch (error: any) {
         console.error("Error starting call:", error);
-        alert("Could not access camera/microphone");
+        
+        // More specific error messages
+        if (error.name === "NotAllowedError" || error.name === "PermissionDeniedError") {
+          alert("Camera/microphone access denied. Please grant permissions in your browser settings and try again.");
+        } else if (error.name === "NotFoundError" || error.name === "DevicesNotFoundError") {
+          alert("No camera/microphone found. Please check your device and try again.");
+        } else if (error.name === "NotReadableError" || error.name === "TrackStartError") {
+          alert("Camera/microphone is already in use by another application.");
+        } else if (error.name === "OverconstrainedError") {
+          alert("Camera/microphone does not meet the requirements.");
+        } else {
+          alert(`Could not start call: ${error.message || "Unknown error"}`);
+        }
+        
         cleanup();
       }
     },
@@ -184,11 +214,29 @@ export function useWebRTC({ socket, userId }: UseWebRTCProps) {
     try {
       otherUserIdRef.current = callerInfo.id; // Store caller ID
 
+      // Check if getUserMedia is supported
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        alert("Your browser does not support audio/video calls. Please use a modern browser like Chrome, Firefox, or Safari.");
+        rejectCall();
+        return;
+      }
+
+      // Mobile-friendly media constraints
+      const constraints: MediaStreamConstraints = {
+        audio: {
+          echoCancellation: true,
+          noiseSuppression: true,
+          autoGainControl: true,
+        },
+        video: callType === "video" ? {
+          width: { ideal: 640, max: 1280 },
+          height: { ideal: 480, max: 720 },
+          facingMode: "user", // Front camera on mobile
+        } : false,
+      };
+
       // Get media stream
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: callType === "video" ? { width: 640, height: 480 } : false,
-        audio: true,
-      });
+      const stream = await navigator.mediaDevices.getUserMedia(constraints);
 
       localStreamRef.current = stream;
       setLocalStream(stream);
@@ -231,12 +279,29 @@ export function useWebRTC({ socket, userId }: UseWebRTCProps) {
       setIsCallActive(true);
       setIsIncomingCall(false);
       setCallerInfo(null);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error accepting call:", error);
-      alert("Could not access camera/microphone");
+      
+      // More specific error messages
+      if (error.name === "NotAllowedError" || error.name === "PermissionDeniedError") {
+        alert("Camera/microphone access denied. Please grant permissions in your browser settings and try again.");
+      } else if (error.name === "NotFoundError" || error.name === "DevicesNotFoundError") {
+        alert("No camera/microphone found. Please check your device and try again.");
+      } else if (error.name === "NotReadableError" || error.name === "TrackStartError") {
+        alert("Camera/microphone is already in use by another application.");
+      } else if (error.name === "OverconstrainedError") {
+        alert("Camera/microphone does not meet the requirements.");
+      } else {
+        alert(`Could not accept call: ${error.message || "Unknown error"}`);
+      }
+      
+      // Reject the call
+      if (socket && callerInfo) {
+        socket.emit("reject-call", { to: callerInfo.id });
+      }
       cleanup();
     }
-  }, [socket, userId, callerInfo, callType]);
+  }, [socket, userId, callerInfo, callType, cleanup]);
 
   const rejectCall = useCallback(() => {
     if (!socket || !callerInfo) return;
