@@ -316,9 +316,9 @@ export default function DirectMessages({
   }
 
   return (
-    <div className="flex-1 flex flex-col bg-gradient-to-br from-[#2F3136] to-[#36393F]">
+    <div className="flex-1 flex flex-col bg-gradient-to-br from-[#2F3136] to-[#36393F] h-full overflow-hidden">
       {/* Header with enhanced styling */}
-      <div className="flex justify-between items-center p-4 border-b border-[#202225]/50 backdrop-blur-sm bg-[#2F3136]/80 gap-3">
+      <div className="flex justify-between items-center p-4 border-b border-[#202225]/50 backdrop-blur-sm bg-[#2F3136]/80 gap-3 flex-shrink-0">
         <div className="flex items-center gap-3">
           <div className="relative hover-lift">
             <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#5B65F5] to-[#7289DA] flex items-center justify-center overflow-hidden flex-shrink-0 shadow-lg">
@@ -383,7 +383,7 @@ export default function DirectMessages({
 
       {/* Messages area with enhanced scrollbar */}
       <div
-        className="flex-1 overflow-y-auto p-4 space-y-3 custom-scrollbar"
+        className="flex-1 overflow-y-auto p-4 space-y-3 custom-scrollbar min-h-0"
         style={{
           scrollbarWidth: "thin",
           scrollbarColor: "#5B65F5 #2F3136",
@@ -460,13 +460,13 @@ export default function DirectMessages({
 
       {/* Error Display */}
       {error && (
-        <div className="px-4 py-2 bg-red-500/20 border-t border-red-500">
+        <div className="px-4 py-2 bg-red-500/20 border-t border-red-500 flex-shrink-0">
           <p className="text-red-300 text-sm">⚠️ {error}</p>
         </div>
       )}
 
       {/* Enhanced Input Area */}
-      <div className="p-4 border-t border-[#202225]/50 backdrop-blur-sm bg-[#2F3136]/80">
+      <div className="p-4 border-t border-[#202225]/50 backdrop-blur-sm bg-[#2F3136]/80 flex-shrink-0">
         <div className="flex gap-3">
           <textarea
             value={messageText}
