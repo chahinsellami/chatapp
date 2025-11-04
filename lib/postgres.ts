@@ -28,14 +28,6 @@ export async function initializeDatabase() {
   const client = await pool.connect();
 
   try {
-    // Drop direct_messages table if it exists and has the wrong constraint
-    // This allows us to recreate it without the foreign key on receiver_id
-    try {
-      await client.query(`DROP TABLE IF EXISTS direct_messages CASCADE`);
-    } catch (err) {
-      // Ignore errors on drop
-    }
-
     // Create users table
     await client.query(`
       CREATE TABLE IF NOT EXISTS users (
