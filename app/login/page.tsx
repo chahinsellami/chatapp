@@ -24,7 +24,7 @@ export default function LoginPage() {
       if (!user.avatar) {
         router.push("/profile");
       } else {
-        router.push("/friends");
+        router.push("/messenger");
       }
     } catch (err: any) {
       setError(err.message || "Login failed");

@@ -164,10 +164,10 @@ export default function ProfilePage() {
               👥 Friends
             </button>
             <Link
-              href="/friends"
-              className="block px-4 py-3 rounded-lg font-bold bg-[#40444B] text-[#DCDDDE] text-center mt-2"
+              href="/messenger"
+              className="block px-4 py-3 rounded-lg font-bold bg-[#40444B] text-[#DCDDDE] text-center mt-2 hover:bg-[#35373B] transition"
             >
-              � Go to DMs
+              💬 Go to DMs
             </Link>
           </div>
           <div className="bg-[#36393F] rounded-xl p-6 border border-[#40444B] mt-6 text-center">
