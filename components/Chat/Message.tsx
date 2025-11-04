@@ -1,7 +1,5 @@
 "use client";
 
-import AudioPlayer from "./AudioPlayer";
-
 interface Message {
   id: string;
   text: string;
@@ -9,7 +7,6 @@ interface Message {
   username: string;
   avatar?: string;
   createdAt: string;
-  audioUrl?: string;
 }
 
 interface MessageProps {
@@ -60,13 +57,9 @@ export default function Message({ message, isOwnMessage }: MessageProps) {
               {timeString}
             </p>
           </div>
-          {message.audioUrl ? (
-            <AudioPlayer audioUrl={message.audioUrl} />
-          ) : (
-            <p className="text-[#DCDDDE] break-words text-sm leading-relaxed">
-              {message.text}
-            </p>
-          )}
+          <p className="text-[#DCDDDE] break-words text-sm leading-relaxed">
+            {message.text}
+          </p>
         </div>
 
         {/* Actions (on hover) */}
