@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
 import { authenticateRequest, createErrorResponse } from "@/lib/auth";
-import { getUserById, initializeDatabase } from "@/lib/db";
+import { getUserById, initializeDatabase } from "@/lib/postgres";
 
 /**
  * GET /api/auth/me
@@ -9,7 +9,7 @@ import { getUserById, initializeDatabase } from "@/lib/db";
 export async function GET(request: NextRequest) {
   try {
     // Initialize database
-    initializeDatabase();
+    await initializeDatabase();
 
     // Authenticate request
     const authPayload = authenticateRequest(request);
@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Get full user details
-    const user = getUserById(authPayload.userId);
+    const user = await getUserById(authPayload.userId);
     if (!user) {
       return createErrorResponse("User not found", 404);
     }
@@ -29,7 +29,8 @@ export async function GET(request: NextRequest) {
       email: user.email,
       avatar: user.avatar,
       status: user.status,
-      createdAt: user.createdAt,
+      bio: user.bio,
+      createdAt: user.created_at,
     });
   } catch (error) {
     console.error("Get user error:", error);

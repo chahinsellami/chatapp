@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { getUserByEmail, initializeDatabase } from "@/lib/db";
+import { getUserByEmail, initializeDatabase } from "@/lib/postgres";
 import {
   comparePassword,
   createToken,
@@ -15,7 +15,7 @@ export async function POST(request: NextRequest) {
   try {
     // Initialize database
     try {
-      initializeDatabase();
+      await initializeDatabase();
     } catch (dbError) {
       console.error("Database initialization failed:", dbError);
       return createErrorResponse(
@@ -33,13 +33,13 @@ export async function POST(request: NextRequest) {
     }
 
     // Find user by email
-    const user = getUserByEmail(email);
+    const user = await getUserByEmail(email);
     if (!user) {
       return createErrorResponse("Invalid email or password");
     }
 
     // Verify password
-    const isPasswordValid = await comparePassword(password, user.passwordHash);
+    const isPasswordValid = await comparePassword(password, user.password_hash);
     if (!isPasswordValid) {
       return createErrorResponse("Invalid email or password");
     }

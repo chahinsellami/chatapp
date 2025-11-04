@@ -129,17 +129,14 @@ export default function DirectMessages({
         return;
       }
 
-      const res = await fetch(
-        `/api/messages/direct/actions/${messageId}`,
-        {
-          method: "PUT",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ text: editText }),
-        }
-      );
+      const res = await fetch(`/api/messages/direct/actions/${messageId}`, {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ text: editText }),
+      });
 
       if (!res.ok) {
         throw new Error("Failed to edit message");
@@ -148,7 +145,9 @@ export default function DirectMessages({
       // Update message in state
       setMessages((prev) =>
         prev.map((m) =>
-          m.id === messageId ? { ...m, text: editText, editedAt: new Date().toISOString() } : m
+          m.id === messageId
+            ? { ...m, text: editText, editedAt: new Date().toISOString() }
+            : m
         )
       );
 
@@ -244,7 +243,9 @@ export default function DirectMessages({
             return (
               <div
                 key={message.id}
-                className={`flex ${isOwn ? "justify-end" : "justify-start"} group`}
+                className={`flex ${
+                  isOwn ? "justify-end" : "justify-start"
+                } group`}
               >
                 <div
                   className={`max-w-xs px-4 py-2 rounded-lg ${

@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { authenticateRequest, createErrorResponse } from "@/lib/auth";
 import {
-  getUserFriends,
+  getFriendsByUserId,
   getPendingFriendRequests,
-  sendFriendRequest,
+  insertFriendRequest,
   initializeDatabase,
-} from "@/lib/db";
+} from "@/lib/postgres";
 
 /**
  * GET /api/friends
@@ -13,15 +13,15 @@ import {
  */
 export async function GET(request: NextRequest) {
   try {
-    initializeDatabase();
+    await initializeDatabase();
 
     const user = authenticateRequest(request);
     if (!user) {
       return createErrorResponse("Unauthorized", 401);
     }
 
-    const friends = getUserFriends(user.userId);
-    const pendingRequests = getPendingFriendRequests(user.userId);
+    const friends = await getFriendsByUserId(user.userId);
+    const pendingRequests = await getPendingFriendRequests(user.userId);
 
     return NextResponse.json({ friends, pendingRequests });
   } catch (error) {
@@ -37,7 +37,7 @@ export async function GET(request: NextRequest) {
  */
 export async function POST(request: NextRequest) {
   try {
-    initializeDatabase();
+    await initializeDatabase();
 
     const user = authenticateRequest(request);
     if (!user) {
@@ -55,13 +55,14 @@ export async function POST(request: NextRequest) {
       return createErrorResponse("Cannot send friend request to yourself");
     }
 
-    const friendRequest = sendFriendRequest(user.userId, receiverId);
+    const id = crypto.randomUUID();
+    const friendRequest = await insertFriendRequest(id, user.userId, receiverId);
 
     return NextResponse.json(friendRequest, { status: 201 });
   } catch (error: any) {
     console.error("Friends POST error:", error);
-    if (error.message.includes("already exists")) {
-      return createErrorResponse(error.message, 400);
+    if (error.message.includes("already exists") || error.message.includes("duplicate")) {
+      return createErrorResponse("Friend request already exists", 400);
     }
     return createErrorResponse("Failed to send friend request", 500);
   }

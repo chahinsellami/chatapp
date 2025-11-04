@@ -3,9 +3,9 @@ import { authenticateRequest, createErrorResponse } from "@/lib/auth";
 import {
   acceptFriendRequest,
   rejectFriendRequest,
-  removeFriend,
+  getFriendRequest,
   initializeDatabase,
-} from "@/lib/db";
+} from "@/lib/postgres";
 
 /**
  * PUT /api/friends/requests/[requestId]?action=accept|reject
@@ -16,7 +16,7 @@ export async function PUT(
   { params }: { params: Promise<{ requestId: string }> }
 ) {
   try {
-    initializeDatabase();
+    await initializeDatabase();
 
     const user = authenticateRequest(request);
     if (!user) {
@@ -35,11 +35,16 @@ export async function PUT(
       return createErrorResponse('Action must be "accept" or "reject"');
     }
 
+    const friendRequest = await getFriendRequest(requestId);
+    if (!friendRequest) {
+      return createErrorResponse("Friend request not found", 404);
+    }
+
     let result;
     if (action === "accept") {
-      result = acceptFriendRequest(requestId);
+      result = await acceptFriendRequest(requestId, user.userId, friendRequest.sender_id);
     } else {
-      result = rejectFriendRequest(requestId);
+      result = await rejectFriendRequest(requestId);
     }
 
     return NextResponse.json(result);
@@ -54,29 +59,23 @@ export async function PUT(
 
 /**
  * DELETE /api/friends/[friendId]
- * Remove a friend
+ * Remove a friend (future implementation)
  */
 export async function DELETE(
   request: NextRequest,
   { params }: { params: Promise<{ requestId: string }> }
 ) {
   try {
-    initializeDatabase();
+    await initializeDatabase();
 
     const user = authenticateRequest(request);
     if (!user) {
       return createErrorResponse("Unauthorized", 401);
     }
 
-    const { requestId: friendId } = await params;
-
-    if (!friendId) {
-      return createErrorResponse("Friend ID is required");
-    }
-
-    removeFriend(user.userId, friendId);
-
-    return NextResponse.json({ deleted: true });
+    // TODO: Implement removeFriend in PostgreSQL
+    // For now, return not implemented
+    return createErrorResponse("Remove friend feature coming soon", 501);
   } catch (error) {
     console.error("Remove friend error:", error);
     return createErrorResponse("Failed to remove friend", 500);

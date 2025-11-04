@@ -11,7 +11,7 @@ export default function Home() {
   useEffect(() => {
     if (!isLoading) {
       if (user) {
-        router.push("/channels");
+        router.push("/profile");
       } else {
         router.push("/login");
       }

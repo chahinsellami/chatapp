@@ -4,7 +4,7 @@ import {
   getUserByEmail,
   getUserByUsername,
   initializeDatabase,
-} from "@/lib/db";
+} from "@/lib/postgres";
 import {
   hashPassword,
   validateEmail,
@@ -23,7 +23,7 @@ export async function POST(request: NextRequest) {
   try {
     // Initialize database
     try {
-      initializeDatabase();
+      await initializeDatabase();
     } catch (dbError) {
       console.error("Database initialization failed:", dbError);
       return createErrorResponse(
@@ -70,12 +70,12 @@ export async function POST(request: NextRequest) {
     // CHECK FOR EXISTING USER
     // ============================================================================
 
-    const existingUsername = getUserByUsername(username);
+    const existingUsername = await getUserByUsername(username);
     if (existingUsername) {
       return createErrorResponse("Username already taken");
     }
 
-    const existingEmail = getUserByEmail(email);
+    const existingEmail = await getUserByEmail(email);
     if (existingEmail) {
       return createErrorResponse("Email already registered");
     }
@@ -93,7 +93,7 @@ export async function POST(request: NextRequest) {
       .substr(2, 9)}`;
 
     // Create user in database
-    const newUser = createUser(userId, username, email, passwordHash);
+    const newUser = await createUser(userId, username, email, passwordHash);
 
     // Create JWT token
     const token = createToken({

@@ -47,9 +47,12 @@ export default function AddFriend({ userId, onFriendAdded }: AddFriendProps) {
         return;
       }
 
-      const res = await fetch(`/api/users/search?q=${encodeURIComponent(searchTerm)}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await fetch(
+        `/api/users/search?q=${encodeURIComponent(searchTerm)}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
 
       if (!res.ok) {
         throw new Error("Failed to search users");

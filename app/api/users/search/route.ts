@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { authenticateRequest, createErrorResponse } from "@/lib/auth";
-import { initializeDatabase, getAllUsers } from "@/lib/db";
+import { initializeDatabase, searchUsers } from "@/lib/postgres";
 
 /**
  * GET /api/users/search?q=query
@@ -9,7 +9,7 @@ import { initializeDatabase, getAllUsers } from "@/lib/db";
  */
 export async function GET(request: NextRequest) {
   try {
-    initializeDatabase();
+    await initializeDatabase();
 
     const user = authenticateRequest(request);
     if (!user) {
@@ -23,29 +23,8 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ users: [] });
     }
 
-    // Get all users and filter client-side
-    // In production, would use database LIKE query or full-text search
-    const allUsers = getAllUsers();
-
-    const results = allUsers
-      .filter((u) => {
-        // Exclude current user
-        if (u.id === user.userId) return false;
-
-        // Match username or email
-        return (
-          u.username.toLowerCase().includes(query) ||
-          u.email.toLowerCase().includes(query)
-        );
-      })
-      .slice(0, 20) // Limit to 20 results
-      .map((u) => ({
-        id: u.id,
-        username: u.username,
-        email: u.email,
-        avatar: u.avatar,
-        status: u.status,
-      }));
+    // Use database ILIKE query for efficient search
+    const results = await searchUsers(query, user.userId);
 
     return NextResponse.json({ users: results });
   } catch (error) {

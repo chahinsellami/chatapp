@@ -4,7 +4,7 @@ import {
   getDirectMessages,
   insertDirectMessage,
   initializeDatabase,
-} from "@/lib/db";
+} from "@/lib/postgres";
 
 /**
  * GET /api/messages/direct/[userId]
@@ -15,7 +15,7 @@ export async function GET(
   { params }: { params: Promise<{ userId: string }> }
 ) {
   try {
-    initializeDatabase();
+    await initializeDatabase();
 
     const user = authenticateRequest(request);
     if (!user) {
@@ -28,7 +28,7 @@ export async function GET(
       return createErrorResponse("User ID is required");
     }
 
-    const messages = getDirectMessages(user.userId, otherUserId);
+    const messages = await getDirectMessages(user.userId, otherUserId);
 
     return NextResponse.json({ messages });
   } catch (error) {
@@ -47,7 +47,7 @@ export async function POST(
   { params }: { params: Promise<{ userId: string }> }
 ) {
   try {
-    initializeDatabase();
+    await initializeDatabase();
 
     const user = authenticateRequest(request);
     if (!user) {
@@ -70,7 +70,8 @@ export async function POST(
       return createErrorResponse("Cannot send message to yourself");
     }
 
-    const message = insertDirectMessage(user.userId, receiverId, text);
+    const id = crypto.randomUUID();
+    const message = await insertDirectMessage(id, user.userId, receiverId, text);
 
     return NextResponse.json(message, { status: 201 });
   } catch (error) {

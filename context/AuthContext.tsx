@@ -14,6 +14,7 @@ export interface User {
   email: string;
   avatar?: string;
   status?: string;
+  bio?: string;
   createdAt?: string;
 }
 
@@ -22,7 +23,7 @@ export interface AuthContextType {
   isLoading: boolean;
   isLoggedIn: boolean;
   token: string | null;
-  login: (email: string, password: string) => Promise<void>;
+  login: (email: string, password: string) => Promise<User>;
   signup: (
     username: string,
     email: string,
@@ -93,6 +94,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser(data.user);
       setToken(data.token);
       localStorage.setItem("auth_token", data.token);
+      return data.user;
     } finally {
       setIsLoading(false);
     }

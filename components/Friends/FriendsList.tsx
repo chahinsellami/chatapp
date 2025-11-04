@@ -269,7 +269,9 @@ export default function FriendsList({
                   {/* Status indicator */}
                   <div
                     className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-[#2F3136] ${
-                      friend.status === "online" ? "bg-green-500" : "bg-gray-500"
+                      friend.status === "online"
+                        ? "bg-green-500"
+                        : "bg-gray-500"
                     }`}
                   ></div>
                 </div>

@@ -4,7 +4,7 @@ import {
   updateDirectMessage,
   deleteDirectMessage,
   initializeDatabase,
-} from "@/lib/db";
+} from "@/lib/postgres";
 
 /**
  * PUT /api/messages/direct/actions/[messageId]
@@ -16,7 +16,7 @@ export async function PUT(
   { params }: { params: Promise<{ messageId: string }> }
 ) {
   try {
-    initializeDatabase();
+    await initializeDatabase();
 
     const user = authenticateRequest(request);
     if (!user) {
@@ -35,9 +35,9 @@ export async function PUT(
       return createErrorResponse("Message text is required");
     }
 
-    updateDirectMessage(messageId, text);
+    const result = await updateDirectMessage(messageId, text);
 
-    return NextResponse.json({ updated: true });
+    return NextResponse.json(result);
   } catch (error) {
     console.error("Update direct message error:", error);
     return createErrorResponse("Failed to update message", 500);
@@ -53,7 +53,7 @@ export async function DELETE(
   { params }: { params: Promise<{ messageId: string }> }
 ) {
   try {
-    initializeDatabase();
+    await initializeDatabase();
 
     const user = authenticateRequest(request);
     if (!user) {
@@ -66,9 +66,9 @@ export async function DELETE(
       return createErrorResponse("Message ID is required");
     }
 
-    deleteDirectMessage(messageId);
+    const result = await deleteDirectMessage(messageId);
 
-    return NextResponse.json({ deleted: true });
+    return NextResponse.json(result);
   } catch (error) {
     console.error("Delete direct message error:", error);
     return createErrorResponse("Failed to delete message", 500);

@@ -18,8 +18,14 @@ export default function LoginPage() {
     setError("");
 
     try {
-      await login(email, password);
-      router.push("/channels");
+      const user = await login(email, password);
+
+      // If user doesn't have an avatar, redirect to profile setup
+      if (!user.avatar) {
+        router.push("/profile");
+      } else {
+        router.push("/friends");
+      }
     } catch (err: any) {
       setError(err.message || "Login failed");
     }
