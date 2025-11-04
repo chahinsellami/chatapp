@@ -344,7 +344,7 @@ export async function rejectFriendRequest(requestId: string) {
 
 export async function getDirectMessages(userId1: string, userId2: string) {
   const result = await pool.query(
-    `SELECT d.id, d.sender_id, d.receiver_id, d.text, d.created_at, d.edited_at,
+    `SELECT d.id, d.sender_id, d.receiver_id, d.text, d.audio_url, d.created_at, d.edited_at,
             u.username, u.avatar
      FROM direct_messages d
      LEFT JOIN users u ON d.sender_id = u.id
@@ -363,10 +363,10 @@ export async function insertDirectMessage(
   audioUrl?: string
 ) {
   const result = await pool.query(
-    `INSERT INTO direct_messages (id, sender_id, receiver_id, text) 
-     VALUES ($1, $2, $3, $4) 
+    `INSERT INTO direct_messages (id, sender_id, receiver_id, text, audio_url) 
+     VALUES ($1, $2, $3, $4, $5) 
      RETURNING *`,
-    [id, senderId, receiverId, text]
+    [id, senderId, receiverId, text, audioUrl || null]
   );
   return result.rows[0];
 }
