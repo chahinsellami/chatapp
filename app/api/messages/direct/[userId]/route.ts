@@ -61,7 +61,7 @@ export async function POST(
 
     const { userId: receiverId } = await params;
     const body = await request.json();
-    const { text } = body;
+    const { text, audioUrl } = body;
 
     if (!receiverId) {
       return createErrorResponse("Receiver ID is required");
@@ -86,7 +86,8 @@ export async function POST(
         id,
         user.userId,
         receiverId,
-        text
+        text,
+        audioUrl
       );
 
       return NextResponse.json(message, { status: 201 });

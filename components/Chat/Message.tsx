@@ -1,5 +1,7 @@
 "use client";
 
+import AudioPlayer from "./AudioPlayer";
+
 interface Message {
   id: string;
   text: string;
@@ -7,6 +9,7 @@ interface Message {
   username: string;
   avatar?: string;
   createdAt: string;
+  audioUrl?: string;
 }
 
 interface MessageProps {
@@ -27,15 +30,21 @@ export default function Message({ message, isOwnMessage }: MessageProps) {
         {/* Avatar with glow effect */}
         <div className="relative shrink-0">
           <div
-            className={`w-12 h-12 rounded-full flex items-center justify-center shrink-0 transition smooth group-hover:shadow-xl group-hover:scale-110 ${
+            className={`w-12 h-12 rounded-full flex items-center justify-center shrink-0 overflow-hidden transition smooth group-hover:shadow-xl group-hover:scale-110 ${
               isOwnMessage ? "bg-[#7289DA] shadow-md" : "bg-[#5B65F5] shadow-md"
             }`}
           >
-            <span className="text-white font-bold text-base">
-              {message.username
-                ? message.username.charAt(0).toUpperCase()
-                : "?"}
-            </span>
+            {message.avatar?.startsWith("/avatars/") ? (
+              <img
+                src={message.avatar}
+                alt={message.username}
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <span className="text-white font-bold text-base">
+                {message.avatar || message.username?.charAt(0).toUpperCase() || "?"}
+              </span>
+            )}
           </div>
           {/* Online indicator */}
           <div className="absolute bottom-0 right-0 w-4 h-4 bg-[#43B581] rounded-full border-2 border-[#36393F] shadow-md animate-pulse"></div>
@@ -51,9 +60,13 @@ export default function Message({ message, isOwnMessage }: MessageProps) {
               {timeString}
             </p>
           </div>
-          <p className="text-[#DCDDDE] break-words text-sm leading-relaxed">
-            {message.text}
-          </p>
+          {message.audioUrl ? (
+            <AudioPlayer audioUrl={message.audioUrl} />
+          ) : (
+            <p className="text-[#DCDDDE] break-words text-sm leading-relaxed">
+              {message.text}
+            </p>
+          )}
         </div>
 
         {/* Actions (on hover) */}

@@ -11,12 +11,14 @@ interface Message {
   createdAt: string;
   username?: string;
   avatar?: string;
+  audioUrl?: string;
 }
 
 export function useSocket(userId: string | null) {
   const [isConnected, setIsConnected] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [typingUsers, setTypingUsers] = useState<Set<string>>(new Set());
+  const [onlineUsers, setOnlineUsers] = useState<Set<string>>(new Set());
   const socketRef = useRef<Socket | null>(null);
 
   useEffect(() => {
@@ -69,6 +71,20 @@ export function useSocket(userId: string | null) {
       });
     });
 
+    socket.on("user-online", (userId: string) => {
+      console.log("🟢 User came online:", userId);
+      setOnlineUsers((prev) => new Set([...prev, userId]));
+    });
+
+    socket.on("user-offline", (userId: string) => {
+      console.log("⚫ User went offline:", userId);
+      setOnlineUsers((prev) => {
+        const newSet = new Set(prev);
+        newSet.delete(userId);
+        return newSet;
+      });
+    });
+
     return () => {
       console.log("🔌 Disconnecting socket");
       socket.disconnect();
@@ -81,12 +97,14 @@ export function useSocket(userId: string | null) {
     receiverId: string;
     text: string;
     createdAt: string;
+    audioUrl?: string;
   }) => {
     if (socketRef.current?.connected) {
       console.log("📤 Sending message via socket:", {
         messageId: message.messageId,
         from: message.senderId,
         to: message.receiverId,
+        hasAudio: !!message.audioUrl,
       });
       socketRef.current.emit("send-message", message);
     } else {
@@ -109,6 +127,7 @@ export function useSocket(userId: string | null) {
     isConnected,
     messages,
     typingUsers,
+    onlineUsers,
     sendMessage,
     sendTypingIndicator,
   };

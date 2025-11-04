@@ -70,12 +70,18 @@ export default function ProfilePage() {
   const [pendingRequests, setPendingRequests] = useState<any[]>([]);
   const [loadingRequests, setLoadingRequests] = useState(false);
   const [acceptingId, setAcceptingId] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const [customImage, setCustomImage] = useState<string | null>(null);
 
   useEffect(() => {
     if (user?.avatar) {
       setAvatar(user.avatar);
       setStatus(user.status || "online");
       setBio(user.bio || "");
+      // Check if avatar is a custom image URL
+      if (user.avatar.startsWith("/avatars/")) {
+        setCustomImage(user.avatar);
+      }
     }
   }, [user]);
 
@@ -153,6 +159,52 @@ export default function ProfilePage() {
       }
     } catch (error) {
       console.error("Error rejecting request:", error);
+    }
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith("image/")) {
+      setError("Please select an image file");
+      return;
+    }
+
+    // Validate file size (5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      setError("Image must be less than 5MB");
+      return;
+    }
+
+    try {
+      setUploading(true);
+      setError("");
+      const token = localStorage.getItem("auth_token");
+      
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const res = await fetch("/api/auth/avatar", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: formData,
+      });
+
+      if (!res.ok) throw new Error("Upload failed");
+      
+      const data = await res.json();
+      setCustomImage(data.avatarUrl);
+      setAvatar(data.avatarUrl);
+      setSuccess(true);
+      setTimeout(() => setSuccess(false), 3000);
+    } catch (err) {
+      setError("Failed to upload image");
+    } finally {
+      setUploading(false);
     }
   };
 
@@ -248,7 +300,15 @@ export default function ProfilePage() {
           </div>
           <div className="bg-[#36393F] rounded-xl p-3 md:p-6 border border-[#40444B] mt-6 text-center">
             <div className="text-4xl md:text-6xl mb-4">
-              {user.avatar || "👤"}
+              {customImage ? (
+                <img
+                  src={customImage}
+                  alt="Profile"
+                  className="w-24 h-24 rounded-full mx-auto object-cover border-4 border-[#5B65F5]"
+                />
+              ) : (
+                <span>{user.avatar || "👤"}</span>
+              )}
             </div>
             <p className="text-[#DCDDDE] font-bold text-sm md:text-base">
               {user.username}
@@ -280,15 +340,57 @@ export default function ProfilePage() {
               <div className="space-y-6">
                 <div>
                   <label className="block text-sm font-bold text-[#DCDDDE] mb-3">
-                    🎨 Avatar
+                    📸 Custom Profile Picture
+                  </label>
+                  <div className="flex flex-col items-center gap-4 p-4 bg-[#2F3136] rounded-lg">
+                    {customImage && (
+                      <img
+                        src={customImage}
+                        alt="Current avatar"
+                        className="w-32 h-32 rounded-full object-cover border-4 border-[#5B65F5]"
+                      />
+                    )}
+                    <label className="cursor-pointer">
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageUpload}
+                        className="hidden"
+                        disabled={uploading}
+                      />
+                      <div className="px-6 py-3 bg-[#5B65F5] hover:bg-[#4752C4] text-white rounded-lg font-bold transition disabled:opacity-50 text-center">
+                        {uploading ? "Uploading..." : customImage ? "Change Picture" : "Upload Picture"}
+                      </div>
+                    </label>
+                    <p className="text-xs text-[#72767D]">
+                      Max 5MB • JPG, PNG, GIF
+                    </p>
+                  </div>
+                </div>
+                
+                <div className="relative">
+                  <div className="absolute inset-0 flex items-center">
+                    <div className="w-full border-t border-[#40444B]"></div>
+                  </div>
+                  <div className="relative flex justify-center text-sm">
+                    <span className="px-2 bg-[#36393F] text-[#72767D]">OR</span>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-bold text-[#DCDDDE] mb-3">
+                    🎨 Emoji Avatar
                   </label>
                   <div className="grid grid-cols-6 md:grid-cols-8 gap-1 md:gap-2 p-2 md:p-3 bg-[#2F3136] rounded max-h-48 overflow-y-auto">
                     {AVATARS.map((o) => (
                       <button
                         key={o}
-                        onClick={() => setAvatar(o)}
+                        onClick={() => {
+                          setAvatar(o);
+                          setCustomImage(null);
+                        }}
                         className={`p-1 md:p-2 text-lg md:text-xl rounded ${
-                          avatar === o ? "bg-[#5B65F5]" : "bg-[#40444B]"
+                          avatar === o && !customImage ? "bg-[#5B65F5]" : "bg-[#40444B]"
                         }`}
                       >
                         {o}
@@ -296,7 +398,7 @@ export default function ProfilePage() {
                     ))}
                   </div>
                 </div>
-                {avatar && (
+                {avatar && !customImage && (
                   <div className="p-4 bg-[#2F3136] rounded text-center">
                     <p className="text-[#72767D]">Selected</p>
                     <div className="text-5xl">{avatar}</div>

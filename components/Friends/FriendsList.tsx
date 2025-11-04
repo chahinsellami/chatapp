@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useSocket } from "@/lib/useSocket";
 
 interface Friend {
   id: string;
@@ -35,6 +36,9 @@ export default function FriendsList({
   const [error, setError] = useState<string | null>(null);
   const [expandPending, setExpandPending] = useState(false);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
+
+  // Get online users from socket
+  const { onlineUsers } = useSocket(userId);
 
   // Fetch friends and pending requests
   useEffect(() => {
@@ -261,15 +265,23 @@ export default function FriendsList({
             >
               <div className="flex items-center gap-2 mb-1">
                 <div className="relative">
-                  <div className="w-8 h-8 rounded-full bg-[#5B65F5] flex items-center justify-center shrink-0">
-                    <span className="text-white text-xs font-bold">
-                      {friend.username[0].toUpperCase()}
-                    </span>
+                  <div className="w-8 h-8 rounded-full bg-[#5B65F5] flex items-center justify-center shrink-0 overflow-hidden">
+                    {friend.avatar?.startsWith("/avatars/") ? (
+                      <img
+                        src={friend.avatar}
+                        alt={friend.username}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <span className="text-white text-xs font-bold">
+                        {friend.avatar || friend.username[0].toUpperCase()}
+                      </span>
+                    )}
                   </div>
                   {/* Status indicator */}
                   <div
                     className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-[#2F3136] ${
-                      friend.status === "online"
+                      onlineUsers.has(friend.id)
                         ? "bg-green-500"
                         : "bg-gray-500"
                     }`}
@@ -280,7 +292,7 @@ export default function FriendsList({
                     {friend.username}
                   </p>
                   <p className="text-xs text-[#72767D] capitalize">
-                    {friend.status}
+                    {onlineUsers.has(friend.id) ? "Online" : "Offline"}
                   </p>
                 </div>
               </div>
