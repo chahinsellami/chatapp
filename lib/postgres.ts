@@ -1,21 +1,27 @@
+/**
+ * PostgreSQL database connection and query utilities
+ * Provides connection pooling, schema initialization, and CRUD operations
+ * for users, messages, friends, and direct messaging functionality
+ */
+
 import { Pool } from "pg";
 
-// PostgreSQL connection pool
+// PostgreSQL connection pool for efficient database connections
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
+  connectionString: process.env.DATABASE_URL, // Database URL from environment variables
   ssl:
     process.env.NODE_ENV === "production"
-      ? { rejectUnauthorized: false }
-      : false,
+      ? { rejectUnauthorized: false } // Required for Railway PostgreSQL
+      : false, // No SSL for local development
 });
 
-// Test connection
+// Connection event handlers for monitoring
 pool.on("connect", () => {
-  
+  // Successfully connected to database
 });
 
 pool.on("error", (err) => {
-  
+  // Database connection error occurred
 });
 
 export { pool };
@@ -23,120 +29,127 @@ export { pool };
 /**
  * Initialize database schema
  * Creates all necessary tables if they don't exist
+ * Sets up the complete database structure for the chat application
  */
 export async function initializeDatabase() {
   const client = await pool.connect();
 
   try {
-    // Create users table
+    // Create users table - stores user account information
     await client.query(`
       CREATE TABLE IF NOT EXISTS users (
-        id VARCHAR(36) PRIMARY KEY,
-        username VARCHAR(255) UNIQUE NOT NULL,
-        email VARCHAR(255) UNIQUE NOT NULL,
-        password_hash VARCHAR(255) NOT NULL,
-        avatar VARCHAR(255),
-        status VARCHAR(50) DEFAULT 'offline',
-        bio TEXT DEFAULT '',
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        id VARCHAR(36) PRIMARY KEY,           -- UUID for user identification
+        username VARCHAR(255) UNIQUE NOT NULL, -- Unique username for display
+        email VARCHAR(255) UNIQUE NOT NULL,    -- Unique email for authentication
+        password_hash VARCHAR(255) NOT NULL,   -- Hashed password for security
+        avatar VARCHAR(255),                   -- Profile picture URL
+        status VARCHAR(50) DEFAULT 'offline',  -- Online/offline/away status
+        bio TEXT DEFAULT '',                   -- User biography/description
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP -- Account creation time
       )
     `);
 
-    // Create channels table
+    // Create channels table - for group chat functionality
     await client.query(`
       CREATE TABLE IF NOT EXISTS channels (
-        id VARCHAR(36) PRIMARY KEY,
-        name VARCHAR(255) NOT NULL,
-        description TEXT,
-        is_private BOOLEAN DEFAULT FALSE,
-        created_by VARCHAR(36) NOT NULL REFERENCES users(id),
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        id VARCHAR(36) PRIMARY KEY,           -- UUID for channel identification
+        name VARCHAR(255) NOT NULL,            -- Channel display name
+        description TEXT,                      -- Channel description/purpose
+        is_private BOOLEAN DEFAULT FALSE,      -- Whether channel is private
+        created_by VARCHAR(36) NOT NULL REFERENCES users(id), -- Channel creator
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP -- Channel creation time
       )
     `);
 
-    // Create channel members table
+    // Create channel members table - tracks which users are in which channels
     await client.query(`
       CREATE TABLE IF NOT EXISTS channel_members (
-        channel_id VARCHAR(36) NOT NULL REFERENCES channels(id),
-        user_id VARCHAR(36) NOT NULL REFERENCES users(id),
-        joined_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        PRIMARY KEY(channel_id, user_id)
+        channel_id VARCHAR(36) NOT NULL REFERENCES channels(id), -- Channel reference
+        user_id VARCHAR(36) NOT NULL REFERENCES users(id),       -- User reference
+        joined_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,           -- When user joined
+        PRIMARY KEY(channel_id, user_id)        -- Composite primary key
       )
     `);
 
-    // Create messages table
+    // Create messages table - stores channel messages
     await client.query(`
       CREATE TABLE IF NOT EXISTS messages (
-        id VARCHAR(36) PRIMARY KEY,
-        text TEXT NOT NULL,
-        user_id VARCHAR(36) NOT NULL REFERENCES users(id),
-        channel_id VARCHAR(36) NOT NULL REFERENCES channels(id),
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        edited_at TIMESTAMP
+        id VARCHAR(36) PRIMARY KEY,           -- UUID for message identification
+        text TEXT NOT NULL,                    -- Message content
+        user_id VARCHAR(36) NOT NULL REFERENCES users(id),      -- Message sender
+        channel_id VARCHAR(36) NOT NULL REFERENCES channels(id), -- Target channel
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,         -- Message timestamp
+        edited_at TIMESTAMP                    -- Last edit timestamp (null if never edited)
       )
     `);
 
-    // Create conversations table
+    // Create conversations table - tracks direct message conversations
     await client.query(`
       CREATE TABLE IF NOT EXISTS conversations (
-        id VARCHAR(36) PRIMARY KEY,
-        user_id VARCHAR(36) NOT NULL REFERENCES users(id),
-        participant_id VARCHAR(36) NOT NULL REFERENCES users(id),
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        UNIQUE(user_id, participant_id)
+        id VARCHAR(36) PRIMARY KEY,           -- UUID for conversation identification
+        user_id VARCHAR(36) NOT NULL REFERENCES users(id),      -- First participant
+        participant_id VARCHAR(36) NOT NULL REFERENCES users(id), -- Second participant
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,         -- Conversation start time
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,         -- Last activity time
+        UNIQUE(user_id, participant_id)        -- Prevent duplicate conversations
       )
     `);
 
-    // Create friends table
+    // Create friends table - stores accepted friend relationships
     await client.query(`
       CREATE TABLE IF NOT EXISTS friends (
-        id VARCHAR(36) PRIMARY KEY,
-        user_id VARCHAR(36) NOT NULL REFERENCES users(id),
-        friend_id VARCHAR(36) NOT NULL REFERENCES users(id),
-        status VARCHAR(50) DEFAULT 'accepted',
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        UNIQUE(user_id, friend_id)
+        id VARCHAR(36) PRIMARY KEY,           -- UUID for friendship record
+        user_id VARCHAR(36) NOT NULL REFERENCES users(id),      -- First friend
+        friend_id VARCHAR(36) NOT NULL REFERENCES users(id),    -- Second friend
+        status VARCHAR(50) DEFAULT 'accepted', -- Friendship status
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,         -- When friendship started
+        UNIQUE(user_id, friend_id)            -- Prevent duplicate friendships
       )
     `);
 
-    // Create friend requests table
+    // Create friend requests table - stores pending friend requests
     await client.query(`
       CREATE TABLE IF NOT EXISTS friend_requests (
-        id VARCHAR(36) PRIMARY KEY,
-        sender_id VARCHAR(36) NOT NULL REFERENCES users(id),
-        receiver_id VARCHAR(36) NOT NULL REFERENCES users(id),
-        status VARCHAR(50) DEFAULT 'pending',
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        UNIQUE(sender_id, receiver_id)
+        id VARCHAR(36) PRIMARY KEY,           -- UUID for request identification
+        sender_id VARCHAR(36) NOT NULL REFERENCES users(id),    -- Request sender
+        receiver_id VARCHAR(36) NOT NULL REFERENCES users(id),  -- Request receiver
+        status VARCHAR(50) DEFAULT 'pending', -- pending/accepted/rejected
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,         -- Request timestamp
+        UNIQUE(sender_id, receiver_id)        -- Prevent duplicate requests
       )
     `);
 
-    // Create direct messages table
+    // Create direct messages table - stores private messages between users
     await client.query(`
       CREATE TABLE IF NOT EXISTS direct_messages (
-        id VARCHAR(36) PRIMARY KEY,
-        sender_id VARCHAR(36) NOT NULL REFERENCES users(id),
-        receiver_id VARCHAR(36) NOT NULL,
-        text TEXT NOT NULL,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        edited_at TIMESTAMP
+        id VARCHAR(36) PRIMARY KEY,           -- UUID for message identification
+        sender_id VARCHAR(36) NOT NULL REFERENCES users(id),    -- Message sender
+        receiver_id VARCHAR(36) NOT NULL,     -- Message receiver (no FK for flexibility)
+        text TEXT NOT NULL,                    -- Message content
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,         -- Message timestamp
+        edited_at TIMESTAMP                    -- Last edit timestamp
       )
     `);
 
-    
   } catch (error) {
-    
+    // Rethrow any database initialization errors
     throw error;
   } finally {
+    // Always release the database connection
     client.release();
   }
 }
 
 // ============================================================================
-// USER FUNCTIONS
+// USER FUNCTIONS - Authentication and user management operations
 // ============================================================================
 
+/**
+ * Find a user by their email address
+ * Used during login authentication
+ * @param email - User's email address
+ * @returns User object or undefined if not found
+ */
 export async function getUserByEmail(email: string) {
   const result = await pool.query("SELECT * FROM users WHERE email = $1", [
     email,
@@ -144,6 +157,12 @@ export async function getUserByEmail(email: string) {
   return result.rows[0];
 }
 
+/**
+ * Find a user by their username
+ * Used for username-based lookups and validation
+ * @param username - User's username
+ * @returns User object or undefined if not found
+ */
 export async function getUserByUsername(username: string) {
   const result = await pool.query("SELECT * FROM users WHERE username = $1", [
     username,
@@ -151,6 +170,12 @@ export async function getUserByUsername(username: string) {
   return result.rows[0];
 }
 
+/**
+ * Find a user by their ID
+ * Returns public profile information (excludes password hash)
+ * @param id - User's unique identifier
+ * @returns User profile object or undefined if not found
+ */
 export async function getUserById(id: string) {
   const result = await pool.query(
     "SELECT id, username, email, avatar, status, bio, created_at FROM users WHERE id = $1",
@@ -159,6 +184,15 @@ export async function getUserById(id: string) {
   return result.rows[0];
 }
 
+/**
+ * Create a new user account
+ * Used during user registration
+ * @param id - Generated UUID for the user
+ * @param username - Desired username
+ * @param email - User's email address
+ * @param passwordHash - Hashed password for security
+ * @returns Created user object
+ */
 export async function createUser(
   id: string,
   username: string,
@@ -166,14 +200,23 @@ export async function createUser(
   passwordHash: string
 ) {
   const result = await pool.query(
-    `INSERT INTO users (id, username, email, password_hash) 
-     VALUES ($1, $2, $3, $4) 
+    `INSERT INTO users (id, username, email, password_hash)
+     VALUES ($1, $2, $3, $4)
      RETURNING id, username, email, avatar, status, bio, created_at`,
     [id, username, email, passwordHash]
   );
   return result.rows[0];
 }
 
+/**
+ * Update a user's complete profile information
+ * Used when user completes their profile setup
+ * @param userId - User's ID
+ * @param avatar - Profile picture URL
+ * @param status - Online status
+ * @param bio - User biography
+ * @returns Updated user object
+ */
 export async function updateUserProfileComplete(
   userId: string,
   avatar: string,
@@ -181,15 +224,21 @@ export async function updateUserProfileComplete(
   bio: string
 ) {
   const result = await pool.query(
-    `UPDATE users 
-     SET avatar = $1, status = $2, bio = $3 
-     WHERE id = $4 
+    `UPDATE users
+     SET avatar = $1, status = $2, bio = $3
+     WHERE id = $4
      RETURNING id, username, email, avatar, status, bio, created_at`,
     [avatar, status, bio, userId]
   );
   return result.rows[0];
 }
 
+/**
+ * Update a user's online status
+ * Used for presence indication in the UI
+ * @param userId - User's ID
+ * @param status - New status (online/offline/away)
+ */
 export async function updateUserStatus(userId: string, status: string) {
   await pool.query("UPDATE users SET status = $1 WHERE id = $2", [
     status,
@@ -198,12 +247,18 @@ export async function updateUserStatus(userId: string, status: string) {
 }
 
 // ============================================================================
-// MESSAGE FUNCTIONS
+// MESSAGE FUNCTIONS - Channel messaging operations
 // ============================================================================
 
+/**
+ * Get all messages for a specific channel
+ * Includes user information for each message
+ * @param channelId - ID of the channel to get messages for
+ * @returns Array of messages with user details, ordered by creation time
+ */
 export async function getMessagesByChannelId(channelId: string) {
   const result = await pool.query(
-    `SELECT m.id, m.text, m.user_id, m.channel_id, m.created_at, m.edited_at, 
+    `SELECT m.id, m.text, m.user_id, m.channel_id, m.created_at, m.edited_at,
             u.username, u.avatar
      FROM messages m
      JOIN users u ON m.user_id = u.id
@@ -214,6 +269,14 @@ export async function getMessagesByChannelId(channelId: string) {
   return result.rows;
 }
 
+/**
+ * Insert a new message into a channel
+ * @param id - Generated UUID for the message
+ * @param text - Message content
+ * @param userId - ID of the user sending the message
+ * @param channelId - ID of the target channel
+ * @returns Created message object
+ */
 export async function insertMessage(
   id: string,
   text: string,
@@ -221,8 +284,8 @@ export async function insertMessage(
   channelId: string
 ) {
   const result = await pool.query(
-    `INSERT INTO messages (id, text, user_id, channel_id) 
-     VALUES ($1, $2, $3, $4) 
+    `INSERT INTO messages (id, text, user_id, channel_id)
+     VALUES ($1, $2, $3, $4)
      RETURNING *`,
     [id, text, userId, channelId]
   );
@@ -230,9 +293,15 @@ export async function insertMessage(
 }
 
 // ============================================================================
-// FRIEND FUNCTIONS
+// FRIEND FUNCTIONS - Friendship and friend request management
 // ============================================================================
 
+/**
+ * Get all accepted friends for a user
+ * Returns friend list with profile information
+ * @param userId - ID of the user to get friends for
+ * @returns Array of friend objects with user details
+ */
 export async function getFriendsByUserId(userId: string) {
   const result = await pool.query(
     `SELECT u.id, u.username, u.avatar, u.status,
@@ -246,6 +315,11 @@ export async function getFriendsByUserId(userId: string) {
   return result.rows;
 }
 
+/**
+ * Get all pending friend requests for a user
+ * @param userId - ID of the user to get friend requests for
+ * @returns Array of pending friend request objects
+ */
 export async function getPendingFriendRequests(userId: string) {
   const result = await pool.query(
     `SELECT fr.id, fr.sender_id, fr.receiver_id, fr.status, fr.created_at,
@@ -259,20 +333,32 @@ export async function getPendingFriendRequests(userId: string) {
   return result.rows;
 }
 
+/**
+ * Create a new friend request
+ * @param id - Generated UUID for the request
+ * @param senderId - ID of the user sending the request
+ * @param receiverId - ID of the user receiving the request
+ * @returns Created friend request object
+ */
 export async function insertFriendRequest(
   id: string,
   senderId: string,
   receiverId: string
 ) {
   const result = await pool.query(
-    `INSERT INTO friend_requests (id, sender_id, receiver_id) 
-     VALUES ($1, $2, $3) 
+    `INSERT INTO friend_requests (id, sender_id, receiver_id)
+     VALUES ($1, $2, $3)
      RETURNING *`,
     [id, senderId, receiverId]
   );
   return result.rows[0];
 }
 
+/**
+ * Get a specific friend request by ID
+ * @param requestId - ID of the friend request
+ * @returns Friend request object or undefined
+ */
 export async function getFriendRequest(requestId: string) {
   const result = await pool.query(
     `SELECT * FROM friend_requests WHERE id = $1`,
@@ -281,6 +367,14 @@ export async function getFriendRequest(requestId: string) {
   return result.rows[0];
 }
 
+/**
+ * Accept a friend request and create friendship relationships
+ * Uses database transaction to ensure data consistency
+ * @param requestId - ID of the friend request to accept
+ * @param userId - ID of the user accepting the request
+ * @param friendId - ID of the user who sent the request
+ * @returns Success status and message
+ */
 export async function acceptFriendRequest(
   requestId: string,
   userId: string,
@@ -290,24 +384,24 @@ export async function acceptFriendRequest(
   try {
     await client.query("BEGIN");
 
-    // Update friend request status
+    // Update friend request status to accepted
     await client.query("UPDATE friend_requests SET status = $1 WHERE id = $2", [
       "accepted",
       requestId,
     ]);
 
-    // Create friend relationship (both directions)
+    // Create bidirectional friend relationships
     const friendId1 = crypto.randomUUID?.() || Math.random().toString();
     const friendId2 = crypto.randomUUID?.() || Math.random().toString();
 
     await client.query(
-      `INSERT INTO friends (id, user_id, friend_id, status) 
+      `INSERT INTO friends (id, user_id, friend_id, status)
        VALUES ($1, $2, $3, 'accepted')`,
       [friendId1, userId, friendId]
     );
 
     await client.query(
-      `INSERT INTO friends (id, user_id, friend_id, status) 
+      `INSERT INTO friends (id, user_id, friend_id, status)
        VALUES ($1, $2, $3, 'accepted')`,
       [friendId2, friendId, userId]
     );
@@ -322,6 +416,11 @@ export async function acceptFriendRequest(
   }
 }
 
+/**
+ * Reject a friend request
+ * @param requestId - ID of the friend request to reject
+ * @returns Success status and message
+ */
 export async function rejectFriendRequest(requestId: string) {
   await pool.query("UPDATE friend_requests SET status = $1 WHERE id = $2", [
     "rejected",
@@ -331,9 +430,16 @@ export async function rejectFriendRequest(requestId: string) {
 }
 
 // ============================================================================
-// DIRECT MESSAGE FUNCTIONS
+// DIRECT MESSAGE FUNCTIONS - Private messaging between users
 // ============================================================================
 
+/**
+ * Get all direct messages between two users
+ * Returns messages in both directions (sent and received)
+ * @param userId1 - ID of first user
+ * @param userId2 - ID of second user
+ * @returns Array of direct messages with sender information
+ */
 export async function getDirectMessages(userId1: string, userId2: string) {
   const result = await pool.query(
     `SELECT d.id, d.sender_id, d.receiver_id, d.text, d.created_at, d.edited_at,
@@ -347,6 +453,14 @@ export async function getDirectMessages(userId1: string, userId2: string) {
   return result.rows;
 }
 
+/**
+ * Insert a new direct message
+ * @param id - Generated UUID for the message
+ * @param senderId - ID of the user sending the message
+ * @param receiverId - ID of the user receiving the message
+ * @param text - Message content
+ * @returns Created direct message object
+ */
 export async function insertDirectMessage(
   id: string,
   senderId: string,
@@ -354,14 +468,21 @@ export async function insertDirectMessage(
   text: string
 ) {
   const result = await pool.query(
-    `INSERT INTO direct_messages (id, sender_id, receiver_id, text) 
-     VALUES ($1, $2, $3, $4) 
+    `INSERT INTO direct_messages (id, sender_id, receiver_id, text)
+     VALUES ($1, $2, $3, $4)
      RETURNING *`,
     [id, senderId, receiverId, text]
   );
   return result.rows[0];
 }
 
+/**
+ * Update the content of a direct message
+ * Sets the edited_at timestamp to current time
+ * @param messageId - ID of the message to update
+ * @param text - New message content
+ * @returns Update confirmation
+ */
 export async function updateDirectMessage(messageId: string, text: string) {
   const now = new Date().toISOString();
   await pool.query(
@@ -371,20 +492,32 @@ export async function updateDirectMessage(messageId: string, text: string) {
   return { updated: true };
 }
 
+/**
+ * Delete a direct message
+ * @param messageId - ID of the message to delete
+ * @returns Deletion confirmation
+ */
 export async function deleteDirectMessage(messageId: string) {
   await pool.query(`DELETE FROM direct_messages WHERE id = $1`, [messageId]);
   return { deleted: true };
 }
 
 // ============================================================================
-// USER SEARCH FUNCTIONS
+// USER SEARCH FUNCTIONS - Finding users for messaging/friending
 // ============================================================================
 
+/**
+ * Search for users by username or email
+ * Used for user discovery and friend adding
+ * @param query - Search term (partial username or email)
+ * @param excludeUserId - User ID to exclude from results (usually current user)
+ * @returns Array of matching user profiles (limited to 10 results)
+ */
 export async function searchUsers(query: string, excludeUserId: string) {
   const result = await pool.query(
-    `SELECT id, username, avatar, status 
-     FROM users 
-     WHERE (username ILIKE $1 OR email ILIKE $1) 
+    `SELECT id, username, avatar, status
+     FROM users
+     WHERE (username ILIKE $1 OR email ILIKE $1)
      AND id != $2
      LIMIT 10`,
     [`%${query}%`, excludeUserId]

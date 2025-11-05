@@ -1,28 +1,44 @@
 "use client";
 
+/**
+ * Direct Messages Component - Main messaging interface between two users
+ * Features real-time messaging via Socket.IO, voice/video calling via WebRTC,
+ * typing indicators, online status, and mobile-responsive design
+ */
+
 import { useState, useEffect, useRef } from "react";
 import { useSocket } from "@/lib/useSocket";
 import { useWebRTC } from "@/lib/useWebRTC";
 
+/**
+ * Interface for direct message data structure
+ */
 interface DirectMessage {
-  id: string;
-  senderId: string;
-  receiverId: string;
-  text: string;
-  username: string;
-  avatar?: string;
-  createdAt: string;
-  editedAt?: string;
+  id: string;           // Unique message identifier
+  senderId: string;     // ID of user who sent the message
+  receiverId: string;   // ID of user who should receive the message
+  text: string;         // Message content
+  username: string;     // Display name of sender
+  avatar?: string;      // Avatar URL of sender
+  createdAt: string;    // Message timestamp
+  editedAt?: string;    // Edit timestamp (if message was edited)
 }
 
+/**
+ * Props interface for DirectMessages component
+ */
 interface DirectMessagesProps {
-  userId: string;
-  friendId: string;
-  friendName: string;
-  friendAvatar?: string;
-  friendStatus?: string;
+  userId: string;       // Current user's ID
+  friendId: string;     // Friend's user ID for this conversation
+  friendName: string;   // Friend's display name
+  friendAvatar?: string; // Friend's avatar (defaults to emoji)
+  friendStatus?: string; // Friend's online status
 }
 
+/**
+ * Main Direct Messages Component
+ * Handles private messaging, real-time updates, and voice/video calls
+ */
 export default function DirectMessages({
   userId,
   friendId,
@@ -30,19 +46,24 @@ export default function DirectMessages({
   friendAvatar = "👤",
   friendStatus = "offline",
 }: DirectMessagesProps) {
-  const [messages, setMessages] = useState<DirectMessage[]>([]);
-  const [messageText, setMessageText] = useState("");
-  const [sending, setSending] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [userAvatar, setUserAvatar] = useState<string>("??");
-  const [isMobile, setIsMobile] = useState(false);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-  const localVideoRef = useRef<HTMLVideoElement>(null);
-  const remoteVideoRef = useRef<HTMLVideoElement>(null);
-  const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  // Message state management
+  const [messages, setMessages] = useState<DirectMessage[]>([]);  // Array of conversation messages
+  const [messageText, setMessageText] = useState("");             // Current message being typed
+  const [sending, setSending] = useState(false);                 // Whether a message is being sent
+  const [error, setError] = useState<string | null>(null);       // Error message display
+  const [loading, setLoading] = useState(true);                  // Initial loading state
 
-  // Detect mobile device
+  // User interface state
+  const [userAvatar, setUserAvatar] = useState<string>("??");     // Current user's avatar
+  const [isMobile, setIsMobile] = useState(false);               // Mobile device detection
+
+  // DOM references for scrolling and video elements
+  const messagesEndRef = useRef<HTMLDivElement>(null);           // Reference for auto-scrolling
+  const localVideoRef = useRef<HTMLVideoElement>(null);          // Local video stream element
+  const remoteVideoRef = useRef<HTMLVideoElement>(null);         // Remote video stream element
+  const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);  // Typing indicator timeout
+
+  // Detect mobile device for responsive behavior and warnings
   useEffect(() => {
     const checkMobile = () => {
       const mobile =
@@ -54,7 +75,7 @@ export default function DirectMessages({
     checkMobile();
   }, []);
 
-  // Socket.IO connection
+  // Initialize Socket.IO connection for real-time messaging
   const {
     socket,
     isConnected,
@@ -64,7 +85,7 @@ export default function DirectMessages({
     onlineUsers,
   } = useSocket(userId);
 
-  // WebRTC for voice/video calls
+  // Initialize WebRTC connection for voice/video calls
   const {
     isCallActive,
     isIncomingCall,
@@ -80,20 +101,21 @@ export default function DirectMessages({
     toggleVideo,
   } = useWebRTC({ socket, userId });
 
-  // Set video streams
+  // Set up local video stream when available
   useEffect(() => {
     if (localStream && localVideoRef.current) {
       localVideoRef.current.srcObject = localStream;
     }
   }, [localStream]);
 
+  // Set up remote video stream when available
   useEffect(() => {
     if (remoteStream && remoteVideoRef.current) {
       remoteVideoRef.current.srcObject = remoteStream;
     }
   }, [remoteStream]);
 
-  // Fetch messages on mount and friendId change
+  // Fetch messages when conversation changes
   useEffect(() => {
     if (friendId && userId) {
       fetchMessages();
@@ -101,7 +123,9 @@ export default function DirectMessages({
     }
   }, [friendId, userId]);
 
-  // Fetch user's avatar
+  /**
+   * Fetch current user's avatar for message display
+   */
   const fetchUserAvatar = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -120,18 +144,20 @@ export default function DirectMessages({
         }
       }
     } catch (error) {
-      
+      console.error("Failed to fetch user avatar:", error);
     }
   };
 
-  // Listen for new messages from Socket.IO
+  // Listen for real-time messages from Socket.IO
   useEffect(() => {
     if (!socket) return;
 
+    /**
+     * Handle incoming messages from Socket.IO
+     * Only processes messages for the current conversation
+     */
     const handleNewMessage = (message: any) => {
-      
-
-      // Check if message is for this conversation
+      // Check if message belongs to this conversation
       if (
         (message.senderId === friendId && message.receiverId === userId) ||
         (message.senderId === userId && message.receiverId === friendId)
@@ -146,14 +172,12 @@ export default function DirectMessages({
           avatar: message.senderId === userId ? undefined : friendAvatar,
         };
 
-        // Only add if not already in messages (prevent duplicates)
+        // Prevent duplicate messages
         setMessages((prev) => {
           const exists = prev.some((msg) => msg.id === formattedMessage.id);
           if (exists) {
-            
             return prev;
           }
-          
           return [...prev, formattedMessage];
         });
       }
@@ -166,11 +190,15 @@ export default function DirectMessages({
     };
   }, [socket, userId, friendId, friendName, friendAvatar]);
 
-  // Auto-scroll to bottom
+  // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
+  /**
+   * Fetch conversation history from the server
+   * Loads existing messages when opening a conversation
+   */
   const fetchMessages = async () => {
     try {
       setLoading(true);
@@ -190,9 +218,7 @@ export default function DirectMessages({
 
       const data = await res.json();
 
-      
-
-      // Format messages
+      // Format messages for display
       const formattedMessages = (data.messages || []).map((msg: any) => ({
         id: msg.id,
         senderId: msg.sender_id,
@@ -205,18 +231,19 @@ export default function DirectMessages({
           msg.sender_id === userId ? undefined : msg.avatar || friendAvatar,
       }));
 
-      
-
       setMessages(formattedMessages);
       setError(null);
     } catch (err) {
-      
       setError(err instanceof Error ? err.message : "Error loading messages");
     } finally {
       setLoading(false);
     }
   };
 
+  /**
+   * Send a new message to the conversation
+   * Saves to database first, then broadcasts via Socket.IO
+   */
   const handleSendMessage = async () => {
     const text = messageText.trim();
     if (!text || sending) return;
@@ -231,9 +258,7 @@ export default function DirectMessages({
         return;
       }
 
-      
-
-      // Send to database first
+      // Send message to server/database first
       const res = await fetch(`/api/messages/direct/${friendId}`, {
         method: "POST",
         headers: {
@@ -250,7 +275,7 @@ export default function DirectMessages({
 
       const newMessage = await res.json();
 
-      // Format message
+      // Format message for local display
       const formattedMessage: DirectMessage = {
         id: newMessage.id,
         senderId: userId,
@@ -260,12 +285,11 @@ export default function DirectMessages({
         username: "You",
       };
 
-      // Add to local state immediately (for sender)
+      // Add to local state immediately for instant UI feedback
       setMessages((prev) => [...prev, formattedMessage]);
 
-      // Send via Socket.IO for real-time delivery to receiver
+      // Broadcast message via Socket.IO for real-time delivery
       if (socket && isConnected) {
-        
         sendMessage({
           messageId: newMessage.id,
           senderId: userId,
@@ -273,8 +297,6 @@ export default function DirectMessages({
           text: text,
           createdAt: formattedMessage.createdAt,
         });
-      } else {
-        
       }
 
       setMessageText("");
@@ -283,12 +305,15 @@ export default function DirectMessages({
       const errorMsg =
         err instanceof Error ? err.message : "Error sending message";
       setError(errorMsg);
-      
     } finally {
       setSending(false);
     }
   };
 
+  /**
+   * Handle Enter key press for sending messages
+   * Shift+Enter for new line, Enter alone to send
+   */
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
@@ -296,10 +321,14 @@ export default function DirectMessages({
     }
   };
 
+  /**
+   * Handle typing input with real-time typing indicators
+   * Sends typing status to other user and clears after timeout
+   */
   const handleTyping = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setMessageText(e.target.value);
 
-    // Send typing indicator
+    // Send typing indicator via Socket.IO
     if (socket && isConnected) {
       sendTypingIndicator(friendId, true);
 
@@ -308,16 +337,20 @@ export default function DirectMessages({
         clearTimeout(typingTimeoutRef.current);
       }
 
-      // Stop typing after 2 seconds
+      // Stop typing indicator after 2 seconds of inactivity
       typingTimeoutRef.current = setTimeout(() => {
         sendTypingIndicator(friendId, false);
       }, 2000);
     }
   };
 
+  // Check if friend is currently typing
   const isTyping = typingUsers.has(friendId);
 
-  // Handle call with mobile-specific warnings
+  /**
+   * Initiate a voice or video call with mobile-specific warnings
+   * Checks permissions and provides user guidance for mobile devices
+   */
   const handleStartCall = async (type: "voice" | "video") => {
     if (isMobile && type === "video") {
       const confirmed = confirm(
@@ -326,7 +359,7 @@ export default function DirectMessages({
       if (!confirmed) return;
     }
 
-    // Check permissions first
+    // Check microphone permissions before starting call
     try {
       const permissionStatus = await navigator.permissions?.query({
         name: "microphone" as PermissionName,
@@ -334,19 +367,19 @@ export default function DirectMessages({
       if (permissionStatus?.state === "denied") {
         alert(
           "Microphone access is blocked. Please enable it in your browser settings:\n\n" +
-            "Chrome: Settings ? Privacy and security ? Site settings ? Microphone\n" +
-            "Safari: Settings ? Safari ? Camera/Microphone"
+            "Chrome: Settings → Privacy and security → Site settings → Microphone\n" +
+            "Safari: Settings → Safari → Camera/Microphone"
         );
         return;
       }
     } catch (e) {
       // Permissions API not supported, continue anyway
-      
     }
 
     startCall(friendId, type);
   };
 
+  // Show loading spinner while fetching initial messages
   if (loading) {
     return (
       <div className="flex-1 flex items-center justify-center bg-[#36393F]">
