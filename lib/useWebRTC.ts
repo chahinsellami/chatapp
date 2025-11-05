@@ -36,12 +36,11 @@ export function useWebRTC({ socket, userId }: UseWebRTCProps) {
     socket.on(
       "incoming-call",
       (data: { from: string; signal: any; callType: CallType }) => {
-        console.log("Incoming call from:", data.from);
         setIsIncomingCall(true);
         setCallType(data.callType);
         setCallerInfo({
           id: data.from,
-          name: data.from, // You can fetch username from your user data
+          name: data.from,
           signal: data.signal,
         });
       }
@@ -49,21 +48,24 @@ export function useWebRTC({ socket, userId }: UseWebRTCProps) {
 
     // Handle call accepted
     socket.on("call-accepted", (data: { signal: any }) => {
-      console.log("Call accepted");
+      
       if (peerRef.current) {
+        
         peerRef.current.signal(data.signal);
+      } else {
+        
       }
     });
 
     // Handle call rejected
     socket.on("call-rejected", () => {
-      console.log("Call rejected");
+      
       endCall();
     });
 
     // Handle call ended
     socket.on("call-ended", () => {
-      console.log("Call ended by other user");
+      
       endCall();
     });
 
@@ -85,17 +87,24 @@ export function useWebRTC({ socket, userId }: UseWebRTCProps) {
 
   const startCall = useCallback(
     async (receiverId: string, type: CallType) => {
-      if (!socket || !userId) return;
+      if (!socket || !userId) {
+        return;
+      }
 
       try {
         setCallType(type);
-        otherUserIdRef.current = receiverId; // Store receiver ID
+        otherUserIdRef.current = receiverId;
 
         // Check if getUserMedia is supported
         if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-          alert("Your browser does not support audio/video calls. Please use a modern browser like Chrome, Firefox, or Safari.");
+          
+          alert(
+            "Your browser does not support audio/video calls. Please use a modern browser like Chrome, Firefox, or Safari."
+          );
           return;
         }
+
+        
 
         // Mobile-friendly media constraints
         const constraints: MediaStreamConstraints = {
@@ -104,11 +113,14 @@ export function useWebRTC({ socket, userId }: UseWebRTCProps) {
             noiseSuppression: true,
             autoGainControl: true,
           },
-          video: type === "video" ? {
-            width: { ideal: 640, max: 1280 },
-            height: { ideal: 480, max: 720 },
-            facingMode: "user", // Front camera on mobile
-          } : false,
+          video:
+            type === "video"
+              ? {
+                  width: { ideal: 640, max: 1280 },
+                  height: { ideal: 480, max: 720 },
+                  facingMode: "user", // Front camera on mobile
+                }
+              : false,
         };
 
         // Get media stream
@@ -131,11 +143,8 @@ export function useWebRTC({ socket, userId }: UseWebRTCProps) {
         });
 
         peer.on("signal", (signal) => {
-          console.log("📡 Peer signal event");
-          
           // Only send the initial call signal, not ICE candidates
           if (!hasInitiatedCallRef.current) {
-            console.log("📡 Sending initial call signal");
             hasInitiatedCallRef.current = true;
             socket.emit("call-user", {
               to: receiverId,
@@ -147,34 +156,55 @@ export function useWebRTC({ socket, userId }: UseWebRTCProps) {
         });
 
         peer.on("stream", (stream) => {
-          console.log("Received remote stream");
           remoteStreamRef.current = stream;
           setRemoteStream(stream);
         });
 
         peer.on("error", (err) => {
-          console.error("Peer error:", err);
+          
           cleanup();
+        });
+
+        peer.on("connect", () => {
+          
+        });
+
+        peer.on("close", () => {
+          
         });
 
         peerRef.current = peer;
         setIsCallActive(true);
-      } catch (error: any) {
-        console.error("Error starting call:", error);
         
+      } catch (error: any) {
+        
+
         // More specific error messages
-        if (error.name === "NotAllowedError" || error.name === "PermissionDeniedError") {
-          alert("Camera/microphone access denied. Please grant permissions in your browser settings and try again.");
-        } else if (error.name === "NotFoundError" || error.name === "DevicesNotFoundError") {
-          alert("No camera/microphone found. Please check your device and try again.");
-        } else if (error.name === "NotReadableError" || error.name === "TrackStartError") {
+        if (
+          error.name === "NotAllowedError" ||
+          error.name === "PermissionDeniedError"
+        ) {
+          alert(
+            "Camera/microphone access denied. Please grant permissions in your browser settings and try again."
+          );
+        } else if (
+          error.name === "NotFoundError" ||
+          error.name === "DevicesNotFoundError"
+        ) {
+          alert(
+            "No camera/microphone found. Please check your device and try again."
+          );
+        } else if (
+          error.name === "NotReadableError" ||
+          error.name === "TrackStartError"
+        ) {
           alert("Camera/microphone is already in use by another application.");
         } else if (error.name === "OverconstrainedError") {
           alert("Camera/microphone does not meet the requirements.");
         } else {
           alert(`Could not start call: ${error.message || "Unknown error"}`);
         }
-        
+
         cleanup();
       }
     },
@@ -209,17 +239,24 @@ export function useWebRTC({ socket, userId }: UseWebRTCProps) {
   }, []);
 
   const acceptCall = useCallback(async () => {
-    if (!socket || !userId || !callerInfo) return;
+    if (!socket || !userId || !callerInfo) {
+      return;
+    }
 
     try {
-      otherUserIdRef.current = callerInfo.id; // Store caller ID
+      otherUserIdRef.current = callerInfo.id;
 
       // Check if getUserMedia is supported
       if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-        alert("Your browser does not support audio/video calls. Please use a modern browser like Chrome, Firefox, or Safari.");
+        
+        alert(
+          "Your browser does not support audio/video calls. Please use a modern browser like Chrome, Firefox, or Safari."
+        );
         rejectCall();
         return;
       }
+
+      
 
       // Mobile-friendly media constraints
       const constraints: MediaStreamConstraints = {
@@ -228,11 +265,14 @@ export function useWebRTC({ socket, userId }: UseWebRTCProps) {
           noiseSuppression: true,
           autoGainControl: true,
         },
-        video: callType === "video" ? {
-          width: { ideal: 640, max: 1280 },
-          height: { ideal: 480, max: 720 },
-          facingMode: "user", // Front camera on mobile
-        } : false,
+        video:
+          callType === "video"
+            ? {
+                width: { ideal: 640, max: 1280 },
+                height: { ideal: 480, max: 720 },
+                facingMode: "user", // Front camera on mobile
+              }
+            : false,
       };
 
       // Get media stream
@@ -255,24 +295,35 @@ export function useWebRTC({ socket, userId }: UseWebRTCProps) {
       });
 
       peer.on("signal", (signal) => {
+        
         socket.emit("accept-call", {
           to: callerInfo.id,
           signal,
         });
+        
       });
 
       peer.on("stream", (stream) => {
-        console.log("Received remote stream");
+        
         remoteStreamRef.current = stream;
         setRemoteStream(stream);
       });
 
       peer.on("error", (err) => {
-        console.error("Peer error:", err);
+        
         cleanup();
       });
 
+      peer.on("connect", () => {
+        
+      });
+
+      peer.on("close", () => {
+        
+      });
+
       // Signal the caller
+      
       peer.signal(callerInfo.signal);
 
       peerRef.current = peer;
@@ -280,21 +331,34 @@ export function useWebRTC({ socket, userId }: UseWebRTCProps) {
       setIsIncomingCall(false);
       setCallerInfo(null);
     } catch (error: any) {
-      console.error("Error accepting call:", error);
       
+
       // More specific error messages
-      if (error.name === "NotAllowedError" || error.name === "PermissionDeniedError") {
-        alert("Camera/microphone access denied. Please grant permissions in your browser settings and try again.");
-      } else if (error.name === "NotFoundError" || error.name === "DevicesNotFoundError") {
-        alert("No camera/microphone found. Please check your device and try again.");
-      } else if (error.name === "NotReadableError" || error.name === "TrackStartError") {
+      if (
+        error.name === "NotAllowedError" ||
+        error.name === "PermissionDeniedError"
+      ) {
+        alert(
+          "Camera/microphone access denied. Please grant permissions in your browser settings and try again."
+        );
+      } else if (
+        error.name === "NotFoundError" ||
+        error.name === "DevicesNotFoundError"
+      ) {
+        alert(
+          "No camera/microphone found. Please check your device and try again."
+        );
+      } else if (
+        error.name === "NotReadableError" ||
+        error.name === "TrackStartError"
+      ) {
         alert("Camera/microphone is already in use by another application.");
       } else if (error.name === "OverconstrainedError") {
         alert("Camera/microphone does not meet the requirements.");
       } else {
         alert(`Could not accept call: ${error.message || "Unknown error"}`);
       }
-      
+
       // Reject the call
       if (socket && callerInfo) {
         socket.emit("reject-call", { to: callerInfo.id });
@@ -316,7 +380,7 @@ export function useWebRTC({ socket, userId }: UseWebRTCProps) {
   }, [socket, callerInfo]);
 
   const endCall = useCallback(() => {
-    console.log("📞 Ending call");
+    
 
     // Notify the other user
     if (socket && otherUserIdRef.current) {

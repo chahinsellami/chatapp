@@ -30,11 +30,8 @@ export async function GET(
 
     const messages = await getDirectMessages(user.userId, otherUserId);
 
-    console.log(`📨 Fetched ${messages.length} messages between ${user.userId} and ${otherUserId}`);
-
     return NextResponse.json({ messages });
   } catch (error) {
-    console.error("Get direct messages error:", error);
     return createErrorResponse("Failed to fetch messages", 500);
   }
 }

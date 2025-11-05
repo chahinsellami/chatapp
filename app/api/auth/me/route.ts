@@ -33,7 +33,7 @@ export async function GET(request: NextRequest) {
       createdAt: user.created_at,
     });
   } catch (error) {
-    console.error("Get user error:", error);
+    
     return createErrorResponse("Failed to get user", 500);
   }
 }

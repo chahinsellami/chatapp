@@ -39,7 +39,9 @@ export default function Message({ message, isOwnMessage }: MessageProps) {
               />
             ) : (
               <span className="text-white font-bold text-base">
-                {message.avatar || message.username?.charAt(0).toUpperCase() || "?"}
+                {message.avatar ||
+                  message.username?.charAt(0).toUpperCase() ||
+                  "?"}
               </span>
             )}
           </div>

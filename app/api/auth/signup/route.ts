@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
     try {
       await initializeDatabase();
     } catch (dbError) {
-      console.error("Database initialization failed:", dbError);
+      
       return createErrorResponse(
         "Database is not available. Please try again later.",
         503
@@ -103,7 +103,7 @@ export async function POST(request: NextRequest) {
     // Return success response with token
     return createAuthResponse(newUser, token, 201);
   } catch (error) {
-    console.error("Signup error:", error);
+    
     return createErrorResponse("Failed to create account", 500);
   }
 }

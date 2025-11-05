@@ -51,7 +51,7 @@ class WebSocketManager {
       });
     }, 30000);
 
-    console.log("✓ WebSocket server initialized");
+    
   }
 
   private handleConnection(ws: WebSocketClientExt, req: IncomingMessage) {
@@ -73,7 +73,7 @@ class WebSocketManager {
     };
 
     this.clients.set(userId, client);
-    console.log(`✓ User connected: ${userId}`);
+    
 
     // Send connection confirmation
     ws.send(
@@ -93,7 +93,7 @@ class WebSocketManager {
     });
     ws.on("close", () => this.handleDisconnect(userId));
     ws.on("error", (error) =>
-      console.error(`WebSocket error for ${userId}:`, error)
+      
     );
   }
 
@@ -126,10 +126,10 @@ class WebSocketManager {
           this.forwardWebRTCSignal(message);
           break;
         default:
-          console.warn(`Unknown message type: ${message.type}`);
+          
       }
     } catch (error) {
-      console.error("Error processing message:", error);
+      
     }
   }
 
@@ -269,7 +269,7 @@ class WebSocketManager {
       }
     });
 
-    console.log(`✗ User disconnected: ${userId}`);
+    
     this.broadcastUserStatus(userId, "offline");
   }
 

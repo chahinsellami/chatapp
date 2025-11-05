@@ -18,19 +18,20 @@ Real-time messaging application with direct messaging, friend management, and vo
 
 ## Tech Stack
 
-| Technology | Purpose |
-|-----------|---------|
-| Next.js 16 | React framework |
-| TypeScript 5 | Type safety |
-| Tailwind CSS | Styling |
-| PostgreSQL | Database |
-| Socket.IO | Real-time messaging |
-| WebRTC | Voice/video calls |
-| Railway | Hosting |
+| Technology   | Purpose             |
+| ------------ | ------------------- |
+| Next.js 16   | React framework     |
+| TypeScript 5 | Type safety         |
+| Tailwind CSS | Styling             |
+| PostgreSQL   | Database            |
+| Socket.IO    | Real-time messaging |
+| WebRTC       | Voice/video calls   |
+| Railway      | Hosting             |
 
 ## Quick Start
 
 1. **Clone and install**
+
 ```bash
 git clone https://github.com/chahinsellami/chatapp.git
 cd chatapp/webchat-app
@@ -40,6 +41,7 @@ npm install
 2. **Configure environment**
 
 Create `.env.local`:
+
 ```env
 DATABASE_URL=postgresql://user:password@host:port/database
 JWT_SECRET=your_secret_key_here
@@ -48,7 +50,8 @@ NEXT_PUBLIC_SOCKET_URL=http://localhost:3001
 ```
 
 3. **Start servers**
-```bash
+
+`````bash
 # Terminal 1 - Next.js app
 npm run dev
 
@@ -91,7 +94,7 @@ http://localhost:3000
 
 - Save profile
 
-````
+`````
 
 ### 3. Find Friendswebchat-app/
 

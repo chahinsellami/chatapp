@@ -11,7 +11,6 @@ interface Message {
   createdAt: string;
   username?: string;
   avatar?: string;
-  audioUrl?: string;
 }
 
 export function useSocket(userId: string | null) {
@@ -22,17 +21,10 @@ export function useSocket(userId: string | null) {
   const socketRef = useRef<Socket | null>(null);
 
   useEffect(() => {
-    if (!userId) {
-      console.warn("⚠️ useSocket: userId is null/undefined");
-      return;
-    }
+    if (!userId) return;
 
-    console.log("🔌 Initializing socket connection for user:", userId);
-    console.log("🔍 userId type:", typeof userId, "value:", JSON.stringify(userId));
-
-    // Get Socket.IO backend URL from environment variable
-    const socketUrl = process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:3001";
-    console.log("🌐 Connecting to Socket.IO server:", socketUrl);
+    const socketUrl =
+      process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:3001";
 
     // Connect to Socket.IO server
     const socket = io(socketUrl, {
@@ -43,19 +35,15 @@ export function useSocket(userId: string | null) {
     socketRef.current = socket;
 
     socket.on("connect", () => {
-      console.log("✅ Socket connected:", socket.id);
       setIsConnected(true);
       socket.emit("join", userId);
-      console.log("📤 Sent join event with userId:", userId);
     });
 
     socket.on("disconnect", () => {
-      console.log("❌ Socket disconnected");
       setIsConnected(false);
     });
 
     socket.on("receive-message", (message: Message) => {
-      console.log("📨 Message received in useSocket:", message);
       setMessages((prev) => [...prev, message]);
     });
 
@@ -72,12 +60,10 @@ export function useSocket(userId: string | null) {
     });
 
     socket.on("user-online", (userId: string) => {
-      console.log("🟢 User came online:", userId);
       setOnlineUsers((prev) => new Set([...prev, userId]));
     });
 
     socket.on("user-offline", (userId: string) => {
-      console.log("⚫ User went offline:", userId);
       setOnlineUsers((prev) => {
         const newSet = new Set(prev);
         newSet.delete(userId);
@@ -86,7 +72,6 @@ export function useSocket(userId: string | null) {
     });
 
     return () => {
-      console.log("🔌 Disconnecting socket");
       socket.disconnect();
     };
   }, [userId]);
@@ -100,15 +85,7 @@ export function useSocket(userId: string | null) {
     audioUrl?: string;
   }) => {
     if (socketRef.current?.connected) {
-      console.log("📤 Sending message via socket:", {
-        messageId: message.messageId,
-        from: message.senderId,
-        to: message.receiverId,
-        hasAudio: !!message.audioUrl,
-      });
       socketRef.current.emit("send-message", message);
-    } else {
-      console.error("❌ Socket not connected, cannot send message");
     }
   };
 

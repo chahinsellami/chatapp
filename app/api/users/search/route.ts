@@ -28,7 +28,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ users: results });
   } catch (error) {
-    console.error("User search error:", error);
+    
     return createErrorResponse("Failed to search users", 500);
   }
 }

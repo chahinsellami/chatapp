@@ -62,7 +62,7 @@ export default function AddFriend({ userId, onFriendAdded }: AddFriendProps) {
       setUsers(data.users || []);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Error searching users");
-      console.error("Error searching users:", err);
+      
     } finally {
       setSearching(false);
     }
@@ -105,7 +105,7 @@ export default function AddFriend({ userId, onFriendAdded }: AddFriendProps) {
       }, 1500);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Error sending request");
-      console.error("Error sending friend request:", err);
+      
     }
   };
 

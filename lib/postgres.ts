@@ -11,11 +11,11 @@ const pool = new Pool({
 
 // Test connection
 pool.on("connect", () => {
-  console.log("✓ Connected to PostgreSQL");
+  
 });
 
 pool.on("error", (err) => {
-  console.error("Unexpected error on idle client", err);
+  
 });
 
 export { pool };
@@ -124,9 +124,9 @@ export async function initializeDatabase() {
       )
     `);
 
-    console.log("✓ Database schema initialized");
+    
   } catch (error) {
-    console.error("Database initialization error:", error);
+    
     throw error;
   } finally {
     client.release();

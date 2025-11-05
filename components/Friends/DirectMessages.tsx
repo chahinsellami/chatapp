@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, useEffect, useRef } from "react";
 import { useSocket } from "@/lib/useSocket";
@@ -30,21 +30,12 @@ export default function DirectMessages({
   friendAvatar = "👤",
   friendStatus = "offline",
 }: DirectMessagesProps) {
-  // Debug logging
-  console.log("🔍 DirectMessages props:", {
-    userId,
-    friendId,
-    friendName,
-    userIdType: typeof userId,
-    friendIdType: typeof friendId,
-  });
-
   const [messages, setMessages] = useState<DirectMessage[]>([]);
   const [messageText, setMessageText] = useState("");
   const [sending, setSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
-  const [userAvatar, setUserAvatar] = useState<string>("😊");
+  const [userAvatar, setUserAvatar] = useState<string>("??");
   const [isMobile, setIsMobile] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const localVideoRef = useRef<HTMLVideoElement>(null);
@@ -54,17 +45,24 @@ export default function DirectMessages({
   // Detect mobile device
   useEffect(() => {
     const checkMobile = () => {
-      const mobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-        navigator.userAgent
-      );
+      const mobile =
+        /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+          navigator.userAgent
+        );
       setIsMobile(mobile);
     };
     checkMobile();
   }, []);
 
   // Socket.IO connection
-  const { socket, isConnected, sendMessage, sendTypingIndicator, typingUsers, onlineUsers } =
-    useSocket(userId);
+  const {
+    socket,
+    isConnected,
+    sendMessage,
+    sendTypingIndicator,
+    typingUsers,
+    onlineUsers,
+  } = useSocket(userId);
 
   // WebRTC for voice/video calls
   const {
@@ -122,7 +120,7 @@ export default function DirectMessages({
         }
       }
     } catch (error) {
-      console.error("Error fetching user avatar:", error);
+      
     }
   };
 
@@ -131,7 +129,7 @@ export default function DirectMessages({
     if (!socket) return;
 
     const handleNewMessage = (message: any) => {
-      console.log("📨 Message received via socket:", message);
+      
 
       // Check if message is for this conversation
       if (
@@ -152,10 +150,10 @@ export default function DirectMessages({
         setMessages((prev) => {
           const exists = prev.some((msg) => msg.id === formattedMessage.id);
           if (exists) {
-            console.log("Message already exists, skipping");
+            
             return prev;
           }
-          console.log("Adding message to state");
+          
           return [...prev, formattedMessage];
         });
       }
@@ -192,7 +190,7 @@ export default function DirectMessages({
 
       const data = await res.json();
 
-      console.log("📥 Fetched messages data:", data);
+      
 
       // Format messages
       const formattedMessages = (data.messages || []).map((msg: any) => ({
@@ -207,12 +205,12 @@ export default function DirectMessages({
           msg.sender_id === userId ? undefined : msg.avatar || friendAvatar,
       }));
 
-      console.log("📥 Formatted messages:", formattedMessages.length);
+      
 
       setMessages(formattedMessages);
       setError(null);
     } catch (err) {
-      console.error("Error fetching messages:", err);
+      
       setError(err instanceof Error ? err.message : "Error loading messages");
     } finally {
       setLoading(false);
@@ -233,7 +231,7 @@ export default function DirectMessages({
         return;
       }
 
-      console.log("📤 Sending message to:", friendId);
+      
 
       // Send to database first
       const res = await fetch(`/api/messages/direct/${friendId}`, {
@@ -267,7 +265,7 @@ export default function DirectMessages({
 
       // Send via Socket.IO for real-time delivery to receiver
       if (socket && isConnected) {
-        console.log("📡 Emitting via socket.io");
+        
         sendMessage({
           messageId: newMessage.id,
           senderId: userId,
@@ -276,7 +274,7 @@ export default function DirectMessages({
           createdAt: formattedMessage.createdAt,
         });
       } else {
-        console.warn("Socket not connected!");
+        
       }
 
       setMessageText("");
@@ -285,7 +283,7 @@ export default function DirectMessages({
       const errorMsg =
         err instanceof Error ? err.message : "Error sending message";
       setError(errorMsg);
-      console.error("Error sending message:", err);
+      
     } finally {
       setSending(false);
     }
@@ -330,16 +328,20 @@ export default function DirectMessages({
 
     // Check permissions first
     try {
-      const permissionStatus = await navigator.permissions?.query({ name: 'microphone' as PermissionName });
-      if (permissionStatus?.state === 'denied') {
-        alert("Microphone access is blocked. Please enable it in your browser settings:\n\n" +
-              "Chrome: Settings → Privacy and security → Site settings → Microphone\n" +
-              "Safari: Settings → Safari → Camera/Microphone");
+      const permissionStatus = await navigator.permissions?.query({
+        name: "microphone" as PermissionName,
+      });
+      if (permissionStatus?.state === "denied") {
+        alert(
+          "Microphone access is blocked. Please enable it in your browser settings:\n\n" +
+            "Chrome: Settings ? Privacy and security ? Site settings ? Microphone\n" +
+            "Safari: Settings ? Safari ? Camera/Microphone"
+        );
         return;
       }
     } catch (e) {
       // Permissions API not supported, continue anyway
-      console.log("Permissions API not available");
+      
     }
 
     startCall(friendId, type);
@@ -367,7 +369,7 @@ export default function DirectMessages({
                   className="w-full h-full object-cover"
                 />
               ) : (
-                <span className="text-2xl">{friendAvatar || "👤"}</span>
+                <span className="text-2xl">{friendAvatar || "??"}</span>
               )}
             </div>
             {/* Enhanced online indicator */}
@@ -406,7 +408,7 @@ export default function DirectMessages({
             className="px-3 py-2 bg-gradient-to-r from-[#43B581] to-[#3BA55D] text-white rounded-xl hover:shadow-lg hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
             title="Voice Call"
           >
-            📞
+            ??
           </button>
           <button
             onClick={() => handleStartCall("video")}
@@ -414,7 +416,7 @@ export default function DirectMessages({
             className="px-3 py-2 bg-gradient-to-r from-[#5B65F5] to-[#4752C4] text-white rounded-xl hover:shadow-lg hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
             title="Video Call"
           >
-            📹
+            ??
           </button>
         </div>
       </div>
@@ -446,7 +448,7 @@ export default function DirectMessages({
                       className="w-full h-full object-cover"
                     />
                   ) : (
-                    <span className="text-lg">{userAvatar || "😊"}</span>
+                    <span className="text-lg">{userAvatar || "??"}</span>
                   )
                 ) : friendAvatar?.startsWith("/avatars/") ? (
                   <img
@@ -455,7 +457,7 @@ export default function DirectMessages({
                     className="w-full h-full object-cover"
                   />
                 ) : (
-                  <span className="text-lg">{friendAvatar || "👤"}</span>
+                  <span className="text-lg">{friendAvatar || "??"}</span>
                 )}
               </div>
 
@@ -488,7 +490,7 @@ export default function DirectMessages({
         {/* Typing Indicator */}
         {isTyping && (
           <div className="flex items-center gap-2 text-[#72767D] text-sm animate-fadeIn">
-            <span className="text-lg">{friendAvatar || "👤"}</span>
+            <span className="text-lg">{friendAvatar || "??"}</span>
             <span className="italic">{friendName} is typing...</span>
           </div>
         )}
@@ -499,7 +501,7 @@ export default function DirectMessages({
       {/* Error Display */}
       {error && (
         <div className="px-4 py-2 bg-red-500/20 border-t border-red-500 flex-shrink-0">
-          <p className="text-red-300 text-sm">⚠️ {error}</p>
+          <p className="text-red-300 text-sm">?? {error}</p>
         </div>
       )}
 
@@ -522,12 +524,12 @@ export default function DirectMessages({
           >
             {sending ? (
               <>
-                <span className="animate-spin">⏳</span>
+                <span className="animate-spin">?</span>
                 <span className="hidden md:inline">Sending...</span>
               </>
             ) : (
               <>
-                <span>📨</span>
+                <span>??</span>
                 <span className="hidden md:inline">Send</span>
               </>
             )}
@@ -540,15 +542,18 @@ export default function DirectMessages({
         <div className="fixed inset-0 bg-black/90 flex items-center justify-center z-50 p-4">
           <div className="bg-[#36393F] rounded-xl p-6 md:p-8 max-w-md w-full text-center">
             <div className="text-5xl mb-4">
-              {callType === "video" ? "📹" : "📞"}
+              {callType === "video" ? "??" : "??"}
             </div>
             <h2 className="text-xl md:text-2xl font-bold text-white mb-2">
               Incoming {callType === "video" ? "Video" : "Voice"} Call
             </h2>
-            <p className="text-[#DCDDDE] mb-6 text-sm md:text-base">{friendName} is calling...</p>
+            <p className="text-[#DCDDDE] mb-6 text-sm md:text-base">
+              {friendName} is calling...
+            </p>
             {isMobile && (
               <p className="text-[#72767D] text-xs mb-4">
-                💡 Make sure to allow microphone{callType === "video" ? " and camera" : ""} access when prompted
+                ?? Make sure to allow microphone
+                {callType === "video" ? " and camera" : ""} access when prompted
               </p>
             )}
             <div className="flex gap-3 md:gap-4 justify-center">
@@ -556,13 +561,13 @@ export default function DirectMessages({
                 onClick={acceptCall}
                 className="flex-1 md:flex-none px-6 py-3 bg-gradient-to-r from-[#43B581] to-[#3BA55D] text-white rounded-xl hover:shadow-lg transition-all duration-200 font-bold"
               >
-                ✓ Accept
+                ? Accept
               </button>
               <button
                 onClick={rejectCall}
                 className="flex-1 md:flex-none px-6 py-3 bg-gradient-to-r from-[#F04747] to-[#D84040] text-white rounded-xl hover:shadow-lg transition-all duration-200 font-bold"
               >
-                ✗ Decline
+                ? Decline
               </button>
             </div>
           </div>
@@ -574,7 +579,8 @@ export default function DirectMessages({
         <div className="fixed inset-0 bg-black/95 flex flex-col items-center justify-center z-50 p-2 md:p-4">
           <div className="text-white text-center mb-2 md:mb-4">
             <h2 className="text-lg md:text-2xl font-bold mb-1 md:mb-2">
-              {callType === "video" ? "📹" : "📞"} {callType === "video" ? "Video" : "Voice"} Call with {friendName}
+              {callType === "video" ? "??" : "??"}{" "}
+              {callType === "video" ? "Video" : "Voice"} Call with {friendName}
             </h2>
             {isMobile && callType === "video" && (
               <p className="text-xs text-[#72767D]">
@@ -609,7 +615,9 @@ export default function DirectMessages({
 
           {callType === "voice" && (
             <>
-              <div className="text-white text-5xl md:text-6xl mb-6 md:mb-8">📞</div>
+              <div className="text-white text-5xl md:text-6xl mb-6 md:mb-8">
+                ??
+              </div>
               {/* Hidden audio elements for voice calls */}
               <audio ref={localVideoRef} autoPlay muted />
               <audio ref={remoteVideoRef} autoPlay />
@@ -622,21 +630,21 @@ export default function DirectMessages({
               onClick={toggleAudio}
               className="px-4 md:px-6 py-2 md:py-3 bg-[#5B65F5] text-white rounded-xl hover:bg-[#4752C4] font-bold text-sm md:text-base transition-all duration-200"
             >
-              🎤 {isMobile ? "" : "Mute"}
+              ?? {isMobile ? "" : "Mute"}
             </button>
             {callType === "video" && (
               <button
                 onClick={toggleVideo}
                 className="px-4 md:px-6 py-2 md:py-3 bg-[#5B65F5] text-white rounded-xl hover:bg-[#4752C4] font-bold text-sm md:text-base transition-all duration-200"
               >
-                📹 {isMobile ? "" : "Camera"}
+                ?? {isMobile ? "" : "Camera"}
               </button>
             )}
             <button
               onClick={endCall}
               className="px-4 md:px-6 py-2 md:py-3 bg-gradient-to-r from-[#F04747] to-[#D84040] text-white rounded-xl hover:shadow-lg font-bold text-sm md:text-base transition-all duration-200"
             >
-              📵 {isMobile ? "" : "End Call"}
+              ?? {isMobile ? "" : "End Call"}
             </button>
           </div>
         </div>

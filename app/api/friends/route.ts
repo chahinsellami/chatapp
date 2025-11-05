@@ -25,7 +25,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ friends, pendingRequests });
   } catch (error) {
-    console.error("Friends GET error:", error);
+    
     return createErrorResponse("Failed to fetch friends", 500);
   }
 }
@@ -64,7 +64,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(friendRequest, { status: 201 });
   } catch (error: any) {
-    console.error("Friends POST error:", error);
+    
     if (
       error.message.includes("already exists") ||
       error.message.includes("duplicate")

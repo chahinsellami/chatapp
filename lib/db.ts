@@ -53,7 +53,7 @@ export function initializeDatabase() {
   } catch (error: any) {
     // Column already exists, ignore error
     if (!error.message.includes("duplicate column")) {
-      console.log("Bio column migration: already exists or error ignored");
+      
     }
   }
 
@@ -160,7 +160,7 @@ export function initializeDatabase() {
   // Create default channels if they don't exist
   createDefaultChannels();
 
-  console.log("✓ Database initialized successfully");
+  
 }
 
 /**
@@ -202,7 +202,7 @@ function createDefaultChannels() {
       stmt.run(channel.id, channel.name, channel.description, systemId, now);
     }
   } catch (error) {
-    console.error("Error creating default channels:", error);
+    
   }
 }
 

@@ -66,7 +66,7 @@ export const FileSharePanel: React.FC<FileSharePanelProps> = ({
         if (fileInputRef.current) fileInputRef.current.value = "";
       }, 500);
     } catch (error) {
-      console.error("Upload error:", error);
+      
       setUploading(false);
     }
   };

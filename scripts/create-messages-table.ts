@@ -13,7 +13,7 @@ async function createMessagesTable() {
 
   try {
     await client.connect();
-    console.log("✓ Connected to PostgreSQL");
+    
 
     // Create direct_messages table
     await client.query(`
@@ -28,7 +28,7 @@ async function createMessagesTable() {
       );
     `);
 
-    console.log("✓ Created direct_messages table");
+    
 
     // Create index for better query performance
     await client.query(`
@@ -36,15 +36,15 @@ async function createMessagesTable() {
       ON direct_messages(sender_id, receiver_id);
     `);
 
-    console.log("✓ Created indexes");
+    
 
     // Check if there are any messages
     const result = await client.query("SELECT COUNT(*) FROM direct_messages");
-    console.log(`📊 Total messages in database: ${result.rows[0].count}`);
+    
 
-    console.log("\n✅ Database setup complete!");
+    
   } catch (error) {
-    console.error("❌ Error:", error);
+    
     throw error;
   } finally {
     await client.end();
@@ -53,10 +53,10 @@ async function createMessagesTable() {
 
 createMessagesTable()
   .then(() => {
-    console.log("✨ Done!");
+    
     process.exit(0);
   })
   .catch((error) => {
-    console.error("Fatal error:", error);
+    
     process.exit(1);
   });

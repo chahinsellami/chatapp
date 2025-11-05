@@ -69,7 +69,7 @@ export default function FriendsList({
       setPendingRequests(data.pendingRequests || []);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Error fetching friends");
-      console.error("Error fetching friends:", err);
+      
     } finally {
       setLoading(false);
     }
@@ -102,7 +102,7 @@ export default function FriendsList({
       onRefresh?.();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Error accepting request");
-      console.error("Error accepting request:", err);
+      
     } finally {
       setActionLoading(null);
     }
@@ -135,7 +135,7 @@ export default function FriendsList({
       onRefresh?.();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Error rejecting request");
-      console.error("Error rejecting request:", err);
+      
     } finally {
       setActionLoading(null);
     }
@@ -167,7 +167,7 @@ export default function FriendsList({
       onRefresh?.();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Error removing friend");
-      console.error("Error removing friend:", err);
+      
     } finally {
       setActionLoading(null);
     }

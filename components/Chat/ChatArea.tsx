@@ -40,7 +40,7 @@ export default function ChatArea({ channelId, user }: ChatAreaProps) {
           setMessages(Array.isArray(data) ? data : []);
         }
       } catch (error) {
-        console.error("Failed to fetch messages:", error);
+        
       } finally {
         setIsLoading(false);
       }
@@ -75,7 +75,7 @@ export default function ChatArea({ channelId, user }: ChatAreaProps) {
         setMessages((prev) => [...prev, newMessage]);
       }
     } catch (error) {
-      console.error("Failed to send message:", error);
+      
     }
   };
 

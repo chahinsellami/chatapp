@@ -50,7 +50,7 @@ export default function FriendsPage() {
         const userData = await res.json();
         setUser(userData.user);
       } catch (error) {
-        console.error("Auth error:", error);
+        
         localStorage.removeItem("token");
         router.push("/login");
       } finally {

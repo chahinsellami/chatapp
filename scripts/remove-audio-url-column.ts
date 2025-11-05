@@ -14,7 +14,7 @@ async function removeAudioUrlColumn() {
 
   try {
     await client.connect();
-    console.log("✓ Connected to PostgreSQL");
+    
 
     // Check if column exists
     const checkColumn = await client.query(`
@@ -24,19 +24,19 @@ async function removeAudioUrlColumn() {
     `);
 
     if (checkColumn.rows.length === 0) {
-      console.log("✓ Column audio_url does not exist, skipping...");
+      
     } else {
       // Drop audio_url column from direct_messages table
       await client.query(`
         ALTER TABLE direct_messages 
         DROP COLUMN IF EXISTS audio_url;
       `);
-      console.log("✓ Removed audio_url column from direct_messages table");
+      
     }
 
-    console.log("\n✅ Migration complete!");
+    
   } catch (error) {
-    console.error("❌ Error:", error);
+    
     throw error;
   } finally {
     await client.end();

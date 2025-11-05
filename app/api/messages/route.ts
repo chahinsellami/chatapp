@@ -22,7 +22,7 @@ export async function GET(request: NextRequest) {
     const messages = await getMessagesByChannelId(channelId);
     return NextResponse.json(messages);
   } catch (error) {
-    console.error("Error in GET /api/messages:", error);
+    
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }
@@ -72,7 +72,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(message, { status: 201 });
   } catch (error) {
-    console.error("Error in POST /api/messages:", error);
+    
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

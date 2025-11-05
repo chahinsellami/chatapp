@@ -50,7 +50,7 @@ export async function GET(request: Request) {
 
     return NextResponse.json(conversations);
   } catch (error) {
-    console.error("Error in GET /api/conversations:", error);
+    
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

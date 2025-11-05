@@ -15,15 +15,15 @@ export function initializeSocketIO(httpServer: HTTPServer) {
   const socketToUser = new Map<string, string>(); // socketId -> userId
 
   io.on("connection", (socket) => {
-    console.log("✓ Socket connected:", socket.id);
+    
 
     // User joins with their ID
     socket.on("join", (userId: string) => {
-      console.log(`👤 User ${userId} joined with socket ${socket.id}`);
+      
       users.set(userId, socket.id);
       socketToUser.set(socket.id, userId);
 
-      console.log(`📊 Active users: ${Array.from(users.keys()).join(", ")}`);
+      ).join(", ")}`);
 
       // Notify others that user is online
       socket.broadcast.emit("user-online", userId);
@@ -47,14 +47,14 @@ export function initializeSocketIO(httpServer: HTTPServer) {
         });
 
         const receiverSocketId = users.get(data.receiverId);
-        console.log(`👤 Receiver ${data.receiverId} socket:`, receiverSocketId);
+        
 
         if (receiverSocketId) {
           // Send to specific user
-          console.log(`✅ Sending message to socket ${receiverSocketId}`);
+          
           io.to(receiverSocketId).emit("receive-message", data);
         } else {
-          console.log(`❌ Receiver ${data.receiverId} not connected`);
+          
         }
 
         // Confirm to sender
@@ -85,7 +85,7 @@ export function initializeSocketIO(httpServer: HTTPServer) {
         signal: any;
         callType: "voice" | "video";
       }) => {
-        console.log(`Call from ${data.from} to ${data.to}`);
+        
         const receiverSocketId = users.get(data.to);
 
         if (receiverSocketId) {
@@ -140,7 +140,7 @@ export function initializeSocketIO(httpServer: HTTPServer) {
       const userId = socketToUser.get(socket.id);
 
       if (userId) {
-        console.log(`User ${userId} disconnected`);
+        
         users.delete(userId);
         socketToUser.delete(socket.id);
 
@@ -150,6 +150,6 @@ export function initializeSocketIO(httpServer: HTTPServer) {
     });
   });
 
-  console.log("✓ Socket.IO server initialized");
+  
   return io;
 }

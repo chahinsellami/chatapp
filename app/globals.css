@@ -162,7 +162,7 @@ body {
   width: 12px;
   height: 12px;
   border-radius: 50%;
-  background: #5B65F5;
+  background: #5b65f5;
   cursor: pointer;
   border: 2px solid #fff;
 }
@@ -171,7 +171,7 @@ body {
   width: 12px;
   height: 12px;
   border-radius: 50%;
-  background: #5B65F5;
+  background: #5b65f5;
   cursor: pointer;
   border: 2px solid #fff;
 }
@@ -262,7 +262,7 @@ body {
 
 /* Modern card styles */
 .modern-card {
-  background: linear-gradient(135deg, #2F3136 0%, #36393F 100%);
+  background: linear-gradient(135deg, #2f3136 0%, #36393f 100%);
   border-radius: 20px;
   border: 1px solid rgba(255, 255, 255, 0.05);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);

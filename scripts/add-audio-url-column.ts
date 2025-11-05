@@ -14,7 +14,7 @@ async function addAudioUrlColumn() {
 
   try {
     await client.connect();
-    console.log("✓ Connected to PostgreSQL");
+    
 
     // Check if column already exists
     const checkColumn = await client.query(`
@@ -24,19 +24,19 @@ async function addAudioUrlColumn() {
     `);
 
     if (checkColumn.rows.length > 0) {
-      console.log("✓ Column audio_url already exists, skipping...");
+      
     } else {
       // Add audio_url column to direct_messages table
       await client.query(`
         ALTER TABLE direct_messages 
         ADD COLUMN audio_url TEXT;
       `);
-      console.log("✓ Added audio_url column to direct_messages table");
+      
     }
 
-    console.log("\n✅ Migration complete!");
+    
   } catch (error) {
-    console.error("❌ Error:", error);
+    
     throw error;
   } finally {
     await client.end();
@@ -45,10 +45,10 @@ async function addAudioUrlColumn() {
 
 addAudioUrlColumn()
   .then(() => {
-    console.log("✨ Done!");
+    
     process.exit(0);
   })
   .catch((error) => {
-    console.error("Fatal error:", error);
+    
     process.exit(1);
   });

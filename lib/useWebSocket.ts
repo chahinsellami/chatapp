@@ -52,7 +52,7 @@ export const useWebSocket = (options: UseWebSocketOptions) => {
       ws.current = new WebSocket(url);
 
       ws.current.onopen = () => {
-        console.log("✓ WebSocket connected");
+        
         setIsConnected(true);
         reconnectAttempts.current = 0;
         onConnected?.();
@@ -90,22 +90,22 @@ export const useWebSocket = (options: UseWebSocketOptions) => {
               });
               break;
             case "connected":
-              console.log("✓ Connection confirmed");
+              
               break;
             default:
-              console.log("Unknown message type:", message.type);
+              
           }
         } catch (error) {
-          console.error("Error parsing message:", error);
+          
         }
       };
 
       ws.current.onerror = (error) => {
-        console.error("WebSocket error:", error);
+        
       };
 
       ws.current.onclose = () => {
-        console.log("✗ WebSocket disconnected");
+        
         setIsConnected(false);
         onDisconnected?.();
 
@@ -116,13 +116,13 @@ export const useWebSocket = (options: UseWebSocketOptions) => {
           );
           reconnectTimeout.current = setTimeout(() => {
             reconnectAttempts.current++;
-            console.log(`🔄 Reconnecting (${reconnectAttempts.current})...`);
+            ...`);
             connect();
           }, delay);
         }
       };
     } catch (error) {
-      console.error("Error creating WebSocket:", error);
+      
     }
   }, [
     userId,
@@ -154,7 +154,7 @@ export const useWebSocket = (options: UseWebSocketOptions) => {
           })
         );
       } else {
-        console.warn("WebSocket not connected");
+        
       }
     },
     [userId]

@@ -35,7 +35,7 @@ export const POST = async (request: NextRequest) => {
     try {
       await mkdir(uploadDir, { recursive: true });
     } catch (err) {
-      console.error("Error creating upload directory:", err);
+      
     }
 
     // Generate unique filename
@@ -64,7 +64,7 @@ export const POST = async (request: NextRequest) => {
       { status: 200 }
     );
   } catch (error) {
-    console.error("File upload error:", error);
+    
     return NextResponse.json({ error: "File upload failed" }, { status: 500 });
   }
 };

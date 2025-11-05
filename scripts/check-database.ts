@@ -14,7 +14,7 @@ async function checkDatabase() {
 
   try {
     await client.connect();
-    console.log("✓ Connected to PostgreSQL\n");
+    
 
     // Check if direct_messages table exists
     const tableCheck = await client.query(`
@@ -23,8 +23,8 @@ async function checkDatabase() {
         WHERE table_name = 'direct_messages'
       );
     `);
+
     
-    console.log("📊 direct_messages table exists:", tableCheck.rows[0].exists);
 
     if (tableCheck.rows[0].exists) {
       // Get table structure
@@ -34,15 +34,15 @@ async function checkDatabase() {
         WHERE table_name = 'direct_messages'
         ORDER BY ordinal_position;
       `);
+
       
-      console.log("\n📋 Table structure:");
-      columns.rows.forEach(col => {
-        console.log(`  - ${col.column_name}: ${col.data_type}`);
+      columns.rows.forEach((col) => {
+        
       });
 
       // Count messages
       const count = await client.query(`SELECT COUNT(*) FROM direct_messages`);
-      console.log(`\n💬 Total messages in database: ${count.rows[0].count}`);
+      
 
       // Show sample messages
       if (parseInt(count.rows[0].count) > 0) {
@@ -52,18 +52,19 @@ async function checkDatabase() {
           ORDER BY created_at DESC 
           LIMIT 5
         `);
-        console.log("\n📨 Recent messages:");
-        sample.rows.forEach(msg => {
-          console.log(`  [${msg.created_at}] ${msg.sender_id} → ${msg.receiver_id}: ${msg.text}`);
+        
+        sample.rows.forEach((msg) => {
+          console.log(
+            `  [${msg.created_at}] ${msg.sender_id} → ${msg.receiver_id}: ${msg.text}`
+          );
         });
       }
     } else {
-      console.log("\n❌ direct_messages table does NOT exist!");
-      console.log("Run: npx tsx scripts/create-messages-table.ts");
+      
+      
     }
-
   } catch (error) {
-    console.error("❌ Error:", error);
+    
   } finally {
     await client.end();
   }

@@ -104,7 +104,7 @@ export default function ProfilePage() {
         setPendingRequests(data.pendingRequests || []);
       }
     } catch (error) {
-      console.error("Error fetching pending requests:", error);
+      
     } finally {
       setLoadingRequests(false);
     }
@@ -129,7 +129,7 @@ export default function ProfilePage() {
         setError("Failed to accept request");
       }
     } catch (error) {
-      console.error("Error accepting request:", error);
+      
       setError("Error accepting request");
     } finally {
       setAcceptingId(null);
@@ -152,7 +152,7 @@ export default function ProfilePage() {
         setPendingRequests((prev) => prev.filter((r) => r.id !== requestId));
       }
     } catch (error) {
-      console.error("Error rejecting request:", error);
+      
     }
   };
 

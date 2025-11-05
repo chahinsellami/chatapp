@@ -46,7 +46,7 @@ export const VoiceCallModal: React.FC<VoiceCallModalProps> = ({
 
       initiateCall(recipientId);
     } catch (error) {
-      console.error("Error starting call:", error);
+      
       onReject();
     }
   };
