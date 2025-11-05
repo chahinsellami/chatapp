@@ -9,6 +9,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useSocket } from "@/lib/useSocket";
 import { useWebRTC } from "@/lib/useWebRTC";
+import { useAuth } from "@/context/AuthContext";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Phone,
@@ -22,6 +23,8 @@ import {
   MoreVertical,
   Smile,
   MessageCircle,
+  ChevronDown,
+  Check,
 } from "lucide-react";
 
 /**
@@ -37,6 +40,14 @@ interface DirectMessage {
   createdAt: string; // Message timestamp
   editedAt?: string; // Edit timestamp (if message was edited)
 }
+
+// Status options for status dropdown
+const STATUS_OPTIONS = [
+  { value: "online", label: "Online", icon: "🟢", color: "#10b981" },
+  { value: "idle", label: "Idle", icon: "🟡", color: "#f59e0b" },
+  { value: "dnd", label: "Do Not Disturb", icon: "🔴", color: "#ef4444" },
+  { value: "invisible", label: "Invisible", icon: "⚫", color: "#6b7280" },
+];
 
 /**
  * Props interface for DirectMessages component
@@ -66,16 +77,21 @@ export default function DirectMessages({
   const [sending, setSending] = useState(false); // Whether a message is being sent
   const [error, setError] = useState<string | null>(null); // Error message display
   const [loading, setLoading] = useState(true); // Initial loading state
+  const [showStatusDropdown, setShowStatusDropdown] = useState(false); // Status dropdown visibility
 
   // User interface state
   const [userAvatar, setUserAvatar] = useState<string>("??"); // Current user's avatar
   const [isMobile, setIsMobile] = useState(false); // Mobile device detection
+  
+  // Auth context for user status
+  const { user, updateUser } = useAuth();
 
   // DOM references for scrolling and video elements
   const messagesEndRef = useRef<HTMLDivElement>(null); // Reference for auto-scrolling
   const localVideoRef = useRef<HTMLVideoElement>(null); // Local video stream element
   const remoteVideoRef = useRef<HTMLVideoElement>(null); // Remote video stream element
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null); // Typing indicator timeout
+  const statusDropdownRef = useRef<HTMLDivElement>(null); // Status dropdown reference
 
   // Detect mobile device for responsive behavior and warnings
   useEffect(() => {
@@ -88,6 +104,23 @@ export default function DirectMessages({
     };
     checkMobile();
   }, []);
+
+  // Close status dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (statusDropdownRef.current && !statusDropdownRef.current.contains(event.target as Node)) {
+        setShowStatusDropdown(false);
+      }
+    };
+
+    if (showStatusDropdown) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [showStatusDropdown]);
 
   // Initialize Socket.IO connection for real-time messaging
   const {
@@ -362,6 +395,37 @@ export default function DirectMessages({
   const isTyping = typingUsers.has(friendId);
 
   /**
+   * Handle status change
+   */
+  const handleStatusChange = async (newStatus: string) => {
+    try {
+      const token = localStorage.getItem("auth_token");
+      if (!token) return;
+
+      const res = await fetch("/api/auth/profile", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ 
+          avatar: user?.avatar || "👤", 
+          status: newStatus, 
+          bio: user?.bio || "" 
+        }),
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        updateUser(data.user);
+        setShowStatusDropdown(false);
+      }
+    } catch (error) {
+      console.error("Failed to update status:", error);
+    }
+  };
+
+  /**
    * Initiate a voice or video call with mobile-specific warnings
    * Checks permissions and provides user guidance for mobile devices
    */
@@ -484,8 +548,58 @@ export default function DirectMessages({
           </div>
         </div>
 
-        {/* Call buttons - PROMINENTLY DISPLAYED */}
-        <div className="flex gap-2">
+        {/* Right side: Status dropdown and call buttons */}
+        <div className="flex items-center gap-2">
+          {/* Status Dropdown */}
+          <div className="relative" ref={statusDropdownRef}>
+            <motion.button
+              onClick={() => setShowStatusDropdown(!showStatusDropdown)}
+              className="p-2 md:p-2.5 rounded-xl bg-slate-800/60 hover:bg-slate-700/60 border border-slate-700/50 transition-all flex items-center gap-1.5"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              title="Change Status"
+            >
+              <span className="text-lg">
+                {STATUS_OPTIONS.find((s) => s.value === (user?.status || "online"))?.icon}
+              </span>
+              <ChevronDown className="w-3 h-3 text-slate-400 hidden sm:block" />
+            </motion.button>
+
+            <AnimatePresence>
+              {showStatusDropdown && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                  transition={{ duration: 0.2 }}
+                  className="absolute top-full right-0 mt-2 w-48 glass-card p-2 z-50 shadow-2xl"
+                  style={{ background: "rgba(30, 41, 59, 0.95)" }}
+                >
+                  {STATUS_OPTIONS.map((option) => (
+                    <motion.button
+                      key={option.value}
+                      onClick={() => handleStatusChange(option.value)}
+                      className={`w-full px-3 py-2.5 rounded-lg text-left flex items-center gap-3 transition-all ${
+                        user?.status === option.value
+                          ? "bg-indigo-500/20 text-white"
+                          : "hover:bg-slate-700/50 text-slate-300"
+                      }`}
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                    >
+                      <span className="text-xl">{option.icon}</span>
+                      <span className="text-sm font-medium flex-1">{option.label}</span>
+                      {user?.status === option.value && (
+                        <Check className="w-4 h-4 text-indigo-400" />
+                      )}
+                    </motion.button>
+                  ))}
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+
+          {/* Call buttons */}
           <motion.button
             onClick={() => handleStartCall("voice")}
             disabled={isCallActive}
