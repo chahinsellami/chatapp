@@ -50,9 +50,9 @@ export async function comparePassword(
  * Contains essential user information for authentication
  */
 export interface TokenPayload {
-  userId: string;    // Unique user identifier
-  username: string;  // User's display name
-  email: string;     // User's email address
+  userId: string; // Unique user identifier
+  username: string; // User's display name
+  email: string; // User's email address
 }
 
 /**

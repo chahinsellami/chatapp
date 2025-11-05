@@ -3,34 +3,48 @@
 /**
  * Direct Messages Component - Main messaging interface between two users
  * Features real-time messaging via Socket.IO, voice/video calling via WebRTC,
- * typing indicators, online status, and mobile-responsive design
+ * typing indicators, online status, and mobile-responsive design with modern UI
  */
 
 import { useState, useEffect, useRef } from "react";
 import { useSocket } from "@/lib/useSocket";
 import { useWebRTC } from "@/lib/useWebRTC";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  Phone,
+  Video,
+  Send,
+  AlertCircle,
+  PhoneOff,
+  VideoOff,
+  Mic,
+  MicOff,
+  MoreVertical,
+  Smile,
+  MessageCircle,
+} from "lucide-react";
 
 /**
  * Interface for direct message data structure
  */
 interface DirectMessage {
-  id: string;           // Unique message identifier
-  senderId: string;     // ID of user who sent the message
-  receiverId: string;   // ID of user who should receive the message
-  text: string;         // Message content
-  username: string;     // Display name of sender
-  avatar?: string;      // Avatar URL of sender
-  createdAt: string;    // Message timestamp
-  editedAt?: string;    // Edit timestamp (if message was edited)
+  id: string; // Unique message identifier
+  senderId: string; // ID of user who sent the message
+  receiverId: string; // ID of user who should receive the message
+  text: string; // Message content
+  username: string; // Display name of sender
+  avatar?: string; // Avatar URL of sender
+  createdAt: string; // Message timestamp
+  editedAt?: string; // Edit timestamp (if message was edited)
 }
 
 /**
  * Props interface for DirectMessages component
  */
 interface DirectMessagesProps {
-  userId: string;       // Current user's ID
-  friendId: string;     // Friend's user ID for this conversation
-  friendName: string;   // Friend's display name
+  userId: string; // Current user's ID
+  friendId: string; // Friend's user ID for this conversation
+  friendName: string; // Friend's display name
   friendAvatar?: string; // Friend's avatar (defaults to emoji)
   friendStatus?: string; // Friend's online status
 }
@@ -47,21 +61,21 @@ export default function DirectMessages({
   friendStatus = "offline",
 }: DirectMessagesProps) {
   // Message state management
-  const [messages, setMessages] = useState<DirectMessage[]>([]);  // Array of conversation messages
-  const [messageText, setMessageText] = useState("");             // Current message being typed
-  const [sending, setSending] = useState(false);                 // Whether a message is being sent
-  const [error, setError] = useState<string | null>(null);       // Error message display
-  const [loading, setLoading] = useState(true);                  // Initial loading state
+  const [messages, setMessages] = useState<DirectMessage[]>([]); // Array of conversation messages
+  const [messageText, setMessageText] = useState(""); // Current message being typed
+  const [sending, setSending] = useState(false); // Whether a message is being sent
+  const [error, setError] = useState<string | null>(null); // Error message display
+  const [loading, setLoading] = useState(true); // Initial loading state
 
   // User interface state
-  const [userAvatar, setUserAvatar] = useState<string>("??");     // Current user's avatar
-  const [isMobile, setIsMobile] = useState(false);               // Mobile device detection
+  const [userAvatar, setUserAvatar] = useState<string>("??"); // Current user's avatar
+  const [isMobile, setIsMobile] = useState(false); // Mobile device detection
 
   // DOM references for scrolling and video elements
-  const messagesEndRef = useRef<HTMLDivElement>(null);           // Reference for auto-scrolling
-  const localVideoRef = useRef<HTMLVideoElement>(null);          // Local video stream element
-  const remoteVideoRef = useRef<HTMLVideoElement>(null);         // Remote video stream element
-  const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);  // Typing indicator timeout
+  const messagesEndRef = useRef<HTMLDivElement>(null); // Reference for auto-scrolling
+  const localVideoRef = useRef<HTMLVideoElement>(null); // Local video stream element
+  const remoteVideoRef = useRef<HTMLVideoElement>(null); // Remote video stream element
+  const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null); // Typing indicator timeout
 
   // Detect mobile device for responsive behavior and warnings
   useEffect(() => {
@@ -382,19 +396,57 @@ export default function DirectMessages({
   // Show loading spinner while fetching initial messages
   if (loading) {
     return (
-      <div className="flex-1 flex items-center justify-center bg-[#36393F]">
-        <div className="animate-spin h-12 w-12 border-b-2 border-[#5B65F5] rounded-full"></div>
+      <div className="flex-1 flex items-center justify-center glass-card m-2">
+        <motion.div
+          className="text-center"
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.5 }}
+        >
+          <motion.div
+            className="w-12 h-12 mx-auto mb-4 rounded-xl flex items-center justify-center"
+            style={{
+              background: "linear-gradient(135deg, #a855f7, #f97316)",
+            }}
+            animate={{ rotate: 360 }}
+            transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+          >
+            <MessageCircle className="w-6 h-6 text-white" />
+          </motion.div>
+          <p className="text-neutral-300">Loading messages...</p>
+        </motion.div>
       </div>
     );
   }
 
   return (
-    <div className="flex-1 flex flex-col bg-gradient-to-br from-[#2F3136] to-[#36393F] h-full overflow-hidden">
+    <motion.div
+      className="flex-1 flex flex-col glass-card m-2 relative overflow-hidden"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+    >
+      {/* Animated background gradient */}
+      <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 via-transparent to-orange-500/5" />
+
       {/* Header with enhanced styling */}
-      <div className="flex justify-between items-center p-4 border-b border-[#202225]/50 backdrop-blur-sm bg-[#2F3136]/80 gap-3 flex-shrink-0">
-        <div className="flex items-center gap-3">
-          <div className="relative hover-lift">
-            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#5B65F5] to-[#7289DA] flex items-center justify-center overflow-hidden flex-shrink-0 shadow-lg">
+      <motion.div
+        className="flex justify-between items-center p-6 border-b border-white/10 backdrop-blur-sm bg-white/5 relative z-10"
+        initial={{ y: -20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.2 }}
+      >
+        <div className="flex items-center gap-4">
+          <motion.div
+            className="relative hover-lift"
+            whileHover={{ scale: 1.05 }}
+          >
+            <div
+              className="w-12 h-12 rounded-2xl overflow-hidden flex items-center justify-center"
+              style={{
+                background: "linear-gradient(135deg, #a855f7, #f97316)",
+              }}
+            >
               {friendAvatar?.startsWith("/avatars/") ? (
                 <img
                   src={friendAvatar}
@@ -407,281 +459,429 @@ export default function DirectMessages({
             </div>
             {/* Enhanced online indicator */}
             {isConnected && onlineUsers.has(friendId) && (
-              <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-[#43B581] rounded-full border-2 border-[#2F3136] animate-pulse shadow-lg"></div>
+              <motion.div
+                className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-400 rounded-full border-2 border-white shadow-lg"
+                animate={{ scale: [1, 1.2, 1] }}
+                transition={{ duration: 2, repeat: Infinity }}
+              />
             )}
-          </div>
+          </motion.div>
           <div>
-            <h3 className="text-white font-bold text-base md:text-lg">
-              {friendName}
-            </h3>
-            <p className="text-[#72767D] text-xs flex items-center gap-1">
+            <h3 className="text-white font-bold text-lg">{friendName}</h3>
+            <p className="text-neutral-400 text-sm flex items-center gap-2">
               {isConnected ? (
                 onlineUsers.has(friendId) ? (
                   <>
-                    <span className="w-2 h-2 bg-[#43B581] rounded-full animate-pulse"></span>
+                    <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
                     <span>Online</span>
                   </>
                 ) : (
                   <>
-                    <span className="w-2 h-2 bg-[#747F8D] rounded-full"></span>
+                    <div className="w-2 h-2 bg-neutral-500 rounded-full"></div>
                     <span>Offline</span>
                   </>
                 )
               ) : (
-                <span>Connecting...</span>
+                <span className="text-orange-400">Connecting...</span>
               )}
             </p>
           </div>
         </div>
 
-        <div className="flex gap-2">
-          <button
+        <div className="flex gap-3">
+          <motion.button
             onClick={() => handleStartCall("voice")}
             disabled={isCallActive}
-            className="px-3 py-2 bg-gradient-to-r from-[#43B581] to-[#3BA55D] text-white rounded-xl hover:shadow-lg hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+            className="p-3 rounded-xl glass-button hover:bg-green-500/10 disabled:opacity-50 disabled:cursor-not-allowed"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
             title="Voice Call"
           >
-            ??
-          </button>
-          <button
+            <Phone className="w-5 h-5 text-green-400" />
+          </motion.button>
+          <motion.button
             onClick={() => handleStartCall("video")}
             disabled={isCallActive}
-            className="px-3 py-2 bg-gradient-to-r from-[#5B65F5] to-[#4752C4] text-white rounded-xl hover:shadow-lg hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+            className="p-3 rounded-xl glass-button hover:bg-purple-500/10 disabled:opacity-50 disabled:cursor-not-allowed"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
             title="Video Call"
           >
-            ??
-          </button>
+            <Video className="w-5 h-5 text-purple-400" />
+          </motion.button>
         </div>
-      </div>
+      </motion.div>
 
-      {/* Messages area with enhanced scrollbar */}
-      <div
-        className="flex-1 overflow-y-auto p-4 space-y-3 custom-scrollbar min-h-0"
-        style={{
-          scrollbarWidth: "thin",
-          scrollbarColor: "#5B65F5 #2F3136",
-        }}
-      >
-        {messages.map((message) => {
-          const isOwnMessage = message.senderId === userId;
-          return (
-            <div
-              key={message.id}
-              className={`flex items-end gap-2 ${
-                isOwnMessage ? "flex-row-reverse" : "flex-row"
-              } animate-fadeIn`}
-            >
-              {/* Avatar with glow effect */}
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#5B65F5] to-[#7289DA] flex items-center justify-center overflow-hidden flex-shrink-0 shadow-lg hover-glow">
-                {isOwnMessage ? (
-                  userAvatar?.startsWith("/avatars/") ? (
+      {/* Messages area with modern scrollbar */}
+      <div className="flex-1 overflow-y-auto p-6 space-y-4 modern-scrollbar min-h-0 relative z-10">
+        <AnimatePresence>
+          {messages.map((message, index) => {
+            const isOwnMessage = message.senderId === userId;
+            return (
+              <motion.div
+                key={message.id}
+                className={`flex items-end gap-3 ${
+                  isOwnMessage ? "flex-row-reverse" : "flex-row"
+                }`}
+                initial={{ opacity: 0, y: 20, scale: 0.95 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                transition={{ delay: index * 0.05, duration: 0.3 }}
+              >
+                {/* Avatar with glow effect */}
+                <motion.div
+                  className="w-8 h-8 rounded-xl overflow-hidden flex items-center justify-center flex-shrink-0 shadow-lg"
+                  style={{
+                    background: isOwnMessage
+                      ? "linear-gradient(135deg, #a855f7, #f97316)"
+                      : "linear-gradient(135deg, #64748b, #475569)",
+                  }}
+                  whileHover={{ scale: 1.1 }}
+                >
+                  {isOwnMessage ? (
+                    userAvatar?.startsWith("/avatars/") ? (
+                      <img
+                        src={userAvatar}
+                        alt="You"
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <span className="text-sm">{userAvatar || "??"}</span>
+                    )
+                  ) : friendAvatar?.startsWith("/avatars/") ? (
                     <img
-                      src={userAvatar}
-                      alt="You"
+                      src={friendAvatar}
+                      alt={friendName}
                       className="w-full h-full object-cover"
                     />
                   ) : (
-                    <span className="text-lg">{userAvatar || "??"}</span>
-                  )
-                ) : friendAvatar?.startsWith("/avatars/") ? (
-                  <img
-                    src={friendAvatar}
-                    alt={friendName}
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <span className="text-lg">{friendAvatar || "??"}</span>
-                )}
-              </div>
+                    <span className="text-sm">{friendAvatar || "??"}</span>
+                  )}
+                </motion.div>
 
-              {/* Enhanced message bubble */}
-              <div
-                className={`max-w-xs md:max-w-md lg:max-w-lg px-4 py-3 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-200 ${
-                  isOwnMessage
-                    ? "bg-gradient-to-br from-[#5B65F5] to-[#4752C4] text-white hover-lift"
-                    : "modern-card text-white"
-                }`}
-              >
-                <p className="break-words whitespace-pre-wrap text-sm md:text-base leading-relaxed">
-                  {message.text}
-                </p>
-                <p
-                  className={`text-xs mt-1 ${
-                    isOwnMessage ? "text-gray-200" : "text-[#72767D]"
+                {/* Enhanced message bubble */}
+                <motion.div
+                  className={`max-w-xs md:max-w-md lg:max-w-lg px-4 py-3 rounded-2xl shadow-lg relative ${
+                    isOwnMessage ? "rounded-br-md" : "rounded-bl-md"
                   }`}
+                  style={{
+                    background: isOwnMessage
+                      ? "linear-gradient(135deg, #a855f7, #f97316)"
+                      : "rgba(255, 255, 255, 0.08)",
+                    backdropFilter: "blur(10px)",
+                    border: "1px solid rgba(255, 255, 255, 0.1)",
+                  }}
+                  whileHover={{ scale: 1.02 }}
+                  transition={{ type: "spring", stiffness: 300 }}
                 >
-                  {new Date(message.createdAt).toLocaleTimeString([], {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })}
-                </p>
-              </div>
-            </div>
-          );
-        })}
+                  <p className="break-words whitespace-pre-wrap text-sm md:text-base leading-relaxed text-white">
+                    {message.text}
+                  </p>
+                  <p
+                    className={`text-xs mt-2 ${
+                      isOwnMessage ? "text-orange-200" : "text-neutral-400"
+                    }`}
+                  >
+                    {new Date(message.createdAt).toLocaleTimeString([], {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
+                  </p>
+                </motion.div>
+              </motion.div>
+            );
+          })}
+        </AnimatePresence>
 
         {/* Typing Indicator */}
-        {isTyping && (
-          <div className="flex items-center gap-2 text-[#72767D] text-sm animate-fadeIn">
-            <span className="text-lg">{friendAvatar || "??"}</span>
-            <span className="italic">{friendName} is typing...</span>
-          </div>
-        )}
+        <AnimatePresence>
+          {isTyping && (
+            <motion.div
+              className="flex items-center gap-3 text-neutral-400 text-sm"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+            >
+              <div className="w-8 h-8 rounded-xl bg-neutral-600 flex items-center justify-center">
+                <span className="text-sm">{friendAvatar || "??"}</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <span>{friendName} is typing</span>
+                <div className="flex gap-1">
+                  <motion.div
+                    className="w-1 h-1 bg-neutral-400 rounded-full"
+                    animate={{ scale: [1, 1.5, 1] }}
+                    transition={{ duration: 0.8, repeat: Infinity }}
+                  />
+                  <motion.div
+                    className="w-1 h-1 bg-neutral-400 rounded-full"
+                    animate={{ scale: [1, 1.5, 1] }}
+                    transition={{ duration: 0.8, delay: 0.2, repeat: Infinity }}
+                  />
+                  <motion.div
+                    className="w-1 h-1 bg-neutral-400 rounded-full"
+                    animate={{ scale: [1, 1.5, 1] }}
+                    transition={{ duration: 0.8, delay: 0.4, repeat: Infinity }}
+                  />
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         <div ref={messagesEndRef} />
       </div>
 
       {/* Error Display */}
-      {error && (
-        <div className="px-4 py-2 bg-red-500/20 border-t border-red-500 flex-shrink-0">
-          <p className="text-red-300 text-sm">?? {error}</p>
-        </div>
-      )}
+      <AnimatePresence>
+        {error && (
+          <motion.div
+            className="px-6 py-3 border-t border-red-500/20 backdrop-blur-sm relative z-10"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            style={{
+              background: "rgba(220, 38, 38, 0.1)",
+            }}
+          >
+            <div className="flex items-center gap-3">
+              <AlertCircle className="w-5 h-5 text-red-400 flex-shrink-0" />
+              <p className="text-red-300 text-sm font-medium">{error}</p>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Enhanced Input Area */}
-      <div className="p-4 border-t border-[#202225]/50 backdrop-blur-sm bg-[#2F3136]/80 flex-shrink-0">
-        <div className="flex gap-3">
-          <textarea
-            value={messageText}
-            onChange={handleTyping}
-            onKeyPress={handleKeyPress}
-            placeholder={`Message ${friendName}...`}
-            className="flex-1 bg-[#40444B] text-[#DCDDDE] rounded-xl px-4 py-3 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-[#5B65F5]/50 transition-all duration-200 placeholder:text-[#72767D]"
-            rows={2}
-            disabled={sending}
-          />
-          <button
+      <motion.div
+        className="p-6 border-t border-white/10 backdrop-blur-sm bg-white/5 relative z-10"
+        initial={{ y: 20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ delay: 0.4 }}
+      >
+        <div className="flex gap-4">
+          <div className="flex-1 relative">
+            <textarea
+              value={messageText}
+              onChange={handleTyping}
+              onKeyPress={handleKeyPress}
+              placeholder={`Message ${friendName}...`}
+              className="w-full modern-input pr-12 resize-none focus-ring"
+              rows={2}
+              disabled={sending}
+            />
+            <motion.button
+              className="absolute right-3 top-3 p-1 rounded-lg hover:bg-white/10 transition-colors"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <Smile className="w-4 h-4 text-neutral-400" />
+            </motion.button>
+          </div>
+          <motion.button
             onClick={handleSendMessage}
             disabled={sending || !messageText.trim()}
-            className="px-6 py-3 bg-gradient-to-r from-[#5B65F5] to-[#4752C4] text-white rounded-xl hover:shadow-lg hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 font-bold flex items-center gap-2"
+            className="px-6 py-3 rounded-xl font-bold text-white relative overflow-hidden disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+            style={{
+              background: "linear-gradient(135deg, #a855f7, #f97316)",
+            }}
+            whileHover={{ scale: 1.05, y: -1 }}
+            whileTap={{ scale: 0.95 }}
           >
-            {sending ? (
-              <>
-                <span className="animate-spin">?</span>
-                <span className="hidden md:inline">Sending...</span>
-              </>
-            ) : (
-              <>
-                <span>??</span>
-                <span className="hidden md:inline">Send</span>
-              </>
-            )}
-          </button>
+            <span className="relative z-10">
+              {sending ? (
+                <motion.div
+                  className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full"
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                />
+              ) : (
+                <Send className="w-5 h-5" />
+              )}
+            </span>
+            <div className="absolute inset-0 bg-gradient-to-r from-purple-600/20 to-orange-600/20 opacity-0 hover:opacity-100 transition-opacity duration-300" />
+          </motion.button>
         </div>
-      </div>
+      </motion.div>
 
-      {/* Incoming Call Modal - Mobile Optimized */}
-      {isIncomingCall && callerInfo && (
-        <div className="fixed inset-0 bg-black/90 flex items-center justify-center z-50 p-4">
-          <div className="bg-[#36393F] rounded-xl p-6 md:p-8 max-w-md w-full text-center">
-            <div className="text-5xl mb-4">
-              {callType === "video" ? "??" : "??"}
-            </div>
-            <h2 className="text-xl md:text-2xl font-bold text-white mb-2">
-              Incoming {callType === "video" ? "Video" : "Voice"} Call
-            </h2>
-            <p className="text-[#DCDDDE] mb-6 text-sm md:text-base">
-              {friendName} is calling...
-            </p>
-            {isMobile && (
-              <p className="text-[#72767D] text-xs mb-4">
-                ?? Make sure to allow microphone
-                {callType === "video" ? " and camera" : ""} access when prompted
-              </p>
-            )}
-            <div className="flex gap-3 md:gap-4 justify-center">
-              <button
-                onClick={acceptCall}
-                className="flex-1 md:flex-none px-6 py-3 bg-gradient-to-r from-[#43B581] to-[#3BA55D] text-white rounded-xl hover:shadow-lg transition-all duration-200 font-bold"
+      {/* Incoming Call Modal */}
+      <AnimatePresence>
+        {isIncomingCall && callerInfo && (
+          <motion.div
+            className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <motion.div
+              className="glass-card p-8 max-w-md w-full text-center"
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+            >
+              <motion.div
+                className="w-20 h-20 mx-auto mb-6 rounded-2xl flex items-center justify-center"
+                style={{
+                  background: "linear-gradient(135deg, #a855f7, #f97316)",
+                }}
+                animate={{ rotate: [0, 10, -10, 0] }}
+                transition={{ duration: 2, repeat: Infinity }}
               >
-                ? Accept
-              </button>
-              <button
-                onClick={rejectCall}
-                className="flex-1 md:flex-none px-6 py-3 bg-gradient-to-r from-[#F04747] to-[#D84040] text-white rounded-xl hover:shadow-lg transition-all duration-200 font-bold"
-              >
-                ? Decline
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+                {callType === "video" ? (
+                  <Video className="w-10 h-10 text-white" />
+                ) : (
+                  <Phone className="w-10 h-10 text-white" />
+                )}
+              </motion.div>
 
-      {/* Active Call Modal - Mobile Optimized */}
-      {isCallActive && (
-        <div className="fixed inset-0 bg-black/95 flex flex-col items-center justify-center z-50 p-2 md:p-4">
-          <div className="text-white text-center mb-2 md:mb-4">
-            <h2 className="text-lg md:text-2xl font-bold mb-1 md:mb-2">
-              {callType === "video" ? "??" : "??"}{" "}
-              {callType === "video" ? "Video" : "Voice"} Call with {friendName}
-            </h2>
-            {isMobile && callType === "video" && (
-              <p className="text-xs text-[#72767D]">
-                Rotate your device for better view
+              <h2 className="text-2xl font-bold text-white mb-2">
+                Incoming {callType === "video" ? "Video" : "Voice"} Call
+              </h2>
+              <p className="text-neutral-300 mb-6">
+                {friendName} is calling...
               </p>
-            )}
-          </div>
 
-          {/* Video Streams */}
-          {callType === "video" && (
-            <div className="relative w-full max-w-4xl aspect-video bg-black rounded-lg overflow-hidden mb-2 md:mb-4">
-              {/* Remote Video (Full Screen) */}
-              <video
-                ref={remoteVideoRef}
-                autoPlay
-                playsInline
-                className="w-full h-full object-cover"
-              />
+              {isMobile && (
+                <p className="text-neutral-400 text-sm mb-4">
+                  Make sure to allow microphone
+                  {callType === "video" ? " and camera" : ""} access when
+                  prompted
+                </p>
+              )}
 
-              {/* Local Video (Picture-in-Picture) - Responsive sizing */}
-              <div className="absolute bottom-2 right-2 md:bottom-4 md:right-4 w-24 h-18 md:w-48 md:h-36 bg-gray-800 rounded-lg overflow-hidden border-2 border-white">
+              <div className="flex gap-4 justify-center">
+                <motion.button
+                  onClick={acceptCall}
+                  className="flex-1 py-3 px-6 rounded-xl font-bold text-white"
+                  style={{
+                    background: "linear-gradient(135deg, #10b981, #059669)",
+                  }}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  Accept
+                </motion.button>
+                <motion.button
+                  onClick={rejectCall}
+                  className="flex-1 py-3 px-6 rounded-xl font-bold text-white"
+                  style={{
+                    background: "linear-gradient(135deg, #ef4444, #dc2626)",
+                  }}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  Decline
+                </motion.button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Active Call Modal */}
+      <AnimatePresence>
+        {isCallActive && (
+          <motion.div
+            className="fixed inset-0 bg-black/95 backdrop-blur-sm flex flex-col items-center justify-center z-50 p-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <div className="text-white text-center mb-6">
+              <h2 className="text-2xl font-bold mb-2">
+                {callType === "video" ? "Video" : "Voice"} Call with{" "}
+                {friendName}
+              </h2>
+              {isMobile && callType === "video" && (
+                <p className="text-sm text-neutral-400">
+                  Rotate your device for better view
+                </p>
+              )}
+            </div>
+
+            {/* Video Streams */}
+            {callType === "video" && (
+              <motion.div
+                className="relative w-full max-w-4xl aspect-video bg-neutral-900 rounded-2xl overflow-hidden mb-6"
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ delay: 0.2 }}
+              >
+                {/* Remote Video */}
                 <video
-                  ref={localVideoRef}
+                  ref={remoteVideoRef}
                   autoPlay
                   playsInline
-                  muted
                   className="w-full h-full object-cover"
                 />
-              </div>
-            </div>
-          )}
 
-          {callType === "voice" && (
-            <>
-              <div className="text-white text-5xl md:text-6xl mb-6 md:mb-8">
-                ??
-              </div>
-              {/* Hidden audio elements for voice calls */}
-              <audio ref={localVideoRef} autoPlay muted />
-              <audio ref={remoteVideoRef} autoPlay />
-            </>
-          )}
-
-          {/* Call Controls - Mobile Optimized */}
-          <div className="flex flex-wrap gap-2 md:gap-4 justify-center">
-            <button
-              onClick={toggleAudio}
-              className="px-4 md:px-6 py-2 md:py-3 bg-[#5B65F5] text-white rounded-xl hover:bg-[#4752C4] font-bold text-sm md:text-base transition-all duration-200"
-            >
-              ?? {isMobile ? "" : "Mute"}
-            </button>
-            {callType === "video" && (
-              <button
-                onClick={toggleVideo}
-                className="px-4 md:px-6 py-2 md:py-3 bg-[#5B65F5] text-white rounded-xl hover:bg-[#4752C4] font-bold text-sm md:text-base transition-all duration-200"
-              >
-                ?? {isMobile ? "" : "Camera"}
-              </button>
+                {/* Local Video */}
+                <motion.div
+                  className="absolute bottom-4 right-4 w-32 h-24 bg-neutral-800 rounded-lg overflow-hidden border-2 border-white shadow-lg"
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ delay: 0.4 }}
+                >
+                  <video
+                    ref={localVideoRef}
+                    autoPlay
+                    playsInline
+                    muted
+                    className="w-full h-full object-cover"
+                  />
+                </motion.div>
+              </motion.div>
             )}
-            <button
-              onClick={endCall}
-              className="px-4 md:px-6 py-2 md:py-3 bg-gradient-to-r from-[#F04747] to-[#D84040] text-white rounded-xl hover:shadow-lg font-bold text-sm md:text-base transition-all duration-200"
+
+            {callType === "voice" && (
+              <motion.div
+                className="text-6xl mb-8"
+                animate={{ scale: [1, 1.1, 1] }}
+                transition={{ duration: 2, repeat: Infinity }}
+              >
+                📞
+              </motion.div>
+            )}
+
+            {/* Call Controls */}
+            <motion.div
+              className="flex flex-wrap gap-4 justify-center"
+              initial={{ y: 20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              transition={{ delay: 0.6 }}
             >
-              ?? {isMobile ? "" : "End Call"}
-            </button>
-          </div>
-        </div>
-      )}
-    </div>
+              <motion.button
+                onClick={toggleAudio}
+                className="p-4 rounded-2xl glass-button hover:bg-neutral-700"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <Mic className="w-6 h-6 text-white" />
+              </motion.button>
+              {callType === "video" && (
+                <motion.button
+                  onClick={toggleVideo}
+                  className="p-4 rounded-2xl glass-button hover:bg-neutral-700"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <Video className="w-6 h-6 text-white" />
+                </motion.button>
+              )}
+              <motion.button
+                onClick={endCall}
+                className="p-4 rounded-2xl"
+                style={{
+                  background: "linear-gradient(135deg, #ef4444, #dc2626)",
+                }}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <PhoneOff className="w-6 h-6 text-white" />
+              </motion.button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.div>
   );
 }

@@ -19,8 +19,8 @@ export type CallType = "voice" | "video";
  * Props interface for the useWebRTC hook
  */
 interface UseWebRTCProps {
-  socket: Socket | null;    // Socket.IO connection for signaling
-  userId: string | null;    // Current user's ID
+  socket: Socket | null; // Socket.IO connection for signaling
+  userId: string | null; // Current user's ID
 }
 
 /**
@@ -31,27 +31,28 @@ interface UseWebRTCProps {
  */
 export function useWebRTC({ socket, userId }: UseWebRTCProps) {
   // Call state management
-  const [isCallActive, setIsCallActive] = useState(false);        // Whether a call is currently active
-  const [isIncomingCall, setIsIncomingCall] = useState(false);    // Whether there's an incoming call waiting
+  const [isCallActive, setIsCallActive] = useState(false); // Whether a call is currently active
+  const [isIncomingCall, setIsIncomingCall] = useState(false); // Whether there's an incoming call waiting
   const [callType, setCallType] = useState<CallType | null>(null); // Type of current/pending call
-  const [callerInfo, setCallerInfo] = useState<{                // Information about incoming call caller
+  const [callerInfo, setCallerInfo] = useState<{
+    // Information about incoming call caller
     id: string;
     name: string;
     signal: any;
   } | null>(null);
 
   // WebRTC connection references
-  const peerRef = useRef<Peer.Instance | null>(null);           // Simple-Peer instance for WebRTC
-  const localStreamRef = useRef<MediaStream | null>(null);      // Local user's media stream
-  const remoteStreamRef = useRef<MediaStream | null>(null);     // Remote user's media stream
+  const peerRef = useRef<Peer.Instance | null>(null); // Simple-Peer instance for WebRTC
+  const localStreamRef = useRef<MediaStream | null>(null); // Local user's media stream
+  const remoteStreamRef = useRef<MediaStream | null>(null); // Remote user's media stream
 
   // React state for media streams (for UI updates)
-  const [localStream, setLocalStream] = useState<MediaStream | null>(null);   // Local video/audio stream
+  const [localStream, setLocalStream] = useState<MediaStream | null>(null); // Local video/audio stream
   const [remoteStream, setRemoteStream] = useState<MediaStream | null>(null); // Remote video/audio stream
 
   // Call tracking references
-  const otherUserIdRef = useRef<string | null>(null);           // ID of the other participant
-  const hasInitiatedCallRef = useRef(false);                    // Prevents duplicate call signals
+  const otherUserIdRef = useRef<string | null>(null); // ID of the other participant
+  const hasInitiatedCallRef = useRef(false); // Prevents duplicate call signals
 
   useEffect(() => {
     // Only set up call listeners if socket and user are available
@@ -148,14 +149,14 @@ export function useWebRTC({ socket, userId }: UseWebRTCProps) {
         // Define media constraints optimized for mobile and web
         const constraints: MediaStreamConstraints = {
           audio: {
-            echoCancellation: true,    // Reduces echo during calls
-            noiseSuppression: true,    // Filters background noise
-            autoGainControl: true,     // Adjusts volume automatically
+            echoCancellation: true, // Reduces echo during calls
+            noiseSuppression: true, // Filters background noise
+            autoGainControl: true, // Adjusts volume automatically
           },
           video:
             type === "video"
               ? {
-                  width: { ideal: 640, max: 1280 },    // HD quality, adaptable
+                  width: { ideal: 640, max: 1280 }, // HD quality, adaptable
                   height: { ideal: 480, max: 720 },
                   facingMode: "user", // Front camera on mobile devices
                 }
@@ -171,13 +172,13 @@ export function useWebRTC({ socket, userId }: UseWebRTCProps) {
 
         // Create WebRTC peer connection as the call initiator
         const peer = new Peer({
-          initiator: true,        // This peer initiates the connection
-          trickle: true,          // Send ICE candidates as they're discovered
-          stream: stream,         // Attach local media stream
+          initiator: true, // This peer initiates the connection
+          trickle: true, // Send ICE candidates as they're discovered
+          stream: stream, // Attach local media stream
           config: {
             iceServers: [
-              { urls: "stun:stun.l.google.com:19302" },     // Google's STUN servers
-              { urls: "stun:stun1.l.google.com:19302" },    // Backup STUN server
+              { urls: "stun:stun.l.google.com:19302" }, // Google's STUN servers
+              { urls: "stun:stun1.l.google.com:19302" }, // Backup STUN server
             ],
           },
         });
@@ -220,7 +221,6 @@ export function useWebRTC({ socket, userId }: UseWebRTCProps) {
         // Store peer reference and update call state
         peerRef.current = peer;
         setIsCallActive(true);
-
       } catch (error: any) {
         // Handle various media access errors with user-friendly messages
         if (
@@ -336,7 +336,7 @@ export function useWebRTC({ socket, userId }: UseWebRTCProps) {
 
       // Create WebRTC peer as the receiver (not initiator)
       const peer = new Peer({
-        initiator: false,     // Responding to call, not initiating
+        initiator: false, // Responding to call, not initiating
         trickle: true,
         stream: stream,
         config: {
@@ -384,7 +384,6 @@ export function useWebRTC({ socket, userId }: UseWebRTCProps) {
       setIsCallActive(true);
       setIsIncomingCall(false);
       setCallerInfo(null);
-
     } catch (error: any) {
       // Handle media access errors (same as startCall)
 
@@ -486,17 +485,17 @@ export function useWebRTC({ socket, userId }: UseWebRTCProps) {
 
   // Return hook interface with all state and methods
   return {
-    isCallActive,      // Whether a call is currently active
-    isIncomingCall,    // Whether there's an incoming call
-    callType,          // Type of current call ("voice" or "video")
-    callerInfo,        // Information about incoming call caller
-    localStream,       // Local user's media stream
-    remoteStream,      // Remote user's media stream
-    startCall,         // Function to initiate a call
-    acceptCall,        // Function to accept incoming call
-    rejectCall,        // Function to reject incoming call
-    endCall,           // Function to end current call
-    toggleAudio,       // Function to mute/unmute microphone
-    toggleVideo,       // Function to turn camera on/off
+    isCallActive, // Whether a call is currently active
+    isIncomingCall, // Whether there's an incoming call
+    callType, // Type of current call ("voice" or "video")
+    callerInfo, // Information about incoming call caller
+    localStream, // Local user's media stream
+    remoteStream, // Remote user's media stream
+    startCall, // Function to initiate a call
+    acceptCall, // Function to accept incoming call
+    rejectCall, // Function to reject incoming call
+    endCall, // Function to end current call
+    toggleAudio, // Function to mute/unmute microphone
+    toggleVideo, // Function to turn camera on/off
   };
 }

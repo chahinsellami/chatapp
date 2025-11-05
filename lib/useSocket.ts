@@ -12,13 +12,13 @@ import { io, Socket } from "socket.io-client";
  * Interface defining the structure of a chat message
  */
 interface Message {
-  messageId: string;      // Unique identifier for the message
-  senderId: string;       // ID of the user who sent the message
-  receiverId: string;     // ID of the user who should receive the message
-  text: string;           // The actual message content
-  createdAt: string;      // Timestamp when the message was created
-  username?: string;      // Optional display name of the sender
-  avatar?: string;        // Optional avatar URL of the sender
+  messageId: string; // Unique identifier for the message
+  senderId: string; // ID of the user who sent the message
+  receiverId: string; // ID of the user who should receive the message
+  text: string; // The actual message content
+  createdAt: string; // Timestamp when the message was created
+  username?: string; // Optional display name of the sender
+  avatar?: string; // Optional avatar URL of the sender
 }
 
 /**
@@ -142,12 +142,12 @@ export function useSocket(userId: string | null) {
 
   // Return hook interface with all state and methods
   return {
-    socket: socketRef.current,     // Raw socket instance for advanced usage
-    isConnected,                   // Connection status
-    messages,                      // Array of received messages
-    typingUsers,                   // Set of users currently typing
-    onlineUsers,                   // Set of users currently online
-    sendMessage,                   // Function to send messages
-    sendTypingIndicator,           // Function to send typing indicators
+    socket: socketRef.current, // Raw socket instance for advanced usage
+    isConnected, // Connection status
+    messages, // Array of received messages
+    typingUsers, // Set of users currently typing
+    onlineUsers, // Set of users currently online
+    sendMessage, // Function to send messages
+    sendTypingIndicator, // Function to send typing indicators
   };
 }

@@ -14,7 +14,6 @@ async function clearUsers() {
 
   try {
     await client.connect();
-    
 
     // Delete in correct order to respect foreign key constraints
     await client.query("DELETE FROM direct_messages");

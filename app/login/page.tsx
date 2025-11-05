@@ -4,6 +4,8 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
+import { motion } from "framer-motion";
+import { Eye, EyeOff, MessageCircle, AlertCircle } from "lucide-react";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -32,51 +34,136 @@ export default function LoginPage() {
   };
 
   return (
-    <div
-      className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden"
-      style={{
-        background:
-          "linear-gradient(135deg, #1a1d23 0%, #2F3136 50%, #202225 100%)",
-      }}
-    >
-      {/* Animated background decoration */}
+    <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden floating-particles">
+      {/* Animated background elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-[#5B65F5] opacity-10 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-[#5B65F5] opacity-10 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute top-1/2 left-1/2 w-80 h-80 bg-[#7289DA] opacity-5 rounded-full blur-3xl"></div>
+        <motion.div
+          className="absolute top-0 left-1/4 w-96 h-96 rounded-full opacity-10"
+          style={{
+            background: "linear-gradient(135deg, #a855f7, #f97316)",
+          }}
+          animate={{
+            scale: [1, 1.2, 1],
+            rotate: [0, 180, 360],
+          }}
+          transition={{
+            duration: 20,
+            repeat: Infinity,
+            ease: "linear",
+          }}
+        />
+        <motion.div
+          className="absolute bottom-0 right-1/4 w-96 h-96 rounded-full opacity-10"
+          style={{
+            background: "linear-gradient(135deg, #dc2626, #a855f7)",
+          }}
+          animate={{
+            scale: [1.2, 1, 1.2],
+            rotate: [360, 180, 0],
+          }}
+          transition={{
+            duration: 25,
+            repeat: Infinity,
+            ease: "linear",
+          }}
+        />
+        <motion.div
+          className="absolute top-1/2 left-1/2 w-80 h-80 rounded-full opacity-5"
+          style={{
+            background: "linear-gradient(135deg, #f97316, #dc2626)",
+            transform: "translate(-50%, -50%)",
+          }}
+          animate={{
+            scale: [1, 1.3, 1],
+            opacity: [0.05, 0.1, 0.05],
+          }}
+          transition={{
+            duration: 15,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+        />
       </div>
 
-      {/* Form container */}
-      <div className="relative w-full max-w-md z-10 fade-in">
-        {/* Card with enhanced styling */}
-        <div className="bg-[#36393F] rounded-xl shadow-2xl p-6 border border-[#40444B] backdrop-blur-sm">
-          {/* Header */}
-          <div className="text-center mb-6 slide-in">
-            <div className="inline-block p-3 bg-[#5B65F5] rounded-full mb-3 shadow-lg">
-              <span className="text-2xl">💬</span>
-            </div>
-            <h1 className="text-4xl font-bold text-white mb-2 tracking-tight">
-              Welcome Back
-            </h1>
-            <p className="text-[#B0BEC5] text-base">
-              Access your WebChat community
-            </p>
-          </div>
+      {/* Main form container */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, ease: "easeOut" }}
+        className="relative w-full max-w-md z-10"
+      >
+        {/* Glass card with enhanced styling */}
+        <div className="glass-card p-8 relative overflow-hidden">
+          {/* Subtle inner glow */}
+          <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 via-transparent to-orange-500/5 rounded-2xl" />
 
-          {/* Error message */}
+          {/* Header section */}
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2, duration: 0.5 }}
+            className="text-center mb-8 relative z-10"
+          >
+            <motion.div
+              className="inline-flex items-center justify-center w-16 h-16 rounded-2xl mb-4"
+              style={{
+                background: "linear-gradient(135deg, #a855f7, #f97316)",
+              }}
+              whileHover={{ scale: 1.05, rotate: 5 }}
+              transition={{ type: "spring", stiffness: 300 }}
+            >
+              <MessageCircle className="w-8 h-8 text-white" />
+            </motion.div>
+
+            <motion.h1
+              className="text-4xl font-bold mb-3 tracking-tight"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.4, duration: 0.5 }}
+            >
+              <span className="gradient-text">Welcome Back</span>
+            </motion.h1>
+
+            <motion.p
+              className="text-neutral-400 text-base leading-relaxed"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.6, duration: 0.5 }}
+            >
+              Access your WebChat community
+            </motion.p>
+          </motion.div>
+
+          {/* Error message with animation */}
           {error && (
-            <div className="mb-4 p-3 bg-[#F04747] bg-opacity-20 border border-[#F04747] rounded-lg slide-in-up">
-              <p className="text-[#FF6B6B] text-sm font-medium">⚠️ {error}</p>
-            </div>
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: -10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="mb-6 p-4 rounded-xl border backdrop-blur-sm"
+              style={{
+                background: "rgba(220, 38, 38, 0.1)",
+                borderColor: "rgba(220, 38, 38, 0.2)",
+              }}
+            >
+              <div className="flex items-center gap-3">
+                <AlertCircle className="w-5 h-5 text-red-400 flex-shrink-0" />
+                <p className="text-red-300 text-sm font-medium">{error}</p>
+              </div>
+            </motion.div>
           )}
 
-          {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Form with staggered animations */}
+          <form onSubmit={handleSubmit} className="space-y-6 relative z-10">
             {/* Email field */}
-            <div className="scale-in">
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.8, duration: 0.5 }}
+            >
               <label
                 htmlFor="email"
-                className="block text-sm font-bold text-[#DCDDDE] mb-2"
+                className="block text-sm font-semibold text-neutral-300 mb-3"
               >
                 📧 Email Address
               </label>
@@ -87,15 +174,19 @@ export default function LoginPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="you@example.com"
                 required
-                className="w-full px-4 py-2.5 bg-[#40444B] border border-[#202225] text-[#DCDDDE] rounded-lg focus:outline-none focus:border-[#5B65F5] focus:ring-2 focus:ring-[#5B65F5] focus:ring-opacity-50 transition placeholder-[#72767D] text-sm"
+                className="modern-input w-full focus-ring"
               />
-            </div>
+            </motion.div>
 
             {/* Password field */}
-            <div className="scale-in">
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 1.0, duration: 0.5 }}
+            >
               <label
                 htmlFor="password"
-                className="block text-sm font-bold text-[#DCDDDE] mb-2"
+                className="block text-sm font-semibold text-neutral-300 mb-3"
               >
                 🔒 Password
               </label>
@@ -107,49 +198,97 @@ export default function LoginPage() {
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
                   required
-                  className="w-full px-4 py-2.5 bg-[#40444B] border border-[#202225] text-[#DCDDDE] rounded-lg focus:outline-none focus:border-[#5B65F5] focus:ring-2 focus:ring-[#5B65F5] focus:ring-opacity-50 transition placeholder-[#72767D] text-sm"
+                  className="modern-input w-full pr-12 focus-ring"
                 />
-                <button
+                <motion.button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[#72767D] hover:text-[#5B65F5] transition text-xs font-semibold"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded-lg hover:bg-white/10 transition-colors"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
                 >
-                  {showPassword ? "Hide" : "Show"}
-                </button>
+                  {showPassword ? (
+                    <EyeOff className="w-4 h-4 text-neutral-400" />
+                  ) : (
+                    <Eye className="w-4 h-4 text-neutral-400" />
+                  )}
+                </motion.button>
               </div>
-            </div>
+            </motion.div>
 
             {/* Submit button */}
-            <button
+            <motion.button
               type="submit"
               disabled={isLoading}
-              className="w-full py-3 bg-[#5B65F5] text-white font-bold rounded-lg hover:bg-[#4752C4] transition disabled:opacity-50 disabled:cursor-not-allowed mt-6 text-base shadow-lg hover:shadow-xl transform hover:scale-105 smooth"
+              className="w-full py-4 px-6 rounded-xl font-bold text-white text-base relative overflow-hidden disabled:opacity-50 disabled:cursor-not-allowed"
+              style={{
+                background: "linear-gradient(135deg, #a855f7, #f97316)",
+              }}
+              whileHover={{ scale: 1.02, y: -1 }}
+              whileTap={{ scale: 0.98 }}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 1.2, duration: 0.5 }}
             >
-              {isLoading ? "🔄 Logging in..." : "Login"}
-            </button>
+              <span className="relative z-10 flex items-center justify-center gap-2">
+                {isLoading ? (
+                  <>
+                    <motion.div
+                      className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full"
+                      animate={{ rotate: 360 }}
+                      transition={{
+                        duration: 1,
+                        repeat: Infinity,
+                        ease: "linear",
+                      }}
+                    />
+                    <span>Signing in...</span>
+                  </>
+                ) : (
+                  <>
+                    <MessageCircle className="w-5 h-5" />
+                    <span>Continue to WebChat</span>
+                  </>
+                )}
+              </span>
+
+              {/* Button glow effect */}
+              <div className="absolute inset-0 bg-gradient-to-r from-purple-600/20 to-orange-600/20 opacity-0 hover:opacity-100 transition-opacity duration-300" />
+            </motion.button>
           </form>
 
           {/* Divider */}
-          <div className="my-6 flex items-center">
-            <div className="flex-1 h-px bg-[#202225]"></div>
-            <div className="px-3 text-[#72767D] text-xs font-bold uppercase tracking-wider">
+          <motion.div
+            className="my-8 flex items-center"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1.4, duration: 0.5 }}
+          >
+            <div className="flex-1 h-px bg-gradient-to-r from-transparent via-neutral-600 to-transparent"></div>
+            <div className="px-4 text-neutral-500 text-xs font-semibold uppercase tracking-wider">
               Or
             </div>
-            <div className="flex-1 h-px bg-[#202225]"></div>
-          </div>
+            <div className="flex-1 h-px bg-gradient-to-r from-transparent via-neutral-600 to-transparent"></div>
+          </motion.div>
 
           {/* Signup link */}
-          <p className="text-center text-[#B0BEC5] text-sm">
+          <motion.p
+            className="text-center text-neutral-400 text-sm relative z-10"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1.6, duration: 0.5 }}
+          >
             Don't have an account?{" "}
             <Link
               href="/signup"
-              className="text-[#5B65F5] hover:text-[#7289DA] font-bold transition hover:underline"
+              className="font-semibold transition-all duration-300 hover:text-purple-400 relative group"
             >
-              Create one
+              <span className="relative z-10">Create one</span>
+              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-purple-400 to-orange-400 group-hover:w-full transition-all duration-300"></span>
             </Link>
-          </p>
+          </motion.p>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 }

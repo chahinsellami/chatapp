@@ -130,7 +130,6 @@ export async function initializeDatabase() {
         edited_at TIMESTAMP                    -- Last edit timestamp
       )
     `);
-
   } catch (error) {
     // Rethrow any database initialization errors
     throw error;

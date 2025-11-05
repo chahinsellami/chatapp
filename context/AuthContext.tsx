@@ -19,13 +19,13 @@ import {
  * Used throughout the app for displaying user information
  */
 export interface User {
-  id: string;           // Unique user identifier
-  username: string;     // User's display name
-  email: string;        // User's email address
-  avatar?: string;      // Profile picture URL
-  status?: string;      // Online/offline/away status
-  bio?: string;         // User biography
-  createdAt?: string;   // Account creation timestamp
+  id: string; // Unique user identifier
+  username: string; // User's display name
+  email: string; // User's email address
+  avatar?: string; // Profile picture URL
+  status?: string; // Online/offline/away status
+  bio?: string; // User biography
+  createdAt?: string; // Account creation timestamp
 }
 
 /**
@@ -33,14 +33,19 @@ export interface User {
  * Defines all authentication-related state and methods available to components
  */
 export interface AuthContextType {
-  user: User | null;                    // Current authenticated user or null
-  isLoading: boolean;                   // Whether auth operations are in progress
-  isLoggedIn: boolean;                  // Computed boolean for login status
-  token: string | null;                 // JWT token for API authentication
-  login: (email: string, password: string) => Promise<User>;  // Login method
-  signup: (username: string, email: string, password: string, passwordConfirm: string) => Promise<void>; // Signup method
-  logout: () => void;                   // Logout method
-  updateUser: (user: User) => void;     // Update user data method
+  user: User | null; // Current authenticated user or null
+  isLoading: boolean; // Whether auth operations are in progress
+  isLoggedIn: boolean; // Computed boolean for login status
+  token: string | null; // JWT token for API authentication
+  login: (email: string, password: string) => Promise<User>; // Login method
+  signup: (
+    username: string,
+    email: string,
+    password: string,
+    passwordConfirm: string
+  ) => Promise<void>; // Signup method
+  logout: () => void; // Logout method
+  updateUser: (user: User) => void; // Update user data method
 }
 
 /**
@@ -57,9 +62,9 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
  */
 export function AuthProvider({ children }: { children: ReactNode }) {
   // Authentication state
-  const [user, setUser] = useState<User | null>(null);        // Current user data
-  const [token, setToken] = useState<string | null>(null);    // JWT token
-  const [isLoading, setIsLoading] = useState(true);          // Loading state for initial auth check
+  const [user, setUser] = useState<User | null>(null); // Current user data
+  const [token, setToken] = useState<string | null>(null); // JWT token
+  const [isLoading, setIsLoading] = useState(true); // Loading state for initial auth check
 
   /**
    * Check authentication status on app load
