@@ -43,7 +43,7 @@ const channels = [
   },
   { id: "tech", name: "tech", description: "Tech discussions" },
   { id: "gaming", name: "gaming", description: "Gaming talk" },
-};
+];
 
 /**
  * Sidebar Component

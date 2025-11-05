@@ -3,71 +3,68 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ===== PROFESSIONAL DESIGN SYSTEM ===== */
+/* ===== ELEGANT DARK DESIGN SYSTEM ===== */
 
 :root {
-  /* Primary - Deep Ocean Blue (Sophisticated & Professional) */
-  --primary-50: #eff6ff;
-  --primary-100: #dbeafe;
-  --primary-200: #bfdbfe;
-  --primary-300: #93c5fd;
-  --primary-400: #60a5fa;
-  --primary-500: #3b82f6; /* Professional blue */
-  --primary-600: #2563eb;
-  --primary-700: #1d4ed8;
-  --primary-800: #1e40af;
-  --primary-900: #1e3a8a;
+  /* Primary - Deep Purple (Elegant & Mysterious) */
+  --primary-50: #faf5ff;
+  --primary-100: #f3e8ff;
+  --primary-200: #e9d5ff;
+  --primary-300: #d8b4fe;
+  --primary-400: #c084fc;
+  --primary-500: #a855f7; /* Rich purple */
+  --primary-600: #9333ea;
+  --primary-700: #7e22ce;
+  --primary-800: #6b21a8;
+  --primary-900: #581c87;
 
-  /* Secondary - Refined Indigo (Mature & Elegant) */
-  --secondary-50: #eef2ff;
-  --secondary-100: #e0e7ff;
-  --secondary-200: #c7d2fe;
-  --secondary-300: #a5b4fc;
-  --secondary-400: #818cf8;
-  --secondary-500: #6366f1; /* Refined indigo */
-  --secondary-600: #4f46e5;
-  --secondary-700: #4338ca;
-  --secondary-800: #3730a3;
-  --secondary-900: #312e81;
+  /* Secondary - Rose Gold (Luxurious) */
+  --secondary-50: #fff1f2;
+  --secondary-100: #ffe4e6;
+  --secondary-200: #fecdd3;
+  --secondary-300: #fda4af;
+  --secondary-400: #fb7185;
+  --secondary-500: #f43f5e; /* Rose */
+  --secondary-600: #e11d48;
+  --secondary-700: #be123c;
+  --secondary-800: #9f1239;
+  --secondary-900: #881337;
 
-  /* Accent - Sophisticated Teal (Professional highlight) */
-  --accent-50: #f0fdfa;
-  --accent-100: #ccfbf1;
-  --accent-200: #99f6e4;
-  --accent-300: #5eead4;
-  --accent-400: #2dd4bf;
-  --accent-500: #14b8a6; /* Professional teal */
-  --accent-600: #0d9488;
-  --accent-700: #0f766e;
-  --accent-800: #115e59;
-  --accent-900: #134e4a;
+  /* Accent - Amber Gold (Premium) */
+  --accent-50: #fffbeb;
+  --accent-100: #fef3c7;
+  --accent-200: #fde68a;
+  --accent-300: #fcd34d;
+  --accent-400: #fbbf24;
+  --accent-500: #f59e0b; /* Gold */
+  --accent-600: #d97706;
+  --accent-700: #b45309;
+  --accent-800: #92400e;
+  --accent-900: #78350f;
 
-  /* Neutral - Professional Gray Scale (Darker, more sophisticated) */
-  --neutral-50: #f8fafc;
-  --neutral-100: #f1f5f9;
-  --neutral-200: #e2e8f0;
-  --neutral-300: #cbd5e1;
-  --neutral-400: #94a3b8;
-  --neutral-500: #64748b;
-  --neutral-600: #475569;
-  --neutral-700: #334155;
-  --neutral-800: #1e293b;
-  --neutral-900: #0f172a;
+  /* Neutral - Ultra Dark (Elegant & Sophisticated) */
+  --neutral-50: #fafafa;
+  --neutral-100: #f5f5f5;
+  --neutral-200: #e5e5e5;
+  --neutral-300: #d4d4d4;
+  --neutral-400: #a3a3a3;
+  --neutral-500: #737373;
+  --neutral-600: #525252;
+  --neutral-700: #404040;
+  --neutral-800: #262626;
+  --neutral-900: #171717;
+  --neutral-950: #0a0a0a;
 
-  /* Background - Deep, sophisticated dark theme */
-  --bg-primary: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
-  --bg-secondary: linear-gradient(
-    135deg,
-    #1e293b 0%,
-    #334155 50%,
-    #475569 100%
-  );
-  --bg-accent: linear-gradient(135deg, #3b82f6 0%, #6366f1 50%, #14b8a6 100%);
+  /* Background - Deep Elegant Dark */
+  --bg-primary: #0a0a0a;
+  --bg-secondary: #121212;
+  --bg-tertiary: #1a1a1a;
+  --bg-hover: #222222;
 
-  /* Glass Effect - More subtle and professional */
-  --glass-bg: rgba(30, 41, 59, 0.4);
-  --glass-border: rgba(148, 163, 184, 0.15);
-  --glass-shadow: rgba(15, 23, 42, 0.3);
+  /* Glass Effect - Darker, more sophisticated */
+  --glass-bg: rgba(26, 26, 26, 0.7);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-shadow: rgba(0, 0, 0, 0.5);
 
   /* Animation Variables */
   --duration-fast: 150ms;
@@ -91,71 +88,85 @@ body {
   font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
     sans-serif;
   background: var(--bg-primary);
-  color: var(--neutral-100);
+  color: #e5e5e5;
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* ===== GLASSMORPHISM COMPONENTS ===== */
+/* ===== ELEGANT GLASSMORPHISM ===== */
 
 .glass-card {
-  background: rgba(30, 41, 59, 0.6);
+  background: rgba(26, 26, 26, 0.8);
   backdrop-filter: blur(24px) saturate(180%);
   -webkit-backdrop-filter: blur(24px) saturate(180%);
-  border: 1px solid rgba(148, 163, 184, 0.12);
-  border-radius: 16px;
-  box-shadow: 0 8px 32px rgba(15, 23, 42, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 20px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
 }
 
 .glass-button {
-  background: rgba(30, 41, 59, 0.5);
+  background: rgba(26, 26, 26, 0.6);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(148, 163, 184, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 12px;
   transition: all var(--duration-normal) var(--easing-smooth);
 }
 
 .glass-button:hover {
-  background: rgba(51, 65, 85, 0.7);
-  border-color: rgba(148, 163, 184, 0.2);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 16px rgba(59, 130, 246, 0.15);
+  background: rgba(34, 34, 34, 0.8);
+  border-color: rgba(168, 85, 247, 0.4);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 20px rgba(168, 85, 247, 0.2);
 }
 
-/* ===== MODERN FORM STYLES ===== */
+/* ===== ELEGANT FORM STYLES ===== */
 
 .modern-input {
-  background: rgba(30, 41, 59, 0.6);
+  background: rgba(26, 26, 26, 0.8);
   backdrop-filter: blur(10px);
-  border: 1px solid rgba(148, 163, 184, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 12px;
-  padding: 12px 16px;
-  color: #f1f5f9;
-  font-size: 14px;
+  padding: 14px 18px;
+  color: #f5f5f5;
+  font-size: 15px;
   transition: all var(--duration-normal) var(--easing-smooth);
   font-family: "Inter", sans-serif;
 }
 
 .modern-input:focus {
   outline: none;
-  border-color: #6366f1;
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
-  background: rgba(51, 65, 85, 0.7);
+  border-color: #a855f7;
+  box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.15);
+  background: rgba(34, 34, 34, 0.9);
 }
 
 .modern-input::placeholder {
-  color: #94a3b8;
+  color: #737373;
 }
 
 /* ===== GRADIENT TEXT ===== */
 
 .gradient-text {
-  background: var(--bg-accent);
+  background: linear-gradient(135deg, #a855f7 0%, #f43f5e 50%, #f59e0b 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
+}
+
+/* ===== GLOW EFFECTS ===== */
+
+.glow-purple {
+  box-shadow: 0 0 20px rgba(168, 85, 247, 0.3);
+}
+
+.glow-rose {
+  box-shadow: 0 0 20px rgba(244, 63, 94, 0.3);
+}
+
+.glow-gold {
+  box-shadow: 0 0 20px rgba(245, 158, 11, 0.3);
 }
 
 /* ===== ANIMATED BACKGROUNDS ===== */
@@ -175,13 +186,12 @@ body {
   background: conic-gradient(
     from 0deg,
     transparent,
-    var(--secondary-500),
+    rgba(168, 85, 247, 0.1),
     transparent,
-    var(--accent-500),
+    rgba(244, 63, 94, 0.1),
     transparent
   );
   animation: rotate 20s linear infinite;
-  opacity: 0.1;
   pointer-events: none;
 }
 
@@ -194,51 +204,11 @@ body {
   }
 }
 
-/* ===== FLOATING PARTICLES ===== */
-
-.floating-particles {
-  position: relative;
-  overflow: hidden;
-}
-
-.floating-particles::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-image: radial-gradient(
-      circle at 20% 80%,
-      var(--secondary-500) 1px,
-      transparent 1px
-    ),
-    radial-gradient(circle at 80% 20%, var(--accent-500) 1px, transparent 1px),
-    radial-gradient(circle at 40% 40%, var(--primary-500) 1px, transparent 1px);
-  background-size: 100px 100px, 150px 150px, 200px 200px;
-  animation: float 30s ease-in-out infinite;
-  opacity: 0.3;
-  pointer-events: none;
-}
-
-@keyframes float {
-  0%,
-  100% {
-    transform: translateY(0px) rotate(0deg);
-  }
-  33% {
-    transform: translateY(-20px) rotate(120deg);
-  }
-  66% {
-    transform: translateY(10px) rotate(240deg);
-  }
-}
-
-/* ===== MODERN SCROLLBAR ===== */
+/* ===== ELEGANT SCROLLBAR ===== */
 
 .modern-scrollbar {
   scrollbar-width: thin;
-  scrollbar-color: var(--secondary-500) transparent;
+  scrollbar-color: #a855f7 transparent;
 }
 
 .modern-scrollbar::-webkit-scrollbar {
@@ -250,15 +220,15 @@ body {
 }
 
 .modern-scrollbar::-webkit-scrollbar-thumb {
-  background: var(--secondary-500);
+  background: linear-gradient(180deg, #a855f7 0%, #f43f5e 100%);
   border-radius: 3px;
 }
 
 .modern-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: var(--secondary-400);
+  background: linear-gradient(180deg, #c084fc 0%, #fb7185 100%);
 }
 
-/* ===== UTILITY CLASSES ===== */
+/* ===== UTILITY ANIMATIONS ===== */
 
 .animate-fade-in {
   animation: fadeIn var(--duration-normal) var(--easing-smooth);
@@ -316,10 +286,10 @@ body {
 
 @keyframes glow {
   from {
-    box-shadow: 0 0 20px var(--secondary-500);
+    box-shadow: 0 0 20px rgba(168, 85, 247, 0.3);
   }
   to {
-    box-shadow: 0 0 30px var(--secondary-400), 0 0 40px var(--secondary-500);
+    box-shadow: 0 0 30px rgba(168, 85, 247, 0.5), 0 0 40px rgba(244, 63, 94, 0.3);
   }
 }
 
@@ -327,12 +297,12 @@ body {
 
 @media (max-width: 768px) {
   .glass-card {
-    border-radius: 12px;
+    border-radius: 16px;
   }
 
   .modern-input {
-    padding: 10px 14px;
-    font-size: 16px; /* Prevents zoom on iOS */
+    padding: 12px 16px;
+    font-size: 16px;
   }
 }
 
@@ -351,7 +321,7 @@ body {
 /* ===== FOCUS STYLES ===== */
 
 .focus-ring:focus-visible {
-  outline: 2px solid var(--secondary-400);
+  outline: 2px solid #a855f7;
   outline-offset: 2px;
 }
 
@@ -361,10 +331,7 @@ body {
   animation: fadeIn var(--duration-normal) var(--easing-smooth);
 }
 
-.slide-in {
-  animation: slideUp var(--duration-normal) var(--easing-smooth);
-}
-
+.slide-in,
 .slide-in-up {
   animation: slideUp var(--duration-normal) var(--easing-smooth);
 }
@@ -379,7 +346,7 @@ body {
 }
 
 .hover-glow:hover {
-  box-shadow: 0 0 20px var(--secondary-500);
+  box-shadow: 0 0 20px rgba(168, 85, 247, 0.4);
   transition: box-shadow var(--duration-normal) var(--easing-smooth);
 }
 
@@ -389,7 +356,7 @@ body {
 
 .custom-scrollbar {
   scrollbar-width: thin;
-  scrollbar-color: var(--secondary-500) transparent;
+  scrollbar-color: #a855f7 transparent;
 }
 
 .custom-scrollbar::-webkit-scrollbar {
@@ -401,18 +368,18 @@ body {
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background: var(--secondary-500);
+  background: #a855f7;
   border-radius: 3px;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: var(--secondary-400);
+  background: #c084fc;
 }
 
 .modern-card {
-  background: var(--glass-bg);
+  background: rgba(26, 26, 26, 0.8);
   backdrop-filter: blur(10px);
-  border: 1px solid var(--glass-border);
-  border-radius: 12px;
-  box-shadow: 0 4px 16px var(--glass-shadow);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
 }
