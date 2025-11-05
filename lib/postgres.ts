@@ -42,12 +42,21 @@ export async function initializeDatabase() {
         username VARCHAR(255) UNIQUE NOT NULL, -- Unique username for display
         email VARCHAR(255) UNIQUE NOT NULL,    -- Unique email for authentication
         password_hash VARCHAR(255) NOT NULL,   -- Hashed password for security
-        avatar VARCHAR(255),                   -- Profile picture URL
+        avatar TEXT,                           -- Profile picture (TEXT for Base64 images)
         status VARCHAR(50) DEFAULT 'offline',  -- Online/offline/away status
         bio TEXT DEFAULT '',                   -- User biography/description
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP -- Account creation time
       )
     `);
+
+    // Migration: Change avatar column to TEXT if it's VARCHAR
+    try {
+      await client.query(`
+        ALTER TABLE users ALTER COLUMN avatar TYPE TEXT;
+      `);
+    } catch (err) {
+      // Ignore error if column is already TEXT or doesn't exist
+    }
 
     // Create channels table - for group chat functionality
     await client.query(`
