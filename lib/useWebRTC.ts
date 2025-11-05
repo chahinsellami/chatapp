@@ -177,8 +177,30 @@ export function useWebRTC({ socket, userId }: UseWebRTCProps) {
           stream: stream, // Attach local media stream
           config: {
             iceServers: [
-              { urls: "stun:stun.l.google.com:19302" }, // Google's STUN servers
-              { urls: "stun:stun1.l.google.com:19302" }, // Backup STUN server
+              // STUN servers help discover your public IP address
+              { urls: "stun:stun.l.google.com:19302" },
+              { urls: "stun:stun1.l.google.com:19302" },
+              { urls: "stun:stun2.l.google.com:19302" },
+              { urls: "stun:stun3.l.google.com:19302" },
+              { urls: "stun:stun4.l.google.com:19302" },
+              // TURN servers relay traffic when direct connection fails
+              // These are free public TURN servers (limited reliability)
+              // For production, use your own TURN server or services like Twilio
+              {
+                urls: "turn:openrelay.metered.ca:80",
+                username: "openrelayproject",
+                credential: "openrelayproject",
+              },
+              {
+                urls: "turn:openrelay.metered.ca:443",
+                username: "openrelayproject",
+                credential: "openrelayproject",
+              },
+              {
+                urls: "turn:openrelay.metered.ca:443?transport=tcp",
+                username: "openrelayproject",
+                credential: "openrelayproject",
+              },
             ],
           },
         });
@@ -341,8 +363,30 @@ export function useWebRTC({ socket, userId }: UseWebRTCProps) {
         stream: stream,
         config: {
           iceServers: [
+            // STUN servers help discover your public IP address
             { urls: "stun:stun.l.google.com:19302" },
             { urls: "stun:stun1.l.google.com:19302" },
+            { urls: "stun:stun2.l.google.com:19302" },
+            { urls: "stun:stun3.l.google.com:19302" },
+            { urls: "stun:stun4.l.google.com:19302" },
+            // TURN servers relay traffic when direct connection fails
+            // These are free public TURN servers (limited reliability)
+            // For production, use your own TURN server or services like Twilio
+            {
+              urls: "turn:openrelay.metered.ca:80",
+              username: "openrelayproject",
+              credential: "openrelayproject",
+            },
+            {
+              urls: "turn:openrelay.metered.ca:443",
+              username: "openrelayproject",
+              credential: "openrelayproject",
+            },
+            {
+              urls: "turn:openrelay.metered.ca:443?transport=tcp",
+              username: "openrelayproject",
+              credential: "openrelayproject",
+            },
           ],
         },
       });

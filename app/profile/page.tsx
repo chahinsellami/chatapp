@@ -345,18 +345,6 @@ export default function ProfilePage() {
                   <span className="text-6xl">{user.avatar || "👤"}</span>
                 )}
               </div>
-
-              {/* Status Indicator */}
-              <motion.div
-                className="absolute bottom-2 right-1/2 translate-x-16 w-6 h-6 rounded-full border-4 border-[#1e293b] shadow-lg"
-                style={{
-                  background:
-                    STATUS_OPTIONS.find((s) => s.value === status)?.color ||
-                    "#14b8a6",
-                }}
-                animate={{ scale: [1, 1.2, 1] }}
-                transition={{ duration: 2, repeat: Infinity }}
-              />
             </motion.div>
 
             {/* User Info */}
