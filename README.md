@@ -18,15 +18,15 @@ Professional real-time messaging application with direct messaging, friend manag
 
 ## Tech Stack
 
-| Technology   | Purpose             |
-| ------------ | ------------------- |
-| Next.js 16   | React framework     |
-| TypeScript 5 | Type safety         |
-| Tailwind CSS | Styling             |
-| PostgreSQL   | Database            |
-| Socket.IO    | Real-time messaging |
-| WebRTC       | Voice/video calls   |
-| Framer Motion| Animations          |
+| Technology    | Purpose             |
+| ------------- | ------------------- |
+| Next.js 16    | React framework     |
+| TypeScript 5  | Type safety         |
+| Tailwind CSS  | Styling             |
+| PostgreSQL    | Database            |
+| Socket.IO     | Real-time messaging |
+| WebRTC        | Voice/video calls   |
+| Framer Motion | Animations          |
 
 ## Quick Start
 
@@ -117,9 +117,9 @@ webchat/
     ├── server.js           # Main server file
     └── package.json        # Dependencies
 
-`````
-
 ```
+
+````
 
 ## API Endpoints
 
@@ -163,7 +163,7 @@ CREATE TABLE users (
   bio TEXT,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
-```
+````
 
 ### Friends Table
 
@@ -207,6 +207,7 @@ CREATE TABLE direct_messages (
 ### Deploy to Railway
 
 1. **Backend Server**
+
    - Push `backend-server/` to GitHub
    - Connect to Railway
    - Set environment variables: `PORT`, `FRONTEND_URL`

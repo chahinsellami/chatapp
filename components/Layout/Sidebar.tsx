@@ -2,7 +2,7 @@
 
 /**
  * Sidebar Component - Left navigation panel for channel-based chat
- * 
+ *
  * Features:
  * - Collapsible sidebar (wide/narrow modes)
  * - List of available channels
@@ -11,7 +11,7 @@
  * - User profile section at bottom
  * - Logout functionality
  * - Responsive design with animations
- * 
+ *
  * Note: This component appears to be designed for a Discord-style server system
  * but is not currently used in the main messenger/DM flow
  */
@@ -78,7 +78,7 @@ export default function Sidebar({
             <p className="text-xs text-[#72767D]">Server</p>
           </div>
         </div>
-        
+
         {/* Toggle button to collapse/expand sidebar */}
         <button
           onClick={() => setIsOpen(!isOpen)}
@@ -156,7 +156,7 @@ export default function Sidebar({
               {user?.username?.charAt(0).toUpperCase() || "U"}
             </span>
           </div>
-          
+
           {/* User info and logout - only visible when sidebar is open */}
           {isOpen && (
             <>
@@ -169,7 +169,7 @@ export default function Sidebar({
                   🟢 Online
                 </p>
               </div>
-              
+
               {/* Logout button with emoji icon */}
               <Link
                 href="/login"
