@@ -2,14 +2,14 @@
 
 /**
  * Messenger Page - Main messaging interface
- * 
+ *
  * This is the primary messaging page where users can:
  * - View their friends list in the sidebar
  * - Select friends to start conversations
  * - Send and receive messages in real-time
  * - Access profile and settings
  * - Logout from the application
- * 
+ *
  * Features:
  * - Responsive design with mobile-friendly sidebar
  * - Smooth animations and transitions
@@ -24,16 +24,23 @@ import { useAuth } from "@/context/AuthContext";
 import FriendsList from "@/components/Friends/FriendsList";
 import DirectMessages from "@/components/Friends/DirectMessages";
 import { motion, AnimatePresence } from "framer-motion";
-import { MessageCircle, Users, LogOut, Menu, X, UserCircle2 } from "lucide-react";
+import {
+  MessageCircle,
+  Users,
+  LogOut,
+  Menu,
+  X,
+  UserCircle2,
+} from "lucide-react";
 
 /**
  * Friend interface - Represents a friend's data
  */
 interface Friend {
-  id: string;          // Unique identifier
-  username: string;    // Display name
-  avatar?: string;     // Avatar emoji or URL
-  status: string;      // Online/offline status
+  id: string; // Unique identifier
+  username: string; // Display name
+  avatar?: string; // Avatar emoji or URL
+  status: string; // Online/offline status
 }
 
 /**
@@ -42,11 +49,11 @@ interface Friend {
 export default function MessengerPage() {
   const router = useRouter();
   const { user, isLoading, logout } = useAuth();
-  
+
   // Selected friend state for displaying chat
   const [selectedFriendId, setSelectedFriendId] = useState<string | null>(null);
   const [selectedFriend, setSelectedFriend] = useState<Friend | null>(null);
-  
+
   // Mobile sidebar visibility control
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -168,10 +175,7 @@ export default function MessengerPage() {
           animate={{ opacity: 1 }}
           transition={{ delay: 0.4 }}
         >
-          <FriendsList
-            userId={user.id}
-            onSelectFriend={handleSelectFriend}
-          />
+          <FriendsList userId={user.id} onSelectFriend={handleSelectFriend} />
         </motion.div>
 
         {/* Footer with logout */}
@@ -395,7 +399,8 @@ export default function MessengerPage() {
                 animate={{ opacity: 1 }}
                 transition={{ delay: 1.1 }}
               >
-                Select a friend from the sidebar to start messaging, or find new friends to connect with.
+                Select a friend from the sidebar to start messaging, or find new
+                friends to connect with.
               </motion.p>
 
               <div className="flex flex-col sm:flex-row gap-3 justify-center">

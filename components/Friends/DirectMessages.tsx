@@ -82,7 +82,7 @@ export default function DirectMessages({
   // User interface state
   const [userAvatar, setUserAvatar] = useState<string>("??"); // Current user's avatar
   const [isMobile, setIsMobile] = useState(false); // Mobile device detection
-  
+
   // Auth context for user status
   const { user, updateUser } = useAuth();
 
@@ -108,7 +108,10 @@ export default function DirectMessages({
   // Close status dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (statusDropdownRef.current && !statusDropdownRef.current.contains(event.target as Node)) {
+      if (
+        statusDropdownRef.current &&
+        !statusDropdownRef.current.contains(event.target as Node)
+      ) {
         setShowStatusDropdown(false);
       }
     };
@@ -408,10 +411,10 @@ export default function DirectMessages({
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ 
-          avatar: user?.avatar || "👤", 
-          status: newStatus, 
-          bio: user?.bio || "" 
+        body: JSON.stringify({
+          avatar: user?.avatar || "👤",
+          status: newStatus,
+          bio: user?.bio || "",
         }),
       });
 
@@ -502,9 +505,7 @@ export default function DirectMessages({
       >
         <div className="flex items-center gap-3">
           <motion.div className="relative" whileHover={{ scale: 1.05 }}>
-            <div
-              className="w-10 h-10 md:w-12 md:h-12 rounded-xl overflow-hidden flex items-center justify-center bg-gradient-to-br from-blue-500 to-indigo-600"
-            >
+            <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl overflow-hidden flex items-center justify-center bg-gradient-to-br from-blue-500 to-indigo-600">
               {friendAvatar?.startsWith("/avatars/") ? (
                 <img
                   src={friendAvatar}
@@ -512,7 +513,9 @@ export default function DirectMessages({
                   className="w-full h-full object-cover"
                 />
               ) : (
-                <span className="text-xl md:text-2xl">{friendAvatar || "??"}</span>
+                <span className="text-xl md:text-2xl">
+                  {friendAvatar || "??"}
+                </span>
               )}
             </div>
             {/* Online indicator */}
@@ -560,7 +563,11 @@ export default function DirectMessages({
               title="Change Status"
             >
               <span className="text-lg">
-                {STATUS_OPTIONS.find((s) => s.value === (user?.status || "online"))?.icon}
+                {
+                  STATUS_OPTIONS.find(
+                    (s) => s.value === (user?.status || "online")
+                  )?.icon
+                }
               </span>
               <ChevronDown className="w-3 h-3 text-slate-400 hidden sm:block" />
             </motion.button>
@@ -588,7 +595,9 @@ export default function DirectMessages({
                       whileTap={{ scale: 0.98 }}
                     >
                       <span className="text-xl">{option.icon}</span>
-                      <span className="text-sm font-medium flex-1">{option.label}</span>
+                      <span className="text-sm font-medium flex-1">
+                        {option.label}
+                      </span>
                       {user?.status === option.value && (
                         <Check className="w-4 h-4 text-indigo-400" />
                       )}
@@ -656,7 +665,9 @@ export default function DirectMessages({
                         className="w-full h-full object-cover"
                       />
                     ) : (
-                      <span className="text-xs md:text-sm">{userAvatar || "??"}</span>
+                      <span className="text-xs md:text-sm">
+                        {userAvatar || "??"}
+                      </span>
                     )
                   ) : friendAvatar?.startsWith("/avatars/") ? (
                     <img
@@ -665,7 +676,9 @@ export default function DirectMessages({
                       className="w-full h-full object-cover"
                     />
                   ) : (
-                    <span className="text-xs md:text-sm">{friendAvatar || "??"}</span>
+                    <span className="text-xs md:text-sm">
+                      {friendAvatar || "??"}
+                    </span>
                   )}
                 </motion.div>
 

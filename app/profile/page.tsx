@@ -2,7 +2,7 @@
 
 /**
  * Profile Page - User profile management and settings
- * 
+ *
  * Features:
  * - Avatar selection from emoji gallery
  * - Status management (online, idle, dnd, invisible)
@@ -97,7 +97,7 @@ const STATUS_OPTIONS = [
 export default function ProfilePage() {
   const router = useRouter();
   const { user, isLoading, updateUser, logout } = useAuth();
-  
+
   // Profile state
   const [avatar, setAvatar] = useState("");
   const [status, setStatus] = useState("online");
@@ -105,7 +105,7 @@ export default function ProfilePage() {
   const [customImage, setCustomImage] = useState<string | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [uploadingImage, setUploadingImage] = useState(false);
-  
+
   // UI state
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
@@ -121,7 +121,10 @@ export default function ProfilePage() {
       setStatus(user.status || "online");
       setBio(user.bio || "");
       // Check if avatar is a custom image URL
-      if (user.avatar.startsWith('/avatars/') || user.avatar.startsWith('http')) {
+      if (
+        user.avatar.startsWith("/avatars/") ||
+        user.avatar.startsWith("http")
+      ) {
         setCustomImage(user.avatar);
       }
     }
@@ -141,16 +144,16 @@ export default function ProfilePage() {
     const file = e.target.files?.[0];
     if (file) {
       // Validate file type
-      if (!file.type.startsWith('image/')) {
-        setError('Please select an image file');
+      if (!file.type.startsWith("image/")) {
+        setError("Please select an image file");
         return;
       }
       // Validate file size (max 5MB)
       if (file.size > 5 * 1024 * 1024) {
-        setError('Image size must be less than 5MB');
+        setError("Image size must be less than 5MB");
         return;
       }
-      
+
       setImageFile(file);
       // Create preview URL
       const reader = new FileReader();
@@ -179,18 +182,18 @@ export default function ProfilePage() {
       setError("Please select an avatar or upload an image");
       return;
     }
-    
+
     try {
       setSaving(true);
       setError("");
       setSuccess(false);
-      
+
       const token = localStorage.getItem("auth_token");
       if (!token) {
         router.push("/login");
         return;
       }
-      
+
       const res = await fetch("/api/auth/profile", {
         method: "PUT",
         headers: {
@@ -199,16 +202,16 @@ export default function ProfilePage() {
         },
         body: JSON.stringify({ avatar: customImage || avatar, status, bio }),
       });
-      
+
       if (!res.ok) {
         const data = await res.json();
         throw new Error(data.error || "Failed to save profile");
       }
-      
+
       const data = await res.json();
       updateUser(data.user);
       setSuccess(true);
-      
+
       // Clear success message after 3 seconds
       setTimeout(() => setSuccess(false), 3000);
     } catch (err) {
@@ -273,7 +276,9 @@ export default function ProfilePage() {
         <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
           <div>
             <h1 className="text-3xl md:text-4xl font-bold text-white">
-              <span className="bg-gradient-to-r from-blue-400 via-indigo-400 to-teal-400 bg-clip-text text-transparent">Profile Settings</span>
+              <span className="bg-gradient-to-r from-blue-400 via-indigo-400 to-teal-400 bg-clip-text text-transparent">
+                Profile Settings
+              </span>
             </h1>
             <p className="text-neutral-400 mt-2">
               Customize your WebChat experience
@@ -325,13 +330,15 @@ export default function ProfilePage() {
               <div
                 className="w-32 h-32 mx-auto rounded-3xl flex items-center justify-center shadow-2xl overflow-hidden"
                 style={{
-                  background: customImage ? "transparent" : "linear-gradient(135deg, #3b82f6, #6366f1)",
+                  background: customImage
+                    ? "transparent"
+                    : "linear-gradient(135deg, #3b82f6, #6366f1)",
                 }}
               >
                 {customImage ? (
-                  <img 
-                    src={customImage} 
-                    alt="Profile" 
+                  <img
+                    src={customImage}
+                    alt="Profile"
                     className="w-full h-full object-cover"
                   />
                 ) : (
@@ -456,7 +463,9 @@ export default function ProfilePage() {
 
                 <div className="relative z-10">
                   <h2 className="text-2xl md:text-3xl font-bold text-white mb-6">
-                    <span className="bg-gradient-to-r from-blue-400 via-indigo-400 to-teal-400 bg-clip-text text-transparent">Customize Profile</span>
+                    <span className="bg-gradient-to-r from-blue-400 via-indigo-400 to-teal-400 bg-clip-text text-transparent">
+                      Customize Profile
+                    </span>
                   </h2>
 
                   {/* Success Message */}
@@ -513,7 +522,7 @@ export default function ProfilePage() {
                         <Upload className="w-5 h-5 text-blue-400" />
                         Upload Custom Profile Picture
                       </label>
-                      
+
                       {customImage ? (
                         <motion.div
                           initial={{ opacity: 0, scale: 0.9 }}
@@ -525,9 +534,9 @@ export default function ProfilePage() {
                             border: "1px solid rgba(255, 255, 255, 0.1)",
                           }}
                         >
-                          <img 
-                            src={customImage} 
-                            alt="Custom avatar" 
+                          <img
+                            src={customImage}
+                            alt="Custom avatar"
                             className="w-32 h-32 mx-auto rounded-2xl object-cover mb-4 shadow-lg"
                           />
                           <motion.button
@@ -549,7 +558,7 @@ export default function ProfilePage() {
                             className="hidden"
                             id="avatar-upload"
                           />
-                          <label 
+                          <label
                             htmlFor="avatar-upload"
                             className="cursor-pointer flex flex-col items-center gap-3"
                           >
@@ -557,8 +566,12 @@ export default function ProfilePage() {
                               <Upload className="w-8 h-8 text-white" />
                             </div>
                             <div className="text-center">
-                              <p className="text-white font-medium">Click to upload an image</p>
-                              <p className="text-neutral-400 text-sm mt-1">PNG, JPG, GIF up to 5MB</p>
+                              <p className="text-white font-medium">
+                                Click to upload an image
+                              </p>
+                              <p className="text-neutral-400 text-sm mt-1">
+                                PNG, JPG, GIF up to 5MB
+                              </p>
                             </div>
                           </label>
                         </div>
@@ -729,7 +742,9 @@ export default function ProfilePage() {
 
                 <div className="relative z-10">
                   <h2 className="text-2xl md:text-3xl font-bold text-white mb-6">
-                    <span className="bg-gradient-to-r from-blue-400 via-indigo-400 to-teal-400 bg-clip-text text-transparent">Add Friends</span>
+                    <span className="bg-gradient-to-r from-blue-400 via-indigo-400 to-teal-400 bg-clip-text text-transparent">
+                      Add Friends
+                    </span>
                   </h2>
                   <AddFriend userId={user.id} />
                 </div>
