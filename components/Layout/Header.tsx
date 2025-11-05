@@ -2,14 +2,14 @@
 
 /**
  * Header Component - Top navigation bar for channel pages
- * 
+ *
  * Features:
  * - Displays current channel name and description
  * - Shows user information with avatar
  * - Online status indicator
  * - Logout button with icon
  * - Responsive layout with hover effects
- * 
+ *
  * Note: This component appears to be designed for a Discord-style channel system
  * but is not currently used in the messenger/DM flow
  */
@@ -49,7 +49,7 @@ const channelInfo: Record<string, { name: string; description: string }> = {
  */
 export default function Header({ channelId, user }: HeaderProps) {
   const router = useRouter();
-  
+
   // Get channel data or use fallback
   const channel = channelInfo[channelId] || {
     name: channelId,

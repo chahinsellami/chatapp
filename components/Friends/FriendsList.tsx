@@ -2,7 +2,7 @@
 
 /**
  * Friends List Component - Displays user's friends and pending friend requests
- * 
+ *
  * Features:
  * - Real-time online status indicators via Socket.IO
  * - Collapsible pending requests section
@@ -92,21 +92,21 @@ export default function FriendsList({
     try {
       setLoading(true);
       setError(null);
-      
+
       // Get auth token from local storage
       const token = localStorage.getItem("auth_token");
       if (!token) {
         setError("Not authenticated");
         return;
       }
-      
+
       // Make API request to get friends data
       const res = await fetch("/api/friends", {
         headers: { Authorization: `Bearer ${token}` },
       });
-      
+
       if (!res.ok) throw new Error("Failed to fetch friends");
-      
+
       // Parse and set friends data
       const data = await res.json();
       setFriends(data.friends || []);
@@ -121,7 +121,7 @@ export default function FriendsList({
   /**
    * Accept a pending friend request
    * Updates the friend request status to 'accepted' and refreshes the list
-   * 
+   *
    * @param requestId - ID of the friend request to accept
    */
   const handleAcceptRequest = async (requestId: string) => {
@@ -129,7 +129,7 @@ export default function FriendsList({
       setActionLoading(requestId); // Show loading state for this specific request
       const token = localStorage.getItem("auth_token");
       if (!token) return;
-      
+
       // Make API call to accept the request
       const res = await fetch(
         `/api/friends/requests/${requestId}?action=accept`,
@@ -138,9 +138,9 @@ export default function FriendsList({
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-      
+
       if (!res.ok) throw new Error("Failed to accept request");
-      
+
       // Refresh friends list and notify parent component
       await fetchFriends();
       onRefresh?.();
@@ -154,7 +154,7 @@ export default function FriendsList({
   /**
    * Reject a pending friend request
    * Deletes the friend request and refreshes the list
-   * 
+   *
    * @param requestId - ID of the friend request to reject
    */
   const handleRejectRequest = async (requestId: string) => {
@@ -162,7 +162,7 @@ export default function FriendsList({
       setActionLoading(requestId); // Show loading state for this specific request
       const token = localStorage.getItem("auth_token");
       if (!token) return;
-      
+
       // Make API call to reject the request
       const res = await fetch(
         `/api/friends/requests/${requestId}?action=reject`,
@@ -171,9 +171,9 @@ export default function FriendsList({
           headers: { Authorization: `Bearer ${token}` },
         }
       );
-      
+
       if (!res.ok) throw new Error("Failed to reject request");
-      
+
       // Refresh friends list and notify parent component
       await fetchFriends();
       onRefresh?.();
@@ -187,26 +187,26 @@ export default function FriendsList({
   /**
    * Remove a friend from the user's friend list
    * Shows confirmation dialog before removing
-   * 
+   *
    * @param friendId - ID of the friend to remove
    */
   const handleRemoveFriend = async (friendId: string) => {
     // Show confirmation dialog to prevent accidental removal
     if (!confirm("Remove this friend?")) return;
-    
+
     try {
       setActionLoading(friendId); // Show loading state for this specific friend
       const token = localStorage.getItem("auth_token");
       if (!token) return;
-      
+
       // Make API call to remove the friend
       const res = await fetch(`/api/friends/${friendId}`, {
         method: "DELETE",
         headers: { Authorization: `Bearer ${token}` },
       });
-      
+
       if (!res.ok) throw new Error("Failed to remove friend");
-      
+
       // Refresh friends list and notify parent component
       await fetchFriends();
       onRefresh?.();
@@ -263,7 +263,7 @@ export default function FriendsList({
     >
       {/* Subtle gradient background overlay */}
       <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 via-transparent to-orange-500/5" />
-      
+
       {/* Header Section */}
       <motion.div
         className="flex items-center gap-3 p-6 border-b border-white/10 backdrop-blur-sm bg-white/5 relative z-10"
@@ -279,7 +279,7 @@ export default function FriendsList({
         >
           <Users className="w-5 h-5 text-white" />
         </motion.div>
-        
+
         {/* Header text */}
         <div>
           <h2 className="text-white font-bold text-lg">Friends</h2>
@@ -288,7 +288,7 @@ export default function FriendsList({
           </p>
         </div>
       </motion.div>
-      
+
       {/* Error Message Display */}
       <AnimatePresence>
         {error && (
@@ -306,7 +306,7 @@ export default function FriendsList({
           </motion.div>
         )}
       </AnimatePresence>
-      
+
       {/* Pending Requests Section (collapsible) */}
       {pendingRequests.length > 0 && (
         <motion.div
@@ -333,7 +333,7 @@ export default function FriendsList({
                 <ChevronRight className="w-4 h-4 text-neutral-400" />
               )}
             </motion.div>
-            
+
             {/* Section title with badge */}
             <div className="flex items-center gap-2">
               <UserPlus className="w-4 h-4 text-orange-400" />
@@ -352,7 +352,7 @@ export default function FriendsList({
               </span>
             </div>
           </motion.button>
-          
+
           {/* Collapsible content - pending requests list */}
           <AnimatePresence>
             {expandPending && (
@@ -397,7 +397,7 @@ export default function FriendsList({
                           </span>
                         )}
                       </motion.div>
-                      
+
                       {/* Username and timestamp */}
                       <div className="flex-1 min-w-0">
                         <p className="text-white font-medium text-sm truncate">
@@ -409,7 +409,7 @@ export default function FriendsList({
                         </p>
                       </div>
                     </div>
-                    
+
                     {/* Action buttons - Accept/Reject */}
                     <div className="flex gap-2">
                       {/* Accept button */}
@@ -444,7 +444,7 @@ export default function FriendsList({
                           )}
                         </div>
                       </motion.button>
-                      
+
                       {/* Reject button */}
                       <motion.button
                         onClick={() => handleRejectRequest(request.id)}
@@ -485,7 +485,7 @@ export default function FriendsList({
           </AnimatePresence>
         </motion.div>
       )}
-      
+
       {/* Friends List Section */}
       <div className="flex-1 overflow-y-auto p-6 space-y-3 modern-scrollbar min-h-0 relative z-10">
         <AnimatePresence>
@@ -529,7 +529,7 @@ export default function FriendsList({
               >
                 {/* Gradient overlay on hover */}
                 <div className="absolute inset-0 bg-gradient-to-r from-purple-500/0 via-transparent to-orange-500/0 group-hover:from-purple-500/5 group-hover:to-orange-500/5 transition-all duration-300" />
-                
+
                 <div className="flex items-center gap-4 relative z-10">
                   {/* Friend avatar with online indicator */}
                   <motion.div
@@ -555,7 +555,7 @@ export default function FriendsList({
                         </span>
                       )}
                     </div>
-                    
+
                     {/* Online status indicator - animated pulsing dot */}
                     <motion.div
                       className={`absolute -bottom-1 -right-1 w-4 h-4 rounded-full border-2 border-white shadow-lg ${
@@ -578,7 +578,7 @@ export default function FriendsList({
                       transition={{ duration: 2, repeat: Infinity }}
                     />
                   </motion.div>
-                  
+
                   {/* Friend name and status */}
                   <div className="flex-1 min-w-0">
                     <h3 className="text-white font-medium text-base truncate">
@@ -598,7 +598,7 @@ export default function FriendsList({
                       )}
                     </p>
                   </div>
-                  
+
                   {/* Remove friend button - appears on hover */}
                   <motion.button
                     onClick={(e) => {
