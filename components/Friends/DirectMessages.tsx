@@ -421,31 +421,25 @@ export default function DirectMessages({
 
   return (
     <motion.div
-      className="flex-1 flex flex-col glass-card m-2 relative overflow-hidden"
+      className="h-full flex flex-col glass-card relative overflow-hidden"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
     >
-      {/* Animated background gradient */}
-      <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 via-transparent to-orange-500/5" />
+      {/* Subtle background */}
+      <div className="absolute inset-0 bg-gradient-to-br from-blue-600/5 via-transparent to-indigo-600/5" />
 
-      {/* Header with enhanced styling */}
+      {/* Header with call buttons - ALWAYS VISIBLE */}
       <motion.div
-        className="flex justify-between items-center p-6 border-b border-white/10 backdrop-blur-sm bg-white/5 relative z-10"
+        className="flex justify-between items-center p-4 md:p-5 border-b border-slate-700/50 backdrop-blur-sm bg-slate-800/40 relative z-20"
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.2 }}
       >
-        <div className="flex items-center gap-4">
-          <motion.div
-            className="relative hover-lift"
-            whileHover={{ scale: 1.05 }}
-          >
+        <div className="flex items-center gap-3">
+          <motion.div className="relative" whileHover={{ scale: 1.05 }}>
             <div
-              className="w-12 h-12 rounded-2xl overflow-hidden flex items-center justify-center"
-              style={{
-                background: "linear-gradient(135deg, #a855f7, #f97316)",
-              }}
+              className="w-10 h-10 md:w-12 md:h-12 rounded-xl overflow-hidden flex items-center justify-center bg-gradient-to-br from-blue-500 to-indigo-600"
             >
               {friendAvatar?.startsWith("/avatars/") ? (
                 <img
@@ -454,86 +448,89 @@ export default function DirectMessages({
                   className="w-full h-full object-cover"
                 />
               ) : (
-                <span className="text-2xl">{friendAvatar || "??"}</span>
+                <span className="text-xl md:text-2xl">{friendAvatar || "??"}</span>
               )}
             </div>
-            {/* Enhanced online indicator */}
+            {/* Online indicator */}
             {isConnected && onlineUsers.has(friendId) && (
               <motion.div
-                className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-400 rounded-full border-2 border-white shadow-lg"
+                className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-teal-400 rounded-full border-2 border-slate-900"
                 animate={{ scale: [1, 1.2, 1] }}
                 transition={{ duration: 2, repeat: Infinity }}
               />
             )}
           </motion.div>
           <div>
-            <h3 className="text-white font-bold text-lg">{friendName}</h3>
-            <p className="text-neutral-400 text-sm flex items-center gap-2">
+            <h3 className="text-slate-100 font-semibold text-base md:text-lg">
+              {friendName}
+            </h3>
+            <p className="text-slate-400 text-xs md:text-sm flex items-center gap-1.5">
               {isConnected ? (
                 onlineUsers.has(friendId) ? (
                   <>
-                    <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                    <div className="w-1.5 h-1.5 bg-teal-400 rounded-full"></div>
                     <span>Online</span>
                   </>
                 ) : (
                   <>
-                    <div className="w-2 h-2 bg-neutral-500 rounded-full"></div>
+                    <div className="w-1.5 h-1.5 bg-slate-500 rounded-full"></div>
                     <span>Offline</span>
                   </>
                 )
               ) : (
-                <span className="text-orange-400">Connecting...</span>
+                <span className="text-blue-400">Connecting...</span>
               )}
             </p>
           </div>
         </div>
 
-        <div className="flex gap-3">
+        {/* Call buttons - PROMINENTLY DISPLAYED */}
+        <div className="flex gap-2">
           <motion.button
             onClick={() => handleStartCall("voice")}
             disabled={isCallActive}
-            className="p-3 rounded-xl glass-button hover:bg-green-500/10 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="p-2.5 md:p-3 rounded-xl bg-slate-800/60 hover:bg-teal-500/20 border border-slate-700/50 hover:border-teal-500/50 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             title="Voice Call"
           >
-            <Phone className="w-5 h-5 text-green-400" />
+            <Phone className="w-4 h-4 md:w-5 md:h-5 text-teal-400" />
           </motion.button>
           <motion.button
             onClick={() => handleStartCall("video")}
             disabled={isCallActive}
-            className="p-3 rounded-xl glass-button hover:bg-purple-500/10 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="p-2.5 md:p-3 rounded-xl bg-slate-800/60 hover:bg-indigo-500/20 border border-slate-700/50 hover:border-indigo-500/50 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             title="Video Call"
           >
-            <Video className="w-5 h-5 text-purple-400" />
+            <Video className="w-4 h-4 md:w-5 md:h-5 text-indigo-400" />
           </motion.button>
         </div>
       </motion.div>
 
-      {/* Messages area with modern scrollbar */}
-      <div className="flex-1 overflow-y-auto p-6 space-y-4 modern-scrollbar min-h-0 relative z-10">
+      {/* Messages area with scrolling */}
+      <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-3 modern-scrollbar min-h-0 relative z-10">
         <AnimatePresence>
           {messages.map((message, index) => {
             const isOwnMessage = message.senderId === userId;
             return (
               <motion.div
                 key={message.id}
-                className={`flex items-end gap-3 ${
+                className={`flex items-end gap-2 ${
                   isOwnMessage ? "flex-row-reverse" : "flex-row"
                 }`}
                 initial={{ opacity: 0, y: 20, scale: 0.95 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
-                transition={{ delay: index * 0.05, duration: 0.3 }}
+                transition={{ delay: index * 0.03, duration: 0.3 }}
               >
-                {/* Avatar with glow effect */}
+                {/* Avatar */}
                 <motion.div
-                  className="w-8 h-8 rounded-xl overflow-hidden flex items-center justify-center flex-shrink-0 shadow-lg"
+                  className="w-7 h-7 md:w-8 md:h-8 rounded-lg overflow-hidden flex items-center justify-center flex-shrink-0 shadow-md"
                   style={{
                     background: isOwnMessage
-                      ? "linear-gradient(135deg, #a855f7, #f97316)"
-                      : "linear-gradient(135deg, #64748b, #475569)",
+                      ? "linear-gradient(135deg, #3b82f6, #6366f1)"
+                      : "linear-gradient(135deg, #475569, #334155)",
                   }}
                   whileHover={{ scale: 1.1 }}
                 >
@@ -545,7 +542,7 @@ export default function DirectMessages({
                         className="w-full h-full object-cover"
                       />
                     ) : (
-                      <span className="text-sm">{userAvatar || "??"}</span>
+                      <span className="text-xs md:text-sm">{userAvatar || "??"}</span>
                     )
                   ) : friendAvatar?.startsWith("/avatars/") ? (
                     <img
@@ -554,31 +551,33 @@ export default function DirectMessages({
                       className="w-full h-full object-cover"
                     />
                   ) : (
-                    <span className="text-sm">{friendAvatar || "??"}</span>
+                    <span className="text-xs md:text-sm">{friendAvatar || "??"}</span>
                   )}
                 </motion.div>
 
-                {/* Enhanced message bubble */}
+                {/* Message bubble */}
                 <motion.div
-                  className={`max-w-xs md:max-w-md lg:max-w-lg px-4 py-3 rounded-2xl shadow-lg relative ${
-                    isOwnMessage ? "rounded-br-md" : "rounded-bl-md"
+                  className={`max-w-[75%] md:max-w-md px-3 md:px-4 py-2 md:py-2.5 rounded-2xl shadow-lg ${
+                    isOwnMessage ? "rounded-br-sm" : "rounded-bl-sm"
                   }`}
                   style={{
                     background: isOwnMessage
-                      ? "linear-gradient(135deg, #a855f7, #f97316)"
-                      : "rgba(255, 255, 255, 0.08)",
+                      ? "linear-gradient(135deg, #3b82f6, #6366f1)"
+                      : "rgba(51, 65, 85, 0.6)",
                     backdropFilter: "blur(10px)",
-                    border: "1px solid rgba(255, 255, 255, 0.1)",
+                    border: isOwnMessage
+                      ? "1px solid rgba(99, 102, 241, 0.3)"
+                      : "1px solid rgba(148, 163, 184, 0.15)",
                   }}
-                  whileHover={{ scale: 1.02 }}
+                  whileHover={{ scale: 1.01 }}
                   transition={{ type: "spring", stiffness: 300 }}
                 >
                   <p className="break-words whitespace-pre-wrap text-sm md:text-base leading-relaxed text-white">
                     {message.text}
                   </p>
                   <p
-                    className={`text-xs mt-2 ${
-                      isOwnMessage ? "text-orange-200" : "text-neutral-400"
+                    className={`text-xs mt-1.5 ${
+                      isOwnMessage ? "text-blue-100/80" : "text-slate-400"
                     }`}
                   >
                     {new Date(message.createdAt).toLocaleTimeString([], {
@@ -635,70 +634,62 @@ export default function DirectMessages({
       <AnimatePresence>
         {error && (
           <motion.div
-            className="px-6 py-3 border-t border-red-500/20 backdrop-blur-sm relative z-10"
+            className="px-4 md:px-6 py-3 border-t border-red-500/20 backdrop-blur-sm relative z-10 bg-red-500/10"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
-            style={{
-              background: "rgba(220, 38, 38, 0.1)",
-            }}
           >
-            <div className="flex items-center gap-3">
-              <AlertCircle className="w-5 h-5 text-red-400 flex-shrink-0" />
+            <div className="flex items-center gap-2">
+              <AlertCircle className="w-4 h-4 text-red-400 flex-shrink-0" />
               <p className="text-red-300 text-sm font-medium">{error}</p>
             </div>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Enhanced Input Area */}
+      {/* Input Area */}
       <motion.div
-        className="p-6 border-t border-white/10 backdrop-blur-sm bg-white/5 relative z-10"
+        className="p-3 md:p-4 border-t border-slate-700/50 backdrop-blur-sm bg-slate-800/40 relative z-10"
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.4 }}
       >
-        <div className="flex gap-4">
+        <div className="flex gap-2 md:gap-3">
           <div className="flex-1 relative">
             <textarea
               value={messageText}
               onChange={handleTyping}
               onKeyPress={handleKeyPress}
               placeholder={`Message ${friendName}...`}
-              className="w-full modern-input pr-12 resize-none focus-ring"
-              rows={2}
+              className="w-full modern-input pr-10 resize-none focus-ring text-sm md:text-base"
+              rows={1}
               disabled={sending}
+              style={{ minHeight: "42px", maxHeight: "120px" }}
             />
             <motion.button
-              className="absolute right-3 top-3 p-1 rounded-lg hover:bg-white/10 transition-colors"
+              className="absolute right-2 top-2 p-1.5 rounded-lg hover:bg-slate-700/50 transition-colors"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
-              <Smile className="w-4 h-4 text-neutral-400" />
+              <Smile className="w-4 h-4 text-slate-400" />
             </motion.button>
           </div>
           <motion.button
             onClick={handleSendMessage}
             disabled={sending || !messageText.trim()}
-            className="px-6 py-3 rounded-xl font-bold text-white relative overflow-hidden disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-            style={{
-              background: "linear-gradient(135deg, #a855f7, #f97316)",
-            }}
-            whileHover={{ scale: 1.05, y: -1 }}
-            whileTap={{ scale: 0.95 }}
+            className="px-4 md:px-5 py-2.5 md:py-3 rounded-xl font-semibold text-white relative overflow-hidden disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 transition-all"
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
           >
-            <span className="relative z-10">
-              {sending ? (
-                <motion.div
-                  className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full"
-                  animate={{ rotate: 360 }}
-                  transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                />
-              ) : (
-                <Send className="w-5 h-5" />
-              )}
-            </span>
-            <div className="absolute inset-0 bg-gradient-to-r from-purple-600/20 to-orange-600/20 opacity-0 hover:opacity-100 transition-opacity duration-300" />
+            {sending ? (
+              <motion.div
+                className="w-4 h-4 md:w-5 md:h-5 border-2 border-white/30 border-t-white rounded-full"
+                animate={{ rotate: 360 }}
+                transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+              />
+            ) : (
+              <Send className="w-4 h-4 md:w-5 md:h-5" />
+            )}
           </motion.button>
         </div>
       </motion.div>

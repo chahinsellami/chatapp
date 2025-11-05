@@ -102,42 +102,38 @@ export default function MessengerPage() {
   if (!user) return null;
 
   return (
-    <div className="flex h-screen overflow-hidden">
+    <div className="flex h-screen overflow-hidden bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
       {/* Desktop Sidebar - Always visible on desktop */}
       <motion.div
         initial={{ x: -300, opacity: 0 }}
         animate={{ x: 0, opacity: 1 }}
         transition={{ type: "spring", stiffness: 300, damping: 30 }}
-        className="hidden lg:flex lg:w-96 glass-card m-3 flex-col relative overflow-hidden"
+        className="hidden lg:flex lg:w-80 glass-card m-3 flex-col relative overflow-hidden"
       >
-        {/* Animated background gradient */}
-        <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 via-transparent to-orange-500/10" />
-        <div className="absolute inset-0 bg-[url('/noise.png')] opacity-5" />
+        {/* Subtle background */}
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-600/5 via-transparent to-indigo-600/5" />
 
         {/* Header */}
         <motion.div
-          className="h-20 border-b border-white/10 backdrop-blur-xl bg-white/5 flex items-center justify-between px-6 relative z-10"
+          className="h-20 border-b border-slate-700/50 backdrop-blur-xl bg-slate-800/40 flex items-center justify-between px-5 relative z-10"
           initial={{ y: -20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.2 }}
         >
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
             <motion.div
-              className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg"
-              style={{
-                background: "linear-gradient(135deg, #a855f7, #f97316)",
-              }}
-              whileHover={{ scale: 1.05, rotate: 5 }}
+              className="w-11 h-11 rounded-xl flex items-center justify-center shadow-lg bg-gradient-to-br from-blue-500 to-indigo-600"
+              whileHover={{ scale: 1.05 }}
               transition={{ type: "spring", stiffness: 400 }}
             >
-              <MessageCircle className="w-7 h-7 text-white" />
+              <MessageCircle className="w-6 h-6 text-white" />
             </motion.div>
             <div className="min-w-0">
-              <h1 className="text-white font-bold text-2xl tracking-tight">
-                <span className="gradient-text">WebChat</span>
+              <h1 className="text-white font-bold text-lg tracking-tight">
+                WebChat
               </h1>
-              <p className="text-xs text-neutral-400 truncate flex items-center gap-1.5">
-                <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+              <p className="text-xs text-slate-400 truncate flex items-center gap-1.5">
+                <div className="w-1.5 h-1.5 bg-teal-400 rounded-full animate-pulse"></div>
                 {user.username}
               </p>
             </div>
@@ -147,7 +143,7 @@ export default function MessengerPage() {
             {/* Profile Button */}
             <motion.button
               onClick={() => router.push("/profile")}
-              className="p-2.5 rounded-xl glass-button hover:bg-white/10 transition-all duration-200"
+              className="p-2 rounded-lg glass-button hover:bg-slate-700/50 transition-all"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               title="Profile"
@@ -156,10 +152,10 @@ export default function MessengerPage() {
                 <img
                   src={user.avatar}
                   alt="Profile"
-                  className="w-6 h-6 rounded-lg object-cover"
+                  className="w-5 h-5 rounded-lg object-cover"
                 />
               ) : (
-                <span className="text-xl">{user.avatar || "👤"}</span>
+                <span className="text-base">{user.avatar || "👤"}</span>
               )}
             </motion.button>
           </div>
@@ -180,19 +176,19 @@ export default function MessengerPage() {
 
         {/* Footer with logout */}
         <motion.div
-          className="p-4 border-t border-white/10 backdrop-blur-xl bg-white/5 relative z-10"
+          className="p-4 border-t border-slate-700/50 backdrop-blur-xl bg-slate-800/40 relative z-10"
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.6 }}
         >
           <motion.button
             onClick={handleLogout}
-            className="w-full flex items-center gap-3 p-3.5 rounded-xl glass-button hover:bg-red-500/10 transition-all duration-200 text-red-400 hover:text-red-300 group"
+            className="w-full flex items-center gap-3 p-3 rounded-xl glass-button hover:bg-red-500/10 transition-all text-red-400 hover:text-red-300 group"
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
           >
             <LogOut className="w-5 h-5 group-hover:rotate-12 transition-transform" />
-            <span className="font-semibold">Logout</span>
+            <span className="font-medium">Logout</span>
           </motion.button>
         </motion.div>
       </motion.div>
@@ -350,18 +346,17 @@ export default function MessengerPage() {
             animate={{ scale: 1, opacity: 1 }}
             transition={{ delay: 0.5 }}
           >
-            {/* Animated background */}
-            <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 via-transparent to-orange-500/10" />
-            <div className="absolute inset-0 bg-[url('/noise.png')] opacity-5" />
+            {/* Subtle background */}
+            <div className="absolute inset-0 bg-gradient-to-br from-blue-600/5 via-transparent to-indigo-600/5" />
 
             {/* Mobile Menu Button */}
             <motion.button
               onClick={() => setMobileMenuOpen(true)}
-              className="lg:hidden absolute top-6 left-6 p-3 rounded-xl glass-button hover:bg-white/10 z-10"
+              className="lg:hidden absolute top-5 left-5 p-3 rounded-xl glass-button hover:bg-slate-700/50 z-10"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
-              <Menu className="w-6 h-6 text-white" />
+              <Menu className="w-6 h-6 text-slate-200" />
             </motion.button>
 
             <motion.div
@@ -371,75 +366,65 @@ export default function MessengerPage() {
               transition={{ delay: 0.7 }}
             >
               <motion.div
-                className="w-32 h-32 mx-auto mb-8 rounded-3xl flex items-center justify-center shadow-2xl"
-                style={{
-                  background: "linear-gradient(135deg, #a855f7, #f97316)",
-                }}
+                className="w-28 h-28 mx-auto mb-8 rounded-3xl flex items-center justify-center shadow-2xl bg-gradient-to-br from-blue-500 to-indigo-600"
                 animate={{
-                  rotate: [0, 5, -5, 0],
-                  scale: [1, 1.05, 1],
+                  rotate: [0, 3, -3, 0],
+                  scale: [1, 1.02, 1],
                 }}
                 transition={{
-                  duration: 4,
+                  duration: 5,
                   repeat: Infinity,
                   ease: "easeInOut",
                 }}
               >
-                <MessageCircle className="w-16 h-16 text-white" />
+                <MessageCircle className="w-14 h-14 text-white" />
               </motion.div>
 
               <motion.h2
-                className="text-4xl font-bold mb-4"
+                className="text-3xl md:text-4xl font-bold mb-4 text-white"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.9 }}
               >
-                <span className="gradient-text">Welcome to WebChat</span>
+                Welcome to WebChat
               </motion.h2>
 
               <motion.p
-                className="text-neutral-400 text-lg mb-10 leading-relaxed"
+                className="text-slate-400 text-base md:text-lg mb-10 leading-relaxed"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 1.1 }}
               >
-                Select a friend from the sidebar to start a conversation, or add
-                new friends to expand your network.
+                Select a friend from the sidebar to start messaging, or find new friends to connect with.
               </motion.p>
 
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <div className="flex flex-col sm:flex-row gap-3 justify-center">
                 <motion.button
                   onClick={() => setMobileMenuOpen(true)}
-                  className="lg:hidden px-8 py-4 rounded-xl font-bold text-white text-lg relative overflow-hidden"
-                  style={{
-                    background: "linear-gradient(135deg, #6366f1, #8b5cf6)",
-                  }}
-                  whileHover={{ scale: 1.05, y: -2 }}
-                  whileTap={{ scale: 0.95 }}
+                  className="lg:hidden px-8 py-3.5 rounded-xl font-semibold text-white bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 transition-all"
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 1.3 }}
                 >
-                  <span className="relative z-10 flex items-center gap-3">
-                    <Menu className="w-6 h-6" />
+                  <span className="flex items-center gap-2">
+                    <Menu className="w-5 h-5" />
                     <span>Open Menu</span>
                   </span>
                 </motion.button>
 
                 <motion.button
                   onClick={() => router.push("/friends")}
-                  className="px-8 py-4 rounded-xl font-bold text-white text-lg relative overflow-hidden"
-                  style={{
-                    background: "linear-gradient(135deg, #a855f7, #f97316)",
-                  }}
-                  whileHover={{ scale: 1.05, y: -2 }}
-                  whileTap={{ scale: 0.95 }}
+                  className="px-8 py-3.5 rounded-xl font-semibold text-white bg-gradient-to-r from-teal-500 to-blue-600 hover:from-teal-600 hover:to-blue-700 transition-all"
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 1.5 }}
                 >
-                  <span className="relative z-10 flex items-center gap-3">
-                    <Users className="w-6 h-6" />
+                  <span className="flex items-center gap-2">
+                    <Users className="w-5 h-5" />
                     <span>Find Friends</span>
                   </span>
                 </motion.button>

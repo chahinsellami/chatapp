@@ -3,71 +3,66 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ===== MODERN DESIGN SYSTEM ===== */
+/* ===== PROFESSIONAL DESIGN SYSTEM ===== */
 
 :root {
-  /* Unique Color Palette - Moving away from Discord blue */
-  --primary-50: #fef2f2;
-  --primary-100: #fce8e8;
-  --primary-200: #f9d1d1;
-  --primary-300: #f4a3a3;
-  --primary-400: #e87979;
-  --primary-500: #dc2626; /* Warm red accent */
-  --primary-600: #b91c1c;
-  --primary-700: #991b1b;
-  --primary-800: #7f1d1d;
-  --primary-900: #450a0a;
+  /* Primary - Deep Ocean Blue (Sophisticated & Professional) */
+  --primary-50: #eff6ff;
+  --primary-100: #dbeafe;
+  --primary-200: #bfdbfe;
+  --primary-300: #93c5fd;
+  --primary-400: #60a5fa;
+  --primary-500: #3b82f6; /* Professional blue */
+  --primary-600: #2563eb;
+  --primary-700: #1d4ed8;
+  --primary-800: #1e40af;
+  --primary-900: #1e3a8a;
 
-  /* Secondary - Warm Purple */
-  --secondary-50: #faf5ff;
-  --secondary-100: #f3e8ff;
-  --secondary-200: #e9d5ff;
-  --secondary-300: #d8b4fe;
-  --secondary-400: #c084fc;
-  --secondary-500: #a855f7; /* Vibrant purple */
-  --secondary-600: #9333ea;
-  --secondary-700: #7c3aed;
-  --secondary-800: #6b21a8;
-  --secondary-900: #581c87;
+  /* Secondary - Refined Indigo (Mature & Elegant) */
+  --secondary-50: #eef2ff;
+  --secondary-100: #e0e7ff;
+  --secondary-200: #c7d2fe;
+  --secondary-300: #a5b4fc;
+  --secondary-400: #818cf8;
+  --secondary-500: #6366f1; /* Refined indigo */
+  --secondary-600: #4f46e5;
+  --secondary-700: #4338ca;
+  --secondary-800: #3730a3;
+  --secondary-900: #312e81;
 
-  /* Accent - Orange */
-  --accent-50: #fff7ed;
-  --accent-100: #ffedd5;
-  --accent-200: #fed7aa;
-  --accent-300: #fdba74;
-  --accent-400: #fb923c;
-  --accent-500: #f97316; /* Warm orange */
-  --accent-600: #ea580c;
-  --accent-700: #c2410c;
-  --accent-800: #9a3412;
-  --accent-900: #7c2d12;
+  /* Accent - Sophisticated Teal (Professional highlight) */
+  --accent-50: #f0fdfa;
+  --accent-100: #ccfbf1;
+  --accent-200: #99f6e4;
+  --accent-300: #5eead4;
+  --accent-400: #2dd4bf;
+  --accent-500: #14b8a6; /* Professional teal */
+  --accent-600: #0d9488;
+  --accent-700: #0f766e;
+  --accent-800: #115e59;
+  --accent-900: #134e4a;
 
-  /* Neutral - Modern Gray Scale */
-  --neutral-50: #fafafa;
-  --neutral-100: #f5f5f5;
-  --neutral-200: #e5e5e5;
-  --neutral-300: #d4d4d4;
-  --neutral-400: #a3a3a3;
-  --neutral-500: #737373;
-  --neutral-600: #525252;
-  --neutral-700: #404040;
-  --neutral-800: #262626;
-  --neutral-900: #171717;
+  /* Neutral - Professional Gray Scale (Darker, more sophisticated) */
+  --neutral-50: #f8fafc;
+  --neutral-100: #f1f5f9;
+  --neutral-200: #e2e8f0;
+  --neutral-300: #cbd5e1;
+  --neutral-400: #94a3b8;
+  --neutral-500: #64748b;
+  --neutral-600: #475569;
+  --neutral-700: #334155;
+  --neutral-800: #1e293b;
+  --neutral-900: #0f172a;
 
-  /* Background Gradients */
-  --bg-primary: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
-  --bg-secondary: linear-gradient(
-    135deg,
-    #1a1a2e 0%,
-    #16213e 50%,
-    #0f0f23 100%
-  );
-  --bg-accent: linear-gradient(135deg, #e94560 0%, #f39c12 50%, #a55eea 100%);
+  /* Background - Deep, sophisticated dark theme */
+  --bg-primary: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%);
+  --bg-secondary: linear-gradient(135deg, #1e293b 0%, #334155 50%, #475569 100%);
+  --bg-accent: linear-gradient(135deg, #3b82f6 0%, #6366f1 50%, #14b8a6 100%);
 
-  /* Glass Effect Colors */
-  --glass-bg: rgba(255, 255, 255, 0.05);
-  --glass-border: rgba(255, 255, 255, 0.1);
-  --glass-shadow: rgba(0, 0, 0, 0.1);
+  /* Glass Effect - More subtle and professional */
+  --glass-bg: rgba(30, 41, 59, 0.4);
+  --glass-border: rgba(148, 163, 184, 0.15);
+  --glass-shadow: rgba(15, 23, 42, 0.3);
 
   /* Animation Variables */
   --duration-fast: 150ms;
@@ -100,38 +95,39 @@ body {
 /* ===== GLASSMORPHISM COMPONENTS ===== */
 
 .glass-card {
-  background: var(--glass-bg);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid var(--glass-border);
+  background: rgba(30, 41, 59, 0.6);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border: 1px solid rgba(148, 163, 184, 0.12);
   border-radius: 16px;
-  box-shadow: 0 8px 32px var(--glass-shadow);
+  box-shadow: 0 8px 32px rgba(15, 23, 42, 0.4);
 }
 
 .glass-button {
-  background: var(--glass-bg);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid var(--glass-border);
+  background: rgba(30, 41, 59, 0.5);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(148, 163, 184, 0.12);
   border-radius: 12px;
   transition: all var(--duration-normal) var(--easing-smooth);
 }
 
 .glass-button:hover {
-  background: rgba(255, 255, 255, 0.1);
-  transform: translateY(-2px);
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+  background: rgba(51, 65, 85, 0.7);
+  border-color: rgba(148, 163, 184, 0.2);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(59, 130, 246, 0.15);
 }
 
 /* ===== MODERN FORM STYLES ===== */
 
 .modern-input {
-  background: var(--glass-bg);
+  background: rgba(30, 41, 59, 0.6);
   backdrop-filter: blur(10px);
-  border: 1px solid var(--glass-border);
+  border: 1px solid rgba(148, 163, 184, 0.15);
   border-radius: 12px;
   padding: 12px 16px;
-  color: var(--neutral-100);
+  color: #f1f5f9;
   font-size: 14px;
   transition: all var(--duration-normal) var(--easing-smooth);
   font-family: "Inter", sans-serif;
@@ -139,13 +135,13 @@ body {
 
 .modern-input:focus {
   outline: none;
-  border-color: var(--secondary-400);
-  box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.1);
-  background: rgba(255, 255, 255, 0.08);
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+  background: rgba(51, 65, 85, 0.7);
 }
 
 .modern-input::placeholder {
-  color: var(--neutral-400);
+  color: #94a3b8;
 }
 
 /* ===== GRADIENT TEXT ===== */
