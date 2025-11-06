@@ -77,7 +77,7 @@ export default function MessengerPage() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-screen floating-particles">
+      <div className="flex items-center justify-center h-screen bg-black">
         <motion.div
           className="text-center"
           initial={{ opacity: 0, scale: 0.9 }}
@@ -85,17 +85,14 @@ export default function MessengerPage() {
           transition={{ duration: 0.5 }}
         >
           <motion.div
-            className="w-16 h-16 mx-auto mb-4 rounded-2xl flex items-center justify-center"
-            style={{
-              background: "linear-gradient(135deg, #a855f7, #f97316)",
-            }}
+            className="w-16 h-16 mx-auto mb-4 rounded-2xl flex items-center justify-center bg-blue-600"
             animate={{ rotate: 360 }}
             transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
           >
             <MessageCircle className="w-8 h-8 text-white" />
           </motion.div>
           <motion.p
-            className="text-neutral-300 text-lg font-medium"
+            className="text-neutral-400 text-lg font-medium"
             animate={{ opacity: [0.5, 1, 0.5] }}
             transition={{ duration: 1.5, repeat: Infinity }}
           >
@@ -109,40 +106,34 @@ export default function MessengerPage() {
   if (!user) return null;
 
   return (
-    <div className="flex h-screen overflow-hidden bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+    <div className="flex h-screen overflow-hidden bg-black">
       {/* Desktop Sidebar - Always visible on desktop */}
       <motion.div
         initial={{ x: -300, opacity: 0 }}
         animate={{ x: 0, opacity: 1 }}
         transition={{ type: "spring", stiffness: 300, damping: 30 }}
-        className="hidden lg:flex lg:w-80 glass-card m-3 flex-col relative overflow-hidden"
+        className="hidden lg:flex lg:w-80 bg-neutral-950 border-r border-neutral-800 flex-col relative overflow-hidden"
       >
-        {/* Subtle background */}
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-600/5 via-transparent to-indigo-600/5" />
-
         {/* Header */}
         <motion.div
-          className="h-20 border-b border-slate-700/50 backdrop-blur-xl bg-slate-800/40 flex items-center justify-between px-5 relative z-10"
+          className="h-16 border-b border-neutral-800 bg-neutral-950/80 backdrop-blur-xl flex items-center justify-between px-5"
           initial={{ y: -20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.2 }}
         >
           <div className="flex items-center gap-3">
             <motion.div
-              className="w-11 h-11 rounded-xl flex items-center justify-center shadow-lg bg-gradient-to-br from-blue-500 to-indigo-600"
+              className="w-10 h-10 rounded-xl flex items-center justify-center bg-blue-600"
               whileHover={{ scale: 1.05 }}
               transition={{ type: "spring", stiffness: 400 }}
             >
-              <MessageCircle className="w-6 h-6 text-white" />
+              <MessageCircle className="w-5 h-5 text-white" />
             </motion.div>
             <div className="min-w-0">
-              <h1 className="text-white font-bold text-lg tracking-tight">
+              <h1 className="text-white font-bold text-base tracking-tight">
                 WebChat
               </h1>
-              <p className="text-xs text-slate-400 truncate flex items-center gap-1.5">
-                <div className="w-1.5 h-1.5 bg-teal-400 rounded-full animate-pulse"></div>
-                {user.username}
-              </p>
+              <p className="text-xs text-neutral-500 truncate">{user.username}</p>
             </div>
           </div>
 
@@ -150,27 +141,19 @@ export default function MessengerPage() {
             {/* Profile Button */}
             <motion.button
               onClick={() => router.push("/profile")}
-              className="p-2 rounded-lg glass-button hover:bg-slate-700/50 transition-all"
+              className="p-2 rounded-lg hover:bg-neutral-800/70 transition-all"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               title="Profile"
             >
-              {user.avatar?.startsWith("/avatars/") ? (
-                <img
-                  src={user.avatar}
-                  alt="Profile"
-                  className="w-5 h-5 rounded-lg object-cover"
-                />
-              ) : (
-                <span className="text-base">{user.avatar || "👤"}</span>
-              )}
+              <UserCircle2 className="w-5 h-5 text-neutral-400" />
             </motion.button>
           </div>
         </motion.div>
 
         {/* Friends List */}
         <motion.div
-          className="flex-1 overflow-hidden relative z-10"
+          className="flex-1 overflow-hidden"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.4 }}
@@ -180,18 +163,18 @@ export default function MessengerPage() {
 
         {/* Footer with logout */}
         <motion.div
-          className="p-4 border-t border-slate-700/50 backdrop-blur-xl bg-slate-800/40 relative z-10"
+          className="p-4 border-t border-neutral-800 bg-neutral-950/80 backdrop-blur-xl"
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.6 }}
         >
           <motion.button
             onClick={handleLogout}
-            className="w-full flex items-center gap-3 p-3 rounded-xl glass-button hover:bg-red-500/10 transition-all text-red-400 hover:text-red-300 group"
+            className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-neutral-800/70 transition-all text-neutral-400 hover:text-red-400 group"
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
           >
-            <LogOut className="w-5 h-5 group-hover:rotate-12 transition-transform" />
+            <LogOut className="w-5 h-5" />
             <span className="font-medium">Logout</span>
           </motion.button>
         </motion.div>
@@ -207,7 +190,7 @@ export default function MessengerPage() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setMobileMenuOpen(false)}
-              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 lg:hidden"
+              className="fixed inset-0 bg-black/80 backdrop-blur-sm z-40 lg:hidden"
             />
 
             {/* Mobile Sidebar */}
@@ -216,33 +199,25 @@ export default function MessengerPage() {
               animate={{ x: 0, opacity: 1 }}
               exit={{ x: -300, opacity: 0 }}
               transition={{ type: "spring", stiffness: 300, damping: 30 }}
-              className="fixed left-0 top-0 bottom-0 w-80 glass-card m-3 flex flex-col overflow-hidden z-50 lg:hidden"
+              className="fixed left-0 top-0 bottom-0 w-80 bg-neutral-950 border-r border-neutral-800 flex flex-col overflow-hidden z-50 lg:hidden"
             >
-              {/* Animated background */}
-              <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 via-transparent to-orange-500/10" />
-
               {/* Header */}
-              <div className="h-20 border-b border-white/10 backdrop-blur-xl bg-white/5 flex items-center justify-between px-6 relative z-10">
-                <div className="flex items-center gap-4">
+              <div className="h-16 border-b border-neutral-800 bg-neutral-950/80 backdrop-blur-xl flex items-center justify-between px-5">
+                <div className="flex items-center gap-3">
                   <motion.div
-                    className="w-12 h-12 rounded-xl flex items-center justify-center"
-                    style={{
-                      background: "linear-gradient(135deg, #a855f7, #f97316)",
-                    }}
+                    className="w-10 h-10 rounded-xl flex items-center justify-center bg-blue-600"
                   >
-                    <MessageCircle className="w-6 h-6 text-white" />
+                    <MessageCircle className="w-5 h-5 text-white" />
                   </motion.div>
                   <div>
-                    <h1 className="text-white font-bold text-xl gradient-text">
-                      WebChat
-                    </h1>
-                    <p className="text-xs text-neutral-400">{user.username}</p>
+                    <h1 className="text-white font-bold text-base">WebChat</h1>
+                    <p className="text-xs text-neutral-500">{user.username}</p>
                   </div>
                 </div>
 
                 <motion.button
                   onClick={() => setMobileMenuOpen(false)}
-                  className="p-2 rounded-lg glass-button hover:bg-white/10"
+                  className="p-2 rounded-lg hover:bg-neutral-800/70"
                   whileTap={{ scale: 0.95 }}
                 >
                   <X className="w-5 h-5 text-neutral-400" />
@@ -250,7 +225,7 @@ export default function MessengerPage() {
               </div>
 
               {/* Friends List */}
-              <div className="flex-1 overflow-hidden relative z-10">
+              <div className="flex-1 overflow-hidden">
                 <FriendsList
                   userId={user.id}
                   onSelectFriend={handleSelectFriend}
@@ -258,10 +233,10 @@ export default function MessengerPage() {
               </div>
 
               {/* Logout Button */}
-              <div className="p-4 border-t border-white/10 backdrop-blur-xl bg-white/5 relative z-10">
+              <div className="p-4 border-t border-neutral-800 bg-neutral-950/80 backdrop-blur-xl">
                 <motion.button
                   onClick={handleLogout}
-                  className="w-full flex items-center gap-3 p-3 rounded-lg glass-button hover:bg-red-500/10 text-red-400"
+                  className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-neutral-800/70 text-neutral-400 hover:text-red-400"
                   whileTap={{ scale: 0.98 }}
                 >
                   <LogOut className="w-5 h-5" />
@@ -284,30 +259,23 @@ export default function MessengerPage() {
           <>
             {/* Mobile Header with back button */}
             <motion.div
-              className="lg:hidden h-16 glass-card m-3 mb-0 flex items-center gap-4 px-4 relative overflow-hidden"
+              className="lg:hidden h-16 bg-neutral-950 border-b border-neutral-800 flex items-center gap-4 px-4"
               initial={{ y: -20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
             >
-              <div className="absolute inset-0 bg-gradient-to-r from-purple-500/5 to-orange-500/5" />
-
               <motion.button
                 onClick={() => {
                   setSelectedFriend(null);
                   setSelectedFriendId(null);
                 }}
-                className="p-2 rounded-lg glass-button hover:bg-white/10 relative z-10"
+                className="p-2 rounded-lg hover:bg-neutral-800/70"
                 whileTap={{ scale: 0.95 }}
               >
-                <X className="w-5 h-5 text-white" />
+                <X className="w-5 h-5 text-neutral-400" />
               </motion.button>
 
-              <div className="flex items-center gap-3 relative z-10">
-                <div
-                  className="w-10 h-10 rounded-lg flex items-center justify-center"
-                  style={{
-                    background: "linear-gradient(135deg, #a855f7, #f97316)",
-                  }}
-                >
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-blue-600">
                   {selectedFriend.avatar?.startsWith("/avatars/") ? (
                     <img
                       src={selectedFriend.avatar}
@@ -315,17 +283,17 @@ export default function MessengerPage() {
                       className="w-full h-full object-cover rounded-lg"
                     />
                   ) : (
-                    <span className="text-lg">
+                    <span className="text-lg text-white">
                       {selectedFriend.avatar ||
                         selectedFriend.username[0].toUpperCase()}
                     </span>
                   )}
                 </div>
                 <div>
-                  <h2 className="text-white font-semibold">
+                  <h2 className="text-white font-semibold text-sm">
                     {selectedFriend.username}
                   </h2>
-                  <p className="text-xs text-neutral-400">
+                  <p className="text-xs text-neutral-500">
                     {selectedFriend.status}
                   </p>
                 </div>
@@ -333,7 +301,7 @@ export default function MessengerPage() {
             </motion.div>
 
             {/* Messages Component */}
-            <div className="flex-1 m-3 mt-3 lg:mt-3 overflow-hidden">
+            <div className="flex-1 overflow-hidden bg-neutral-950">
               <DirectMessages
                 userId={user.id}
                 friendId={selectedFriend.id}
@@ -345,43 +313,39 @@ export default function MessengerPage() {
           </>
         ) : (
           <motion.div
-            className="h-full glass-card m-3 flex flex-col items-center justify-center relative overflow-hidden"
+            className="h-full flex flex-col items-center justify-center relative overflow-hidden bg-neutral-950"
             initial={{ scale: 0.95, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ delay: 0.5 }}
           >
-            {/* Subtle background */}
-            <div className="absolute inset-0 bg-gradient-to-br from-blue-600/5 via-transparent to-indigo-600/5" />
-
             {/* Mobile Menu Button */}
             <motion.button
               onClick={() => setMobileMenuOpen(true)}
-              className="lg:hidden absolute top-5 left-5 p-3 rounded-xl glass-button hover:bg-slate-700/50 z-10"
+              className="lg:hidden absolute top-5 left-5 p-3 rounded-xl bg-neutral-900 hover:bg-neutral-800 border border-neutral-800 z-10"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
-              <Menu className="w-6 h-6 text-slate-200" />
+              <Menu className="w-6 h-6 text-neutral-300" />
             </motion.button>
 
             <motion.div
-              className="text-center relative z-10 max-w-lg mx-auto p-8"
+              className="text-center max-w-lg mx-auto p-8"
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.7 }}
             >
               <motion.div
-                className="w-28 h-28 mx-auto mb-8 rounded-3xl flex items-center justify-center shadow-2xl bg-gradient-to-br from-blue-500 to-indigo-600"
+                className="w-24 h-24 mx-auto mb-8 rounded-2xl flex items-center justify-center bg-blue-600"
                 animate={{
-                  rotate: [0, 3, -3, 0],
                   scale: [1, 1.02, 1],
                 }}
                 transition={{
-                  duration: 5,
+                  duration: 3,
                   repeat: Infinity,
                   ease: "easeInOut",
                 }}
               >
-                <MessageCircle className="w-14 h-14 text-white" />
+                <MessageCircle className="w-12 h-12 text-white" />
               </motion.div>
 
               <motion.h2
@@ -394,19 +358,19 @@ export default function MessengerPage() {
               </motion.h2>
 
               <motion.p
-                className="text-slate-400 text-base md:text-lg mb-10 leading-relaxed"
+                className="text-neutral-400 text-base md:text-lg mb-10"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 1.1 }}
               >
-                Select a friend from the sidebar to start messaging, or find new
-                friends to connect with.
+                Select a friend from the sidebar to start messaging,<br />
+                or find new friends to connect with.
               </motion.p>
 
               <div className="flex flex-col sm:flex-row gap-3 justify-center">
                 <motion.button
                   onClick={() => setMobileMenuOpen(true)}
-                  className="lg:hidden px-8 py-3.5 rounded-xl font-semibold text-white bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 transition-all"
+                  className="lg:hidden px-6 py-3 rounded-lg font-medium text-white bg-neutral-800 hover:bg-neutral-700 border border-neutral-700 transition-all"
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   initial={{ opacity: 0, y: 20 }}
@@ -421,7 +385,7 @@ export default function MessengerPage() {
 
                 <motion.button
                   onClick={() => router.push("/friends")}
-                  className="px-8 py-3.5 rounded-xl font-semibold text-white bg-gradient-to-r from-teal-500 to-blue-600 hover:from-teal-600 hover:to-blue-700 transition-all"
+                  className="px-6 py-3 rounded-lg font-medium text-white bg-blue-600 hover:bg-blue-700 transition-all"
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   initial={{ opacity: 0, y: 20 }}
