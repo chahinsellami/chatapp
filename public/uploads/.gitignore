@@ -1,0 +1,7 @@
+# Ignore all uploaded files
+*
+!.gitignore
+
+# Keep the directory structure but ignore the contents
+profiles/
+covers/

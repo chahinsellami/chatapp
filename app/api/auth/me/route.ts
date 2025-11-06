@@ -34,7 +34,6 @@ export async function GET(request: NextRequest) {
       createdAt: user.created_at,
     });
   } catch (error) {
-    
     return createErrorResponse("Failed to get user", 500);
   }
 }
