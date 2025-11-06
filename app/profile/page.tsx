@@ -113,6 +113,12 @@ export default function ProfilePage() {
   const [success, setSuccess] = useState(false);
   const [tab, setTab] = useState("posts");
 
+  // Post state
+  const [postContent, setPostContent] = useState("");
+  const [postImage, setPostImage] = useState<File | null>(null);
+  const [postImagePreview, setPostImagePreview] = useState<string | null>(null);
+  const [posting, setPosting] = useState(false);
+
   /**
    * Initialize profile data from user context
    */
@@ -275,6 +281,58 @@ export default function ProfilePage() {
   };
 
   /**
+   * Handle photo selection for post
+   */
+  const handlePostImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (!file.type.startsWith("image/")) {
+        setError("Please select an image file");
+        return;
+      }
+      if (file.size > 5 * 1024 * 1024) {
+        setError("Image size must be less than 5MB");
+        return;
+      }
+
+      setPostImage(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPostImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  /**
+   * Handle creating a post
+   */
+  const handleCreatePost = async () => {
+    if (!postContent.trim() && !postImage) {
+      setError("Please write something or add a photo");
+      return;
+    }
+
+    try {
+      setPosting(true);
+      setError("");
+
+      // For now, just show success message since we don't have a posts API yet
+      // In the future, you can implement actual post creation
+      setSuccess(true);
+      setPostContent("");
+      setPostImage(null);
+      setPostImagePreview(null);
+
+      setTimeout(() => setSuccess(false), 3000);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Error creating post");
+    } finally {
+      setPosting(false);
+    }
+  };
+
+  /**
    * Loading state UI
    */
   if (isLoading) {
@@ -334,27 +392,62 @@ export default function ProfilePage() {
                   </h2>
                   <div className="space-y-4">
                     <textarea
+                      value={postContent}
+                      onChange={(e) => setPostContent(e.target.value)}
                       placeholder="What's on your mind?"
                       className="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
                       rows={4}
                     />
+                    
+                    {/* Image Preview */}
+                    {postImagePreview && (
+                      <div className="relative">
+                        <img
+                          src={postImagePreview}
+                          alt="Post preview"
+                          className="w-full max-h-64 object-cover rounded-lg"
+                        />
+                        <motion.button
+                          onClick={() => {
+                            setPostImage(null);
+                            setPostImagePreview(null);
+                          }}
+                          className="absolute top-2 right-2 p-2 bg-red-500/80 hover:bg-red-500 rounded-full"
+                          whileHover={{ scale: 1.1 }}
+                          whileTap={{ scale: 0.9 }}
+                        >
+                          <X className="w-4 h-4 text-white" />
+                        </motion.button>
+                      </div>
+                    )}
+
                     <div className="flex justify-between items-center">
                       <div className="flex gap-2">
-                        <motion.button
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={handlePostImageChange}
+                          className="hidden"
+                          id="post-image-upload"
+                        />
+                        <motion.label
+                          htmlFor="post-image-upload"
                           whileHover={{ scale: 1.05 }}
                           whileTap={{ scale: 0.95 }}
-                          className="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg flex items-center gap-2"
+                          className="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg flex items-center gap-2 cursor-pointer"
                         >
                           <Upload className="w-4 h-4" />
                           Photo
-                        </motion.button>
+                        </motion.label>
                       </div>
                       <motion.button
+                        onClick={handleCreatePost}
+                        disabled={posting || (!postContent.trim() && !postImage)}
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
-                        className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold"
+                        className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
                       >
-                        Post
+                        {posting ? "Posting..." : "Post"}
                       </motion.button>
                     </div>
                   </div>

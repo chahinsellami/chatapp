@@ -69,19 +69,25 @@ export default function MessengerPage() {
     const friendId = searchParams.get("friend");
     if (friendId && user) {
       // Fetch friend data and select them
+      const token = localStorage.getItem("auth_token");
       fetch(`/api/users/${friendId}`, {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
+          Authorization: `Bearer ${token}`,
         },
       })
-        .then((res) => res.json())
+        .then((res) => {
+          if (!res.ok) {
+            throw new Error("Failed to fetch user");
+          }
+          return res.json();
+        })
         .then((data) => {
-          if (data.id) {
-            handleSelectFriend(data.id, {
-              id: data.id,
-              username: data.username,
-              avatar: data.avatar,
-              status: "online",
+          if (data.user) {
+            handleSelectFriend(data.user.id, {
+              id: data.user.id,
+              username: data.user.username,
+              avatar: data.user.avatar,
+              status: data.user.status || "online",
             });
           }
         })

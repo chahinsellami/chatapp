@@ -95,6 +95,12 @@ export default function NavigationBar({ currentPage }: NavigationBarProps) {
     setSearchQuery("");
   };
 
+  const messageUser = (userId: string) => {
+    router.push(`/messenger?friend=${userId}`);
+    setShowResults(false);
+    setSearchQuery("");
+  };
+
   return (
     <div className="bg-neutral-950 border-b border-neutral-800 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-6 py-3 flex justify-between items-center gap-4">
@@ -142,34 +148,47 @@ export default function NavigationBar({ currentPage }: NavigationBarProps) {
                 ) : searchResults.length > 0 ? (
                   <div className="py-2">
                     {searchResults.map((user) => (
-                      <motion.button
+                      <div
                         key={user.id}
-                        onClick={() => viewProfile(user.id)}
-                        className="w-full px-4 py-3 hover:bg-neutral-800 flex items-center gap-3 transition-colors"
-                        whileHover={{ x: 4 }}
+                        className="px-4 py-3 hover:bg-neutral-800 flex items-center gap-3 transition-colors group"
                       >
-                        <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center flex-shrink-0">
-                          {user.avatar?.startsWith("/avatars/") ? (
-                            <img
-                              src={user.avatar}
-                              alt={user.username}
-                              className="w-full h-full rounded-full object-cover"
-                            />
-                          ) : (
-                            <span className="text-white font-bold">
-                              {user.avatar || user.username[0].toUpperCase()}
-                            </span>
-                          )}
-                        </div>
-                        <div className="flex-1 text-left">
-                          <p className="text-white font-medium">
-                            {user.username}
-                          </p>
-                          <p className="text-neutral-400 text-sm capitalize">
-                            {user.status}
-                          </p>
-                        </div>
-                      </motion.button>
+                        <motion.button
+                          onClick={() => viewProfile(user.id)}
+                          className="flex items-center gap-3 flex-1 text-left"
+                          whileHover={{ x: 4 }}
+                        >
+                          <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center flex-shrink-0">
+                            {user.avatar?.startsWith("/avatars/") ? (
+                              <img
+                                src={user.avatar}
+                                alt={user.username}
+                                className="w-full h-full rounded-full object-cover"
+                              />
+                            ) : (
+                              <span className="text-white font-bold">
+                                {user.avatar || user.username[0].toUpperCase()}
+                              </span>
+                            )}
+                          </div>
+                          <div className="flex-1">
+                            <p className="text-white font-medium">
+                              {user.username}
+                            </p>
+                            <p className="text-neutral-400 text-sm capitalize">
+                              {user.status}
+                            </p>
+                          </div>
+                        </motion.button>
+                        <motion.button
+                          onClick={() => messageUser(user.id)}
+                          className="p-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white opacity-0 group-hover:opacity-100 transition-opacity"
+                          whileHover={{ scale: 1.1 }}
+                          whileTap={{ scale: 0.9 }}
+                          title="Send Message"
+                        >
+                          <MessageCircle className="w-4 h-4" />
+                        </motion.button>
+                      </div>
                     ))}
                   </div>
                 ) : (
