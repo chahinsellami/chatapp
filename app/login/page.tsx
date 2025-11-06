@@ -22,12 +22,8 @@ export default function LoginPage() {
     try {
       const user = await login(email, password);
 
-      // If user doesn't have an avatar, redirect to profile setup
-      if (!user.avatar) {
-        router.push("/profile");
-      } else {
-        router.push("/messenger");
-      }
+      // Redirect to profile page after successful login
+      router.push("/profile");
     } catch (err: any) {
       setError(err.message || "Login failed");
     }

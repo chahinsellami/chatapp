@@ -471,10 +471,7 @@ export default function DirectMessages({
           transition={{ duration: 0.5 }}
         >
           <motion.div
-            className="w-12 h-12 mx-auto mb-4 rounded-xl flex items-center justify-center"
-            style={{
-              background: "linear-gradient(135deg, #a855f7, #f97316)",
-            }}
+            className="w-12 h-12 mx-auto mb-4 rounded-xl flex items-center justify-center bg-blue-600"
             animate={{ rotate: 360 }}
             transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
           >
@@ -532,20 +529,16 @@ export default function DirectMessages({
               {friendName}
             </h3>
             <p className="text-slate-400 text-xs md:text-sm flex items-center gap-1.5">
-              {isConnected ? (
-                onlineUsers.has(friendId) ? (
-                  <>
-                    <div className="w-1.5 h-1.5 bg-teal-400 rounded-full"></div>
-                    <span>Online</span>
-                  </>
-                ) : (
-                  <>
-                    <div className="w-1.5 h-1.5 bg-slate-500 rounded-full"></div>
-                    <span>Offline</span>
-                  </>
-                )
+              {onlineUsers.has(friendId) ? (
+                <>
+                  <div className="w-1.5 h-1.5 bg-teal-400 rounded-full"></div>
+                  <span>Online</span>
+                </>
               ) : (
-                <span className="text-blue-400">Connecting...</span>
+                <>
+                  <div className="w-1.5 h-1.5 bg-slate-500 rounded-full"></div>
+                  <span>Offline</span>
+                </>
               )}
             </p>
           </div>
@@ -649,12 +642,9 @@ export default function DirectMessages({
               >
                 {/* Avatar */}
                 <motion.div
-                  className="w-7 h-7 md:w-8 md:h-8 rounded-lg overflow-hidden flex items-center justify-center flex-shrink-0 shadow-md"
-                  style={{
-                    background: isOwnMessage
-                      ? "linear-gradient(135deg, #3b82f6, #6366f1)"
-                      : "linear-gradient(135deg, #475569, #334155)",
-                  }}
+                  className={`w-7 h-7 md:w-8 md:h-8 rounded-lg overflow-hidden flex items-center justify-center flex-shrink-0 shadow-md ${
+                    isOwnMessage ? 'bg-blue-600' : 'bg-neutral-700'
+                  }`}
                   whileHover={{ scale: 1.1 }}
                 >
                   {isOwnMessage ? (
@@ -685,16 +675,10 @@ export default function DirectMessages({
                 {/* Message bubble */}
                 <motion.div
                   className={`max-w-[75%] md:max-w-md px-3 md:px-4 py-2 md:py-2.5 rounded-2xl shadow-lg ${
-                    isOwnMessage ? "rounded-br-sm" : "rounded-bl-sm"
+                    isOwnMessage ? "rounded-br-sm bg-blue-600 border border-blue-500/30" : "rounded-bl-sm bg-neutral-800/60 border border-neutral-700/15"
                   }`}
                   style={{
-                    background: isOwnMessage
-                      ? "linear-gradient(135deg, #3b82f6, #6366f1)"
-                      : "rgba(51, 65, 85, 0.6)",
                     backdropFilter: "blur(10px)",
-                    border: isOwnMessage
-                      ? "1px solid rgba(99, 102, 241, 0.3)"
-                      : "1px solid rgba(148, 163, 184, 0.15)",
                   }}
                   whileHover={{ scale: 1.01 }}
                   transition={{ type: "spring", stiffness: 300 }}
@@ -837,10 +821,7 @@ export default function DirectMessages({
               exit={{ scale: 0.9, opacity: 0 }}
             >
               <motion.div
-                className="w-20 h-20 mx-auto mb-6 rounded-2xl flex items-center justify-center"
-                style={{
-                  background: "linear-gradient(135deg, #a855f7, #f97316)",
-                }}
+                className="w-20 h-20 rounded-2xl flex items-center justify-center mb-6 bg-blue-600"
                 animate={{ rotate: [0, 10, -10, 0] }}
                 transition={{ duration: 2, repeat: Infinity }}
               >
@@ -869,10 +850,7 @@ export default function DirectMessages({
               <div className="flex gap-4 justify-center">
                 <motion.button
                   onClick={acceptCall}
-                  className="flex-1 py-3 px-6 rounded-xl font-bold text-white"
-                  style={{
-                    background: "linear-gradient(135deg, #10b981, #059669)",
-                  }}
+                  className="flex-1 py-3 px-6 rounded-xl font-bold text-white bg-green-600 hover:bg-green-700 transition-colors"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                 >
@@ -880,10 +858,7 @@ export default function DirectMessages({
                 </motion.button>
                 <motion.button
                   onClick={rejectCall}
-                  className="flex-1 py-3 px-6 rounded-xl font-bold text-white"
-                  style={{
-                    background: "linear-gradient(135deg, #ef4444, #dc2626)",
-                  }}
+                  className="flex-1 py-3 px-6 rounded-xl font-bold text-white bg-red-600 hover:bg-red-700 transition-colors"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                 >
@@ -987,10 +962,7 @@ export default function DirectMessages({
               )}
               <motion.button
                 onClick={endCall}
-                className="p-4 rounded-2xl"
-                style={{
-                  background: "linear-gradient(135deg, #ef4444, #dc2626)",
-                }}
+                className="p-4 rounded-2xl bg-red-600 hover:bg-red-700 transition-colors"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >

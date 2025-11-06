@@ -57,24 +57,6 @@ export default function ProfileHeader({
               </div>
             </div>
           )}
-
-          {/* Edit Cover Photo Button */}
-          <motion.button
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className="absolute bottom-6 right-6 px-4 py-2 bg-white/90 hover:bg-white text-slate-900 rounded-lg font-semibold flex items-center gap-2 shadow-lg backdrop-blur-sm"
-            onClick={() => document.getElementById("cover-upload")?.click()}
-          >
-            <Upload className="w-4 h-4" />
-            Edit cover photo
-          </motion.button>
-          <input
-            type="file"
-            accept="image/*"
-            onChange={onCoverImageChange}
-            className="hidden"
-            id="cover-upload"
-          />
         </motion.div>
 
         {/* Profile Picture and Info Section */}
@@ -104,21 +86,23 @@ export default function ProfileHeader({
                     </div>
                   )}
                 </div>
-
-                {/* Status Indicator on Avatar (bottom-right) */}
-                <div
-                  className="absolute bottom-5 right-5 w-9 h-9 rounded-full border-4 border-slate-900 shadow-lg"
-                  style={{
-                    backgroundColor: statusColor,
-                  }}
-                />
               </motion.div>
 
-              {/* Name and Bio - aligned to the bottom of the avatar */}
+              {/* Name and Bio with Status - aligned to the bottom of the avatar */}
               <div className="flex flex-col justify-end pb-6">
-                <h1 className="text-3xl md:text-4xl font-bold text-white leading-tight">
-                  {username}
-                </h1>
+                <div className="flex items-center gap-3">
+                  <h1 className="text-3xl md:text-4xl font-bold text-white leading-tight">
+                    {username}
+                  </h1>
+                  {/* Status Indicator next to name */}
+                  <div
+                    className="w-4 h-4 rounded-full shadow-lg"
+                    style={{
+                      backgroundColor: statusColor,
+                    }}
+                    title={status}
+                  />
+                </div>
                 {bio && <p className="text-slate-300 text-sm mt-1">"{bio}"</p>}
               </div>
             </div>
