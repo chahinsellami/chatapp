@@ -34,10 +34,18 @@ export async function POST(request: NextRequest) {
     }
 
     // Validate file type
-    const allowedTypes = ["image/jpeg", "image/jpg", "image/png", "image/gif", "image/webp"];
+    const allowedTypes = [
+      "image/jpeg",
+      "image/jpg",
+      "image/png",
+      "image/gif",
+      "image/webp",
+    ];
     if (!allowedTypes.includes(file.type)) {
       return NextResponse.json(
-        { error: "Invalid file type. Only JPEG, PNG, GIF, and WebP are allowed" },
+        {
+          error: "Invalid file type. Only JPEG, PNG, GIF, and WebP are allowed",
+        },
         { status: 400 }
       );
     }
@@ -57,21 +65,23 @@ export async function POST(request: NextRequest) {
 
     // Upload to Cloudinary
     const uploadResult = await new Promise<any>((resolve, reject) => {
-      cloudinary.uploader.upload_stream(
-        {
-          folder: "webchat/covers",
-          public_id: `${decoded.userId}-${Date.now()}`,
-          resource_type: "image",
-          transformation: [
-            { width: 1200, height: 400, crop: "fill" },
-            { quality: "auto" },
-          ],
-        },
-        (error, result) => {
-          if (error) reject(error);
-          else resolve(result);
-        }
-      ).end(buffer);
+      cloudinary.uploader
+        .upload_stream(
+          {
+            folder: "webchat/covers",
+            public_id: `${decoded.userId}-${Date.now()}`,
+            resource_type: "image",
+            transformation: [
+              { width: 1200, height: 400, crop: "fill" },
+              { quality: "auto" },
+            ],
+          },
+          (error, result) => {
+            if (error) reject(error);
+            else resolve(result);
+          }
+        )
+        .end(buffer);
     });
 
     // Return the Cloudinary URL

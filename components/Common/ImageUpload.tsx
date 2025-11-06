@@ -40,7 +40,7 @@ export default function ImageUpload({
           {label}
         </label>
       )}
-      <div className="relative h-48 rounded-xl overflow-hidden bg-slate-800 flex items-center justify-center border border-slate-700">
+      <div className="relative h-48 rounded-xl overflow-hidden bg-slate-800/50 flex items-center justify-center border border-slate-700/50">
         {preview ? (
           <>
             <img
@@ -51,6 +51,7 @@ export default function ImageUpload({
             {onRemove && (
               <motion.button
                 onClick={onRemove}
+                type="button"
                 className="absolute top-2 right-2 p-2 bg-red-500/80 hover:bg-red-500 rounded-full"
                 whileHover={{ scale: 1.1 }}
                 whileTap={{ scale: 0.9 }}
@@ -60,10 +61,14 @@ export default function ImageUpload({
             )}
           </>
         ) : (
-          <div className="text-center text-slate-600">
-            <Upload className="w-12 h-12 mx-auto mb-2" />
-            <p className="text-sm">{placeholder}</p>
-          </div>
+          <label
+            htmlFor={id}
+            className="cursor-pointer text-center p-8 w-full h-full flex flex-col items-center justify-center hover:bg-slate-700/30 transition-colors"
+          >
+            <Upload className="w-12 h-12 mx-auto mb-2 text-blue-400" />
+            <p className="text-sm text-slate-400">{placeholder}</p>
+            <p className="text-xs text-slate-500 mt-2">Click to upload</p>
+          </label>
         )}
       </div>
       <input
@@ -73,6 +78,18 @@ export default function ImageUpload({
         className="hidden"
         id={id}
       />
+      {!preview && (
+        <motion.button
+          onClick={() => document.getElementById(id)?.click()}
+          type="button"
+          className="w-full mt-3 px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium flex items-center justify-center gap-2 transition-colors"
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+        >
+          <Upload className="w-4 h-4" />
+          Upload Image
+        </motion.button>
+      )}
     </div>
   );
 }
