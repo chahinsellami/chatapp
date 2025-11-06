@@ -79,8 +79,8 @@ export default function FriendsPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-screen bg-[#36393F]">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#5B65F5]"></div>
+      <div className="flex items-center justify-center h-screen bg-black">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
       </div>
     );
   }
@@ -90,16 +90,16 @@ export default function FriendsPage() {
   }
 
   return (
-    <div className="flex h-screen bg-[#36393F]">
+    <div className="flex h-screen bg-black">
       {/* Left Sidebar - Friends List */}
-      <div className="w-80 border-r border-[#202225] flex flex-col">
+      <div className="w-80 border-r border-neutral-800 flex flex-col">
         {/* Header */}
-        <div className="h-16 bg-[#2F3136] border-b border-[#202225] flex items-center px-4">
-          <h1 className="text-[#DCDDDE] font-bold">Friends</h1>
+        <div className="h-16 bg-neutral-950 border-b border-neutral-800 flex items-center px-4">
+          <h1 className="text-white font-bold">Friends</h1>
         </div>
 
         {/* Add Friend Section */}
-        <div className="p-4 border-b border-[#202225]">
+        <div className="p-4 border-b border-neutral-800">
           <AddFriend userId={user.userId} onFriendAdded={handleFriendAdded} />
         </div>
 
@@ -121,13 +121,13 @@ export default function FriendsPage() {
             friendStatus={selectedFriend.status}
           />
         ) : (
-          <div className="flex-1 flex items-center justify-center bg-[#36393F]">
+          <div className="flex-1 flex items-center justify-center bg-black">
             <div className="text-center">
               <div className="text-4xl mb-4">👋</div>
-              <p className="text-[#DCDDDE] font-bold text-lg mb-2">
+              <p className="text-white font-bold text-lg mb-2">
                 Select a friend to start chatting
               </p>
-              <p className="text-[#72767D] text-sm">
+              <p className="text-neutral-400 text-sm">
                 Choose from your friends list on the left
               </p>
             </div>

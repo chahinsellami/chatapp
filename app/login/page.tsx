@@ -94,9 +94,6 @@ export default function LoginPage() {
       >
         {/* Glass card with enhanced styling */}
         <div className="glass-card p-8 relative overflow-hidden">
-          {/* Subtle inner glow */}
-          <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 via-transparent to-orange-500/5 rounded-2xl" />
-
           {/* Header section */}
           <motion.div
             initial={{ opacity: 0, y: -20 }}
@@ -105,10 +102,7 @@ export default function LoginPage() {
             className="text-center mb-8 relative z-10"
           >
             <motion.div
-              className="inline-flex items-center justify-center w-16 h-16 rounded-2xl mb-4"
-              style={{
-                background: "linear-gradient(135deg, #a855f7, #f97316)",
-              }}
+              className="inline-flex items-center justify-center w-16 h-16 rounded-2xl mb-4 bg-blue-600"
               whileHover={{ scale: 1.05, rotate: 5 }}
               transition={{ type: "spring", stiffness: 300 }}
             >
@@ -251,9 +245,6 @@ export default function LoginPage() {
                   </>
                 )}
               </span>
-
-              {/* Button glow effect */}
-              <div className="absolute inset-0 bg-gradient-to-r from-purple-600/20 to-orange-600/20 opacity-0 hover:opacity-100 transition-opacity duration-300" />
             </motion.button>
           </form>
 
@@ -264,11 +255,11 @@ export default function LoginPage() {
             animate={{ opacity: 1 }}
             transition={{ delay: 1.4, duration: 0.5 }}
           >
-            <div className="flex-1 h-px bg-gradient-to-r from-transparent via-neutral-600 to-transparent"></div>
+            <div className="flex-1 h-px bg-neutral-700"></div>
             <div className="px-4 text-neutral-500 text-xs font-semibold uppercase tracking-wider">
               Or
             </div>
-            <div className="flex-1 h-px bg-gradient-to-r from-transparent via-neutral-600 to-transparent"></div>
+            <div className="flex-1 h-px bg-neutral-700"></div>
           </motion.div>
 
           {/* Signup link */}
@@ -281,10 +272,10 @@ export default function LoginPage() {
             Don't have an account?{" "}
             <Link
               href="/signup"
-              className="font-semibold transition-all duration-300 hover:text-purple-400 relative group"
+              className="font-semibold transition-all duration-300 hover:text-blue-400 relative group"
             >
               <span className="relative z-10">Create one</span>
-              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-purple-400 to-orange-400 group-hover:w-full transition-all duration-300"></span>
+              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-blue-400 group-hover:w-full transition-all duration-300"></span>
             </Link>
           </motion.p>
         </div>

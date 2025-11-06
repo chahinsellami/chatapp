@@ -90,9 +90,6 @@ export default function SignupPage() {
       >
         {/* Glass card with enhanced styling */}
         <div className="glass-card p-8 relative overflow-hidden">
-          {/* Subtle inner glow */}
-          <div className="absolute inset-0 bg-gradient-to-br from-orange-500/5 via-transparent to-purple-500/5 rounded-2xl" />
-
           {/* Header section */}
           <motion.div
             initial={{ opacity: 0, y: -20 }}
@@ -101,10 +98,7 @@ export default function SignupPage() {
             className="text-center mb-8 relative z-10"
           >
             <motion.div
-              className="inline-flex items-center justify-center w-16 h-16 rounded-2xl mb-4"
-              style={{
-                background: "linear-gradient(135deg, #f97316, #a855f7)",
-              }}
+              className="inline-flex items-center justify-center w-16 h-16 rounded-2xl mb-4 bg-blue-600"
               whileHover={{ scale: 1.05, rotate: -5 }}
               transition={{ type: "spring", stiffness: 300 }}
             >
@@ -314,9 +308,6 @@ export default function SignupPage() {
                   </>
                 )}
               </span>
-
-              {/* Button glow effect */}
-              <div className="absolute inset-0 bg-gradient-to-r from-orange-600/20 to-purple-600/20 opacity-0 hover:opacity-100 transition-opacity duration-300" />
             </motion.button>
           </form>
 
@@ -327,11 +318,11 @@ export default function SignupPage() {
             animate={{ opacity: 1 }}
             transition={{ delay: 1.8, duration: 0.5 }}
           >
-            <div className="flex-1 h-px bg-gradient-to-r from-transparent via-neutral-600 to-transparent"></div>
+            <div className="flex-1 h-px bg-neutral-700"></div>
             <div className="px-4 text-neutral-500 text-xs font-semibold uppercase tracking-wider">
               Or
             </div>
-            <div className="flex-1 h-px bg-gradient-to-r from-transparent via-neutral-600 to-transparent"></div>
+            <div className="flex-1 h-px bg-neutral-700"></div>
           </motion.div>
 
           {/* Login link */}
@@ -344,10 +335,10 @@ export default function SignupPage() {
             Already have an account?{" "}
             <Link
               href="/login"
-              className="font-semibold transition-all duration-300 hover:text-orange-400 relative group"
+              className="font-semibold transition-all duration-300 hover:text-blue-400 relative group"
             >
-              <span className="relative z-10">Login here</span>
-              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-orange-400 to-purple-400 group-hover:w-full transition-all duration-300"></span>
+              <span className="relative z-10">Sign in</span>
+              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-blue-400 group-hover:w-full transition-all duration-300"></span>
             </Link>
           </motion.p>
         </div>

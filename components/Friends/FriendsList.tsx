@@ -261,20 +261,16 @@ export default function FriendsList({
       animate={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.5 }}
     >
-      {/* Subtle gradient background overlay */}
-      <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 via-transparent to-orange-500/5" />
-
       {/* Header Section */}
       <motion.div
-        className="flex items-center gap-3 p-6 border-b border-white/10 backdrop-blur-sm bg-white/5 relative z-10"
+        className="flex items-center gap-3 p-6 border-b border-neutral-800 backdrop-blur-sm bg-neutral-950/50 relative z-10"
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ delay: 0.2 }}
       >
-        {/* Icon with gradient background */}
+        {/* Icon with blue background */}
         <motion.div
-          className="w-10 h-10 rounded-xl flex items-center justify-center"
-          style={{ background: "linear-gradient(135deg, #a855f7, #f97316)" }}
+          className="w-10 h-10 rounded-xl flex items-center justify-center bg-blue-600"
           whileHover={{ scale: 1.05 }}
         >
           <Users className="w-5 h-5 text-white" />
@@ -519,7 +515,7 @@ export default function FriendsList({
             friends.map((friend, index) => (
               <motion.div
                 key={friend.id}
-                className="p-4 rounded-xl glass-card hover:bg-white/5 transition-colors cursor-pointer group relative overflow-hidden"
+                className="p-4 rounded-xl glass-card hover:bg-neutral-800/50 transition-colors cursor-pointer group relative overflow-hidden"
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.05 + 0.3 }}
@@ -527,9 +523,6 @@ export default function FriendsList({
                 whileTap={{ scale: 0.98 }}
                 onClick={() => onSelectFriend?.(friend.id, friend)}
               >
-                {/* Gradient overlay on hover */}
-                <div className="absolute inset-0 bg-gradient-to-r from-purple-500/0 via-transparent to-orange-500/0 group-hover:from-purple-500/5 group-hover:to-orange-500/5 transition-all duration-300" />
-
                 <div className="flex items-center gap-4 relative z-10">
                   {/* Friend avatar with online indicator */}
                   <motion.div
@@ -538,10 +531,7 @@ export default function FriendsList({
                   >
                     {/* Avatar */}
                     <div
-                      className="w-12 h-12 rounded-xl overflow-hidden flex items-center justify-center"
-                      style={{
-                        background: "linear-gradient(135deg, #a855f7, #f97316)",
-                      }}
+                      className="w-12 h-12 rounded-xl overflow-hidden flex items-center justify-center bg-blue-600"
                     >
                       {friend.avatar?.startsWith("/avatars/") ? (
                         <img
