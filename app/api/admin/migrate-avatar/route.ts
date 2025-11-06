@@ -1,7 +1,7 @@
 /**
  * Admin API route to migrate avatar column from VARCHAR(255) to TEXT
  * This is a one-time migration endpoint
- * 
+ *
  * To run: Visit https://your-domain.vercel.app/api/admin/migrate-avatar
  */
 
@@ -31,7 +31,8 @@ export async function GET(request: NextRequest) {
 
       return NextResponse.json({
         success: true,
-        message: "Avatar column successfully migrated from VARCHAR(255) to TEXT",
+        message:
+          "Avatar column successfully migrated from VARCHAR(255) to TEXT",
         note: "You can now upload custom profile images up to 5MB",
       });
     } catch (error) {

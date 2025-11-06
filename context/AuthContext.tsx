@@ -23,6 +23,7 @@ export interface User {
   username: string; // User's display name
   email: string; // User's email address
   avatar?: string; // Profile picture URL
+  coverImage?: string; // Cover photo URL
   status?: string; // Online/offline/away status
   bio?: string; // User biography
   createdAt?: string; // Account creation timestamp

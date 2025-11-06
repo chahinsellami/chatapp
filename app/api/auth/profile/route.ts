@@ -20,7 +20,7 @@ export async function PUT(request: NextRequest) {
 
     // Parse request body
     const body = await request.json();
-    const { avatar, status, bio } = body;
+    const { avatar, coverImage, status, bio } = body;
 
     // Validate inputs
     if (!avatar || typeof avatar !== "string") {
@@ -53,7 +53,8 @@ export async function PUT(request: NextRequest) {
       decoded.userId,
       avatar,
       status,
-      bio || ""
+      bio || "",
+      coverImage || ""
     );
 
     if (!updatedUser) {
@@ -68,6 +69,7 @@ export async function PUT(request: NextRequest) {
           username: updatedUser.username,
           email: updatedUser.email,
           avatar: updatedUser.avatar,
+          coverImage: updatedUser.cover_image,
           status: updatedUser.status,
           bio: updatedUser.bio,
           createdAt: updatedUser.created_at,
@@ -79,7 +81,10 @@ export async function PUT(request: NextRequest) {
     // Log the actual error for debugging
     console.error("❌ Profile update error:", error);
     return NextResponse.json(
-      { error: "Internal server error", details: error instanceof Error ? error.message : "Unknown error" },
+      {
+        error: "Internal server error",
+        details: error instanceof Error ? error.message : "Unknown error",
+      },
       { status: 500 }
     );
   }

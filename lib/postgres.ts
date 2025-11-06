@@ -58,6 +58,15 @@ export async function initializeDatabase() {
       // Ignore error if column is already TEXT or doesn't exist
     }
 
+    // Migration: Add cover_image column if it doesn't exist
+    try {
+      await client.query(`
+        ALTER TABLE users ADD COLUMN IF NOT EXISTS cover_image TEXT;
+      `);
+    } catch (err) {
+      // Ignore error if column already exists
+    }
+
     // Create channels table - for group chat functionality
     await client.query(`
       CREATE TABLE IF NOT EXISTS channels (
@@ -139,6 +148,50 @@ export async function initializeDatabase() {
         edited_at TIMESTAMP                    -- Last edit timestamp
       )
     `);
+
+    // Create posts table - stores user posts for social feed
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS posts (
+        id VARCHAR(36) PRIMARY KEY,           -- UUID for post identification
+        user_id VARCHAR(36) NOT NULL REFERENCES users(id),      -- Post author
+        content TEXT NOT NULL,                 -- Post text content
+        image TEXT,                            -- Optional post image (Base64)
+        likes INTEGER DEFAULT 0,               -- Number of likes
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,         -- Post timestamp
+        edited_at TIMESTAMP                    -- Last edit timestamp
+      )
+    `);
+
+    // Create post_likes table - tracks who liked which posts
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS post_likes (
+        id VARCHAR(36) PRIMARY KEY,           -- UUID for like record
+        post_id VARCHAR(36) NOT NULL REFERENCES posts(id) ON DELETE CASCADE,
+        user_id VARCHAR(36) NOT NULL REFERENCES users(id),
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE(post_id, user_id)              -- Prevent duplicate likes
+      )
+    `);
+
+    // Create post_comments table - stores comments on posts
+    await client.query(`
+      CREATE TABLE IF NOT EXISTS post_comments (
+        id VARCHAR(36) PRIMARY KEY,           -- UUID for comment identification
+        post_id VARCHAR(36) NOT NULL REFERENCES posts(id) ON DELETE CASCADE,
+        user_id VARCHAR(36) NOT NULL REFERENCES users(id),
+        content TEXT NOT NULL,                 -- Comment text
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
+    // Add cover_photo column to users table if it doesn't exist
+    try {
+      await client.query(`
+        ALTER TABLE users ADD COLUMN IF NOT EXISTS cover_photo TEXT;
+      `);
+    } catch (err) {
+      // Ignore if column already exists
+    }
   } catch (error) {
     // Rethrow any database initialization errors
     throw error;
@@ -186,7 +239,7 @@ export async function getUserByUsername(username: string) {
  */
 export async function getUserById(id: string) {
   const result = await pool.query(
-    "SELECT id, username, email, avatar, status, bio, created_at FROM users WHERE id = $1",
+    "SELECT id, username, email, avatar, status, bio, cover_image, created_at FROM users WHERE id = $1",
     [id]
   );
   return result.rows[0];
@@ -229,14 +282,15 @@ export async function updateUserProfileComplete(
   userId: string,
   avatar: string,
   status: string,
-  bio: string
+  bio: string,
+  coverImage: string = ""
 ) {
   const result = await pool.query(
     `UPDATE users
-     SET avatar = $1, status = $2, bio = $3
-     WHERE id = $4
-     RETURNING id, username, email, avatar, status, bio, created_at`,
-    [avatar, status, bio, userId]
+     SET avatar = $1, status = $2, bio = $3, cover_image = $4
+     WHERE id = $5
+     RETURNING id, username, email, avatar, status, bio, cover_image, created_at`,
+    [avatar, status, bio, coverImage, userId]
   );
   return result.rows[0];
 }

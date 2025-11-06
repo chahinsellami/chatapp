@@ -9,7 +9,7 @@ import { initializeDatabase } from "@/lib/postgres";
 export async function GET() {
   try {
     await initializeDatabase();
-    
+
     return NextResponse.json({
       success: true,
       message: "Database initialized and avatar column migrated to TEXT type",

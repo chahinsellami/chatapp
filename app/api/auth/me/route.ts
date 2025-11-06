@@ -28,6 +28,7 @@ export async function GET(request: NextRequest) {
       username: user.username,
       email: user.email,
       avatar: user.avatar,
+      coverImage: user.cover_image,
       status: user.status,
       bio: user.bio,
       createdAt: user.created_at,

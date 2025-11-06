@@ -103,7 +103,9 @@ export default function ProfilePage() {
   const [status, setStatus] = useState("online");
   const [bio, setBio] = useState("");
   const [customImage, setCustomImage] = useState<string | null>(null);
+  const [coverImage, setCoverImage] = useState<string | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
+  const [coverFile, setCoverFile] = useState<File | null>(null);
   const [uploadingImage, setUploadingImage] = useState(false);
 
   // UI state
@@ -126,6 +128,10 @@ export default function ProfilePage() {
         user.avatar.startsWith("http")
       ) {
         setCustomImage(user.avatar);
+      }
+      // Check if user has cover image
+      if (user.coverImage) {
+        setCoverImage(user.coverImage);
       }
     }
   }, [user]);
@@ -166,12 +172,47 @@ export default function ProfilePage() {
   };
 
   /**
+   * Handle cover image file selection
+   */
+  const handleCoverImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      // Validate file type
+      if (!file.type.startsWith("image/")) {
+        setError("Please select an image file");
+        return;
+      }
+      // Validate file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        setError("Image size must be less than 5MB");
+        return;
+      }
+
+      setCoverFile(file);
+      // Create preview URL
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setCoverImage(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  /**
    * Remove custom image and go back to emoji selection
    */
   const handleRemoveImage = () => {
     setCustomImage(null);
     setImageFile(null);
     setAvatar("");
+  };
+
+  /**
+   * Remove cover image
+   */
+  const handleRemoveCoverImage = () => {
+    setCoverImage(null);
+    setCoverFile(null);
   };
 
   /**
@@ -200,7 +241,12 @@ export default function ProfilePage() {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({ avatar: customImage || avatar, status, bio }),
+        body: JSON.stringify({
+          avatar: customImage || avatar,
+          coverImage: coverImage || "",
+          status,
+          bio,
+        }),
       });
 
       if (!res.ok) {
@@ -265,178 +311,174 @@ export default function ProfilePage() {
   if (!user) return null;
 
   return (
-    <div className="min-h-screen floating-particles bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-4 md:p-6">
-      {/* Header */}
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="max-w-7xl mx-auto mb-8"
-      >
-        <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
-          <div>
-            <h1 className="text-3xl md:text-4xl font-bold text-white">
-              <span className="bg-gradient-to-r from-blue-400 via-indigo-400 to-teal-400 bg-clip-text text-transparent">
-                Profile Settings
-              </span>
-            </h1>
-            <p className="text-neutral-400 mt-2">
-              Customize your WebChat experience
-            </p>
-          </div>
-
-          <div className="flex gap-3 w-full sm:w-auto">
-            <motion.button
-              onClick={() => router.push("/messenger")}
-              className="flex-1 sm:flex-none px-6 py-3 rounded-xl glass-button hover:bg-blue-500/10 transition-all flex items-center gap-2"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <MessageCircle className="w-5 h-5 text-blue-400" />
-              <span className="text-white font-medium">Messages</span>
-            </motion.button>
-
-            <motion.button
-              onClick={handleLogout}
-              className="flex-1 sm:flex-none px-6 py-3 rounded-xl glass-button hover:bg-red-500/10 transition-all flex items-center gap-2 text-red-400 hover:text-red-300"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <LogOut className="w-5 h-5" />
-              <span className="font-medium">Logout</span>
-            </motion.button>
-          </div>
-        </div>
-      </motion.div>
-
-      {/* Main Content */}
-      <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-4 gap-6">
-        {/* Left Sidebar - Profile Card */}
-        <motion.div
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 0.2 }}
-          className="lg:col-span-1"
-        >
-          <div className="glass-card p-6 relative overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-br from-blue-500/10 via-transparent to-indigo-500/10" />
-
-            {/* Avatar Display */}
-            <motion.div
-              className="relative z-10 text-center mb-6"
-              whileHover={{ scale: 1.05 }}
-              transition={{ type: "spring", stiffness: 300 }}
-            >
-              <div
-                className="w-32 h-32 mx-auto rounded-3xl flex items-center justify-center shadow-2xl overflow-hidden"
-                style={{
-                  background: customImage
-                    ? "transparent"
-                    : "linear-gradient(135deg, #3b82f6, #6366f1)",
-                }}
-              >
-                {customImage ? (
-                  <img
-                    src={customImage}
-                    alt="Profile"
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <span className="text-6xl">{user.avatar || "👤"}</span>
-                )}
-              </div>
-            </motion.div>
-
-            {/* User Info */}
-            <div className="relative z-10 text-center">
-              <h2 className="text-2xl font-bold text-white mb-2">
-                {user.username}
-              </h2>
-              <p className="text-neutral-400 text-sm flex items-center gap-2 justify-center mb-4">
-                <Mail className="w-4 h-4" />
-                {user.email}
-              </p>
-
-              {bio && (
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  className="mt-4 p-4 rounded-xl bg-white/5 border border-white/10"
-                >
-                  <p className="text-neutral-300 text-sm italic">"{bio}"</p>
-                </motion.div>
-              )}
-
-              {/* Current Status Display */}
-              <div className="mt-6">
-                <div className="p-4 rounded-xl bg-white/5 border border-white/10 text-center">
-                  <div className="text-3xl mb-2">
-                    {STATUS_OPTIONS.find((s) => s.value === status)?.icon}
-                  </div>
-                  <p className="text-sm text-neutral-300 font-medium">
-                    {STATUS_OPTIONS.find((s) => s.value === status)?.label}
-                  </p>
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+      {/* Facebook-style Profile Header */}
+      <div className="max-w-6xl mx-auto">
+        {/* Cover Photo Section */}
+        <div className="relative">
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="relative w-full h-[400px] bg-gradient-to-br from-slate-700 via-slate-600 to-slate-700 rounded-b-2xl overflow-hidden"
+          >
+            {coverImage ? (
+              <img
+                src={coverImage}
+                alt="Cover"
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center">
+                <div className="text-center text-slate-400">
+                  <Upload className="w-16 h-16 mx-auto mb-4 opacity-50" />
+                  <p className="text-lg">No cover photo</p>
                 </div>
+              </div>
+            )}
+
+            {/* Edit Cover Photo Button */}
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="absolute bottom-6 right-6 px-4 py-2 bg-white/90 hover:bg-white text-slate-900 rounded-lg font-semibold flex items-center gap-2 shadow-lg backdrop-blur-sm"
+              onClick={() => document.getElementById("cover-upload")?.click()}
+            >
+              <Upload className="w-4 h-4" />
+              Edit cover photo
+            </motion.button>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleCoverImageChange}
+              className="hidden"
+              id="cover-upload"
+            />
+          </motion.div>
+
+          {/* Profile Picture and Info Section */}
+          <div className="max-w-5xl mx-auto px-6">
+            <div className="relative">
+              {/* Profile Picture */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="absolute -top-32 left-0"
+              >
+                <div className="relative">
+                  <div className="w-44 h-44 rounded-full border-4 border-slate-900 bg-gradient-to-br from-blue-500 to-indigo-600 overflow-hidden shadow-2xl">
+                    {customImage ? (
+                      <img
+                        src={customImage}
+                        alt="Profile"
+                        className="w-full h-full object-cover"
+                      />
+                    ) : avatar && !avatar.startsWith("http") ? (
+                      <div className="w-full h-full flex items-center justify-center text-7xl">
+                        {avatar}
+                      </div>
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center">
+                        <User className="w-20 h-20 text-white" />
+                      </div>
+                    )}
+                  </div>
+                  {/* Edit Profile Picture Button */}
+                  <motion.button
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
+                    onClick={() =>
+                      document.getElementById("avatar-upload")?.click()
+                    }
+                    className="absolute bottom-2 right-2 w-10 h-10 bg-slate-700 hover:bg-slate-600 rounded-full flex items-center justify-center border-2 border-slate-900 shadow-lg"
+                  >
+                    <Upload className="w-5 h-5 text-white" />
+                  </motion.button>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageChange}
+                    className="hidden"
+                    id="avatar-upload"
+                  />
+                </div>
+              </motion.div>
+
+              {/* Name and Info */}
+              <div className="pt-16 pb-4 flex flex-col md:flex-row justify-between items-start md:items-end border-b border-slate-700">
+                <div className="ml-0 md:ml-52">
+                  <h1 className="text-4xl font-bold text-white mb-2">
+                    {user.username}
+                  </h1>
+                  <p className="text-slate-400 mb-2">{user.email}</p>
+                  {bio && <p className="text-slate-300 italic mb-2">"{bio}"</p>}
+                  <div className="flex items-center gap-2 text-slate-400">
+                    <span className="text-2xl">
+                      {STATUS_OPTIONS.find((s) => s.value === status)?.icon}
+                    </span>
+                    <span className="text-sm font-medium">
+                      {STATUS_OPTIONS.find((s) => s.value === status)?.label}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex gap-3 mt-4 md:mt-0">
+                  <motion.button
+                    onClick={() => router.push("/messenger")}
+                    className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold flex items-center gap-2 shadow-lg"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    <MessageCircle className="w-5 h-5" />
+                    Messages
+                  </motion.button>
+
+                  <motion.button
+                    onClick={handleLogout}
+                    className="px-6 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg font-semibold flex items-center gap-2 shadow-lg"
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    <LogOut className="w-5 h-5" />
+                    Logout
+                  </motion.button>
+                </div>
+              </div>
+
+              {/* Navigation Tabs */}
+              <div className="flex gap-4 mt-4">
+                <motion.button
+                  onClick={() => setTab("profile")}
+                  className={`px-6 py-3 font-semibold rounded-lg transition-all ${
+                    tab === "profile"
+                      ? "bg-blue-600 text-white"
+                      : "text-slate-400 hover:bg-slate-800 hover:text-white"
+                  }`}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  Edit Profile
+                </motion.button>
+
+                <motion.button
+                  onClick={() => setTab("friends")}
+                  className={`px-6 py-3 font-semibold rounded-lg transition-all ${
+                    tab === "friends"
+                      ? "bg-blue-600 text-white"
+                      : "text-slate-400 hover:bg-slate-800 hover:text-white"
+                  }`}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  Friends
+                </motion.button>
               </div>
             </div>
           </div>
+        </div>
 
-          {/* Navigation Tabs */}
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.4 }}
-            className="glass-card p-4 mt-6"
-          >
-            <motion.button
-              onClick={() => setTab("profile")}
-              className={`w-full px-4 py-3 rounded-xl font-semibold mb-3 transition-all flex items-center gap-3 ${
-                tab === "profile"
-                  ? "text-white"
-                  : "text-neutral-400 hover:text-white hover:bg-white/5"
-              }`}
-              style={{
-                background:
-                  tab === "profile"
-                    ? "linear-gradient(135deg, #3b82f6, #6366f1)"
-                    : "transparent",
-              }}
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-            >
-              <User className="w-5 h-5" />
-              <span>Edit Profile</span>
-            </motion.button>
-
-            <motion.button
-              onClick={() => setTab("friends")}
-              className={`w-full px-4 py-3 rounded-xl font-semibold transition-all flex items-center gap-3 ${
-                tab === "friends"
-                  ? "text-white"
-                  : "text-neutral-400 hover:text-white hover:bg-white/5"
-              }`}
-              style={{
-                background:
-                  tab === "friends"
-                    ? "linear-gradient(135deg, #3b82f6, #6366f1)"
-                    : "transparent",
-              }}
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-            >
-              <Users className="w-5 h-5" />
-              <span>Add Friends</span>
-            </motion.button>
-          </motion.div>
-        </motion.div>
-
-        {/* Right Content Area */}
-        <motion.div
-          initial={{ opacity: 0, x: 20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 0.3 }}
-          className="lg:col-span-3"
-        >
+        {/* Content Area */}
+        <div className="max-w-5xl mx-auto px-6 py-8">
           <AnimatePresence mode="wait">
             {tab === "profile" && (
               <motion.div
@@ -444,275 +486,213 @@ export default function ProfilePage() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.3 }}
-                className="glass-card p-6 md:p-8 relative overflow-hidden"
+                className="glass-card p-8 rounded-2xl"
               >
-                <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-transparent to-indigo-500/5" />
+                <h2 className="text-2xl font-bold text-white mb-6">
+                  Customize Your Profile
+                </h2>
 
-                <div className="relative z-10">
-                  <h2 className="text-2xl md:text-3xl font-bold text-white mb-6">
-                    <span className="bg-gradient-to-r from-blue-400 via-indigo-400 to-teal-400 bg-clip-text text-transparent">
-                      Customize Profile
-                    </span>
-                  </h2>
+                {/* Success/Error Messages */}
+                <AnimatePresence>
+                  {success && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0 }}
+                      className="mb-6 p-4 bg-green-500/20 border border-green-500/50 rounded-lg flex items-center gap-3"
+                    >
+                      <CheckCircle className="w-5 h-5 text-green-400" />
+                      <p className="text-green-300 font-medium">
+                        Profile updated successfully!
+                      </p>
+                    </motion.div>
+                  )}
 
-                  {/* Success Message */}
-                  <AnimatePresence>
-                    {success && (
-                      <motion.div
-                        initial={{ opacity: 0, scale: 0.95, y: -10 }}
-                        animate={{ opacity: 1, scale: 1, y: 0 }}
-                        exit={{ opacity: 0, scale: 0.95 }}
-                        className="mb-6 p-4 rounded-xl border backdrop-blur-sm"
-                        style={{
-                          background: "rgba(16, 185, 129, 0.1)",
-                          borderColor: "rgba(16, 185, 129, 0.2)",
-                        }}
-                      >
-                        <div className="flex items-center gap-3">
-                          <CheckCircle className="w-5 h-5 text-green-400 flex-shrink-0" />
-                          <p className="text-green-300 text-sm font-medium">
-                            Profile updated successfully!
-                          </p>
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
+                  {error && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0 }}
+                      className="mb-6 p-4 bg-red-500/20 border border-red-500/50 rounded-lg flex items-center gap-3"
+                    >
+                      <AlertCircle className="w-5 h-5 text-red-400" />
+                      <p className="text-red-300 font-medium">{error}</p>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
 
-                  {/* Error Message */}
-                  <AnimatePresence>
-                    {error && (
-                      <motion.div
-                        initial={{ opacity: 0, scale: 0.95, y: -10 }}
-                        animate={{ opacity: 1, scale: 1, y: 0 }}
-                        exit={{ opacity: 0, scale: 0.95 }}
-                        className="mb-6 p-4 rounded-xl border backdrop-blur-sm"
-                        style={{
-                          background: "rgba(220, 38, 38, 0.1)",
-                          borderColor: "rgba(220, 38, 38, 0.2)",
-                        }}
-                      >
-                        <div className="flex items-center gap-3">
-                          <AlertCircle className="w-5 h-5 text-red-400 flex-shrink-0" />
-                          <p className="text-red-300 text-sm font-medium">
-                            {error}
-                          </p>
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-
-                  {/* Avatar Selection */}
-                  <div className="space-y-6">
-                    {/* Custom Image Upload */}
+                <div className="space-y-8">
+                  {/* Current Images Preview */}
+                  <div className="grid md:grid-cols-2 gap-6">
                     <div>
-                      <label className="flex items-center gap-2 text-sm font-semibold text-neutral-300 mb-4">
-                        <Upload className="w-5 h-5 text-blue-400" />
-                        Upload Custom Profile Picture
+                      <label className="block text-sm font-semibold text-slate-300 mb-3">
+                        Profile Picture
                       </label>
-
-                      {customImage ? (
-                        <motion.div
-                          initial={{ opacity: 0, scale: 0.9 }}
-                          animate={{ opacity: 1, scale: 1 }}
-                          className="relative p-6 rounded-xl text-center"
-                          style={{
-                            background:
-                              "linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(99, 102, 241, 0.1))",
-                            border: "1px solid rgba(255, 255, 255, 0.1)",
-                          }}
-                        >
-                          <img
-                            src={customImage}
-                            alt="Custom avatar"
-                            className="w-32 h-32 mx-auto rounded-2xl object-cover mb-4 shadow-lg"
-                          />
-                          <motion.button
-                            onClick={handleRemoveImage}
-                            className="px-4 py-2 rounded-lg bg-red-500/20 hover:bg-red-500/30 border border-red-500/50 text-red-300 font-medium transition-all flex items-center gap-2 mx-auto"
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
-                          >
-                            <X className="w-4 h-4" />
-                            Remove Image
-                          </motion.button>
-                        </motion.div>
-                      ) : (
-                        <div className="p-6 rounded-xl bg-white/5 border-2 border-dashed border-white/20 hover:border-blue-400/50 transition-all">
-                          <input
-                            type="file"
-                            accept="image/*"
-                            onChange={handleImageChange}
-                            className="hidden"
-                            id="avatar-upload"
-                          />
-                          <label
-                            htmlFor="avatar-upload"
-                            className="cursor-pointer flex flex-col items-center gap-3"
-                          >
-                            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center">
-                              <Upload className="w-8 h-8 text-white" />
-                            </div>
-                            <div className="text-center">
-                              <p className="text-white font-medium">
-                                Click to upload an image
-                              </p>
-                              <p className="text-neutral-400 text-sm mt-1">
-                                PNG, JPG, GIF up to 5MB
-                              </p>
-                            </div>
-                          </label>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Emoji Avatar Selection */}
-                    {!customImage && (
-                      <div>
-                        <label className="flex items-center gap-2 text-sm font-semibold text-neutral-300 mb-4">
-                          <Smile className="w-5 h-5 text-indigo-400" />
-                          Or Choose an Emoji Avatar
-                        </label>
-                        <div className="grid grid-cols-8 sm:grid-cols-10 md:grid-cols-12 lg:grid-cols-14 gap-2 p-4 rounded-xl bg-white/5 border border-white/10 max-h-64 overflow-y-auto modern-scrollbar">
-                          {AVATARS.map((emoji) => (
+                      <div className="relative h-48 rounded-xl overflow-hidden bg-slate-800 flex items-center justify-center">
+                        {customImage ? (
+                          <>
+                            <img
+                              src={customImage}
+                              alt="Profile preview"
+                              className="w-full h-full object-cover"
+                            />
                             <motion.button
-                              key={emoji}
-                              onClick={() => {
-                                setAvatar(emoji);
-                                setCustomImage(null);
-                              }}
-                              className={`p-3 text-2xl rounded-xl transition-all ${
-                                avatar === emoji
-                                  ? "ring-2 ring-blue-400 scale-110"
-                                  : "hover:bg-white/10"
-                              }`}
-                              style={{
-                                background:
-                                  avatar === emoji
-                                    ? "linear-gradient(135deg, #3b82f6, #6366f1)"
-                                    : "rgba(255, 255, 255, 0.05)",
-                              }}
+                              onClick={handleRemoveImage}
+                              className="absolute top-2 right-2 p-2 bg-red-500/80 hover:bg-red-500 rounded-full"
                               whileHover={{ scale: 1.1 }}
-                              whileTap={{ scale: 0.95 }}
+                              whileTap={{ scale: 0.9 }}
                             >
-                              {emoji}
+                              <X className="w-4 h-4 text-white" />
                             </motion.button>
-                          ))}
-                        </div>
-
-                        {avatar && !customImage && (
-                          <motion.div
-                            initial={{ opacity: 0, scale: 0.9 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            className="mt-4 p-6 rounded-xl text-center"
-                            style={{
-                              background:
-                                "linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(99, 102, 241, 0.1))",
-                              border: "1px solid rgba(255, 255, 255, 0.1)",
-                            }}
-                          >
-                            <p className="text-neutral-400 text-sm mb-3">
-                              Selected Avatar
-                            </p>
-                            <div className="text-6xl">{avatar}</div>
-                          </motion.div>
+                          </>
+                        ) : avatar && !avatar.startsWith("http") ? (
+                          <div className="text-6xl">{avatar}</div>
+                        ) : (
+                          <User className="w-16 h-16 text-slate-600" />
                         )}
                       </div>
-                    )}
+                    </div>
 
-                    {/* Status Selection */}
                     <div>
-                      <label className="flex items-center gap-2 text-sm font-semibold text-neutral-300 mb-4">
-                        <Smile className="w-5 h-5 text-teal-400" />
-                        Your Status
+                      <label className="block text-sm font-semibold text-slate-300 mb-3">
+                        Cover Photo
                       </label>
-                      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                        {STATUS_OPTIONS.map((option) => (
-                          <motion.button
-                            key={option.value}
-                            onClick={() => setStatus(option.value)}
-                            className={`p-4 rounded-xl border transition-all ${
-                              status === option.value
-                                ? "border-blue-400"
-                                : "border-white/10 hover:border-white/20"
-                            }`}
-                            style={{
-                              background:
-                                status === option.value
-                                  ? "rgba(59, 130, 246, 0.1)"
-                                  : "rgba(255, 255, 255, 0.03)",
-                            }}
-                            whileHover={{ scale: 1.02 }}
-                            whileTap={{ scale: 0.98 }}
-                          >
-                            <div className="text-2xl mb-2">{option.icon}</div>
-                            <p
-                              className={`text-sm font-medium ${
-                                status === option.value
-                                  ? "text-white"
-                                  : "text-neutral-400"
-                              }`}
+                      <div className="relative h-48 rounded-xl overflow-hidden bg-slate-800 flex items-center justify-center">
+                        {coverImage ? (
+                          <>
+                            <img
+                              src={coverImage}
+                              alt="Cover preview"
+                              className="w-full h-full object-cover"
+                            />
+                            <motion.button
+                              onClick={handleRemoveCoverImage}
+                              className="absolute top-2 right-2 p-2 bg-red-500/80 hover:bg-red-500 rounded-full"
+                              whileHover={{ scale: 1.1 }}
+                              whileTap={{ scale: 0.9 }}
                             >
-                              {option.label}
-                            </p>
+                              <X className="w-4 h-4 text-white" />
+                            </motion.button>
+                          </>
+                        ) : (
+                          <div className="text-center text-slate-600">
+                            <Upload className="w-12 h-12 mx-auto mb-2" />
+                            <p className="text-sm">No cover photo</p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Emoji Avatar Selection */}
+                  {!customImage && (
+                    <div>
+                      <label className="flex items-center gap-2 text-sm font-semibold text-slate-300 mb-4">
+                        <Smile className="w-5 h-5 text-indigo-400" />
+                        Or Choose an Emoji Avatar
+                      </label>
+                      <div className="grid grid-cols-8 sm:grid-cols-12 md:grid-cols-16 gap-2 p-4 rounded-xl bg-slate-800/50 border border-slate-700 max-h-64 overflow-y-auto">
+                        {AVATARS.map((emoji) => (
+                          <motion.button
+                            key={emoji}
+                            onClick={() => {
+                              setAvatar(emoji);
+                              setCustomImage(null);
+                            }}
+                            className={`p-3 text-2xl rounded-xl transition-all ${
+                              avatar === emoji
+                                ? "ring-2 ring-blue-500 bg-blue-500/20"
+                                : "hover:bg-slate-700"
+                            }`}
+                            whileHover={{ scale: 1.1 }}
+                            whileTap={{ scale: 0.95 }}
+                          >
+                            {emoji}
                           </motion.button>
                         ))}
                       </div>
                     </div>
+                  )}
 
-                    {/* Bio */}
-                    <div>
-                      <label className="block text-sm font-semibold text-neutral-300 mb-3">
-                        📝 About You
-                      </label>
-                      <textarea
-                        value={bio}
-                        onChange={(e) => setBio(e.target.value)}
-                        maxLength={150}
-                        placeholder="Tell everyone about yourself..."
-                        className="modern-input w-full resize-none focus-ring"
-                        rows={4}
-                      />
-                      <p className="text-neutral-500 text-xs mt-2">
-                        {bio.length}/150 characters
-                      </p>
+                  {/* Status Selection */}
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-300 mb-4">
+                      Your Status
+                    </label>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                      {STATUS_OPTIONS.map((option) => (
+                        <motion.button
+                          key={option.value}
+                          onClick={() => setStatus(option.value)}
+                          className={`p-4 rounded-xl border transition-all ${
+                            status === option.value
+                              ? "border-blue-500 bg-blue-500/20"
+                              : "border-slate-700 bg-slate-800/50 hover:bg-slate-700"
+                          }`}
+                          whileHover={{ scale: 1.02 }}
+                          whileTap={{ scale: 0.98 }}
+                        >
+                          <div className="text-2xl mb-2">{option.icon}</div>
+                          <p
+                            className={`text-sm font-medium ${
+                              status === option.value
+                                ? "text-white"
+                                : "text-slate-400"
+                            }`}
+                          >
+                            {option.label}
+                          </p>
+                        </motion.button>
+                      ))}
                     </div>
-
-                    {/* Save Button */}
-                    <motion.button
-                      onClick={handleSave}
-                      disabled={saving}
-                      className="w-full py-4 px-6 rounded-xl font-bold text-white text-lg relative overflow-hidden disabled:opacity-50 disabled:cursor-not-allowed"
-                      style={{
-                        background: "linear-gradient(135deg, #3b82f6, #6366f1)",
-                      }}
-                      whileHover={{ scale: 1.02, y: -1 }}
-                      whileTap={{ scale: 0.98 }}
-                    >
-                      <span className="relative z-10 flex items-center justify-center gap-2">
-                        {saving ? (
-                          <>
-                            <motion.div
-                              className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full"
-                              animate={{ rotate: 360 }}
-                              transition={{
-                                duration: 1,
-                                repeat: Infinity,
-                                ease: "linear",
-                              }}
-                            />
-                            <span>Saving Changes...</span>
-                          </>
-                        ) : (
-                          <>
-                            <Save className="w-5 h-5" />
-                            <span>Save Profile</span>
-                          </>
-                        )}
-                      </span>
-                      <div className="absolute inset-0 bg-gradient-to-r from-blue-600/20 to-indigo-600/20 opacity-0 hover:opacity-100 transition-opacity duration-300" />
-                    </motion.button>
                   </div>
+
+                  {/* Bio */}
+                  <div>
+                    <label className="block text-sm font-semibold text-slate-300 mb-3">
+                      About You
+                    </label>
+                    <textarea
+                      value={bio}
+                      onChange={(e) => setBio(e.target.value)}
+                      maxLength={150}
+                      placeholder="Tell everyone about yourself..."
+                      className="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                      rows={4}
+                    />
+                    <p className="text-slate-500 text-xs mt-2">
+                      {bio.length}/150 characters
+                    </p>
+                  </div>
+
+                  {/* Save Button */}
+                  <motion.button
+                    onClick={handleSave}
+                    disabled={saving}
+                    className="w-full py-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-xl font-bold text-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                  >
+                    {saving ? (
+                      <>
+                        <motion.div
+                          className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full"
+                          animate={{ rotate: 360 }}
+                          transition={{
+                            duration: 1,
+                            repeat: Infinity,
+                            ease: "linear",
+                          }}
+                        />
+                        Saving...
+                      </>
+                    ) : (
+                      <>
+                        <Save className="w-5 h-5" />
+                        Save Profile
+                      </>
+                    )}
+                  </motion.button>
                 </div>
               </motion.div>
             )}
@@ -723,23 +703,16 @@ export default function ProfilePage() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.3 }}
-                className="glass-card p-6 md:p-8 relative overflow-hidden"
+                className="glass-card p-8 rounded-2xl"
               >
-                <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-transparent to-indigo-500/5" />
-
-                <div className="relative z-10">
-                  <h2 className="text-2xl md:text-3xl font-bold text-white mb-6">
-                    <span className="bg-gradient-to-r from-blue-400 via-indigo-400 to-teal-400 bg-clip-text text-transparent">
-                      Add Friends
-                    </span>
-                  </h2>
-                  <AddFriend userId={user.id} />
-                </div>
+                <h2 className="text-2xl font-bold text-white mb-6">
+                  Add Friends
+                </h2>
+                <AddFriend userId={user.id} />
               </motion.div>
             )}
           </AnimatePresence>
-        </motion.div>
+        </div>
       </div>
     </div>
   );

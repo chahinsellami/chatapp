@@ -1,7 +1,7 @@
 /**
  * Migration script to update avatar column from VARCHAR(255) to TEXT
  * This allows storing Base64 encoded images which can be 50KB+ in size
- * 
+ *
  * Run with: npx tsx scripts/update-avatar-column.ts
  */
 
