@@ -8,7 +8,7 @@ import { pool } from "@/lib/postgres";
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: { userId: string } }
+  { params }: { params: Promise<{ userId: string }> }
 ) {
   try {
     // Verify authentication
@@ -24,7 +24,7 @@ export async function GET(
       return NextResponse.json({ error: "Invalid token" }, { status: 401 });
     }
 
-    const { userId } = params;
+    const { userId } = await params;
 
     // Fetch user profile from database
     const result = await pool.query(
