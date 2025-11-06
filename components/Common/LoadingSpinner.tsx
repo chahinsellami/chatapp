@@ -22,17 +22,14 @@ export default function LoadingSpinner({
   message = "Loading...",
 }: LoadingSpinnerProps) {
   return (
-    <div className="min-h-screen flex items-center justify-center floating-particles bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
+    <div className="min-h-screen flex items-center justify-center bg-black">
       <motion.div
         className="text-center"
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
       >
         <motion.div
-          className="w-20 h-20 mx-auto mb-6 rounded-2xl flex items-center justify-center shadow-2xl"
-          style={{
-            background: "linear-gradient(135deg, #3b82f6, #6366f1)",
-          }}
+          className="w-20 h-20 mx-auto mb-6 rounded-2xl flex items-center justify-center shadow-2xl bg-blue-600"
           animate={{ rotate: 360 }}
           transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
         >

@@ -34,14 +34,11 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden floating-particles">
+    <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
       {/* Animated background elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <motion.div
-          className="absolute top-0 left-1/4 w-96 h-96 rounded-full opacity-10"
-          style={{
-            background: "linear-gradient(135deg, #a855f7, #f97316)",
-          }}
+          className="absolute top-0 left-1/4 w-96 h-96 rounded-full opacity-5 bg-blue-600"
           animate={{
             scale: [1, 1.2, 1],
             rotate: [0, 180, 360],
@@ -53,10 +50,7 @@ export default function LoginPage() {
           }}
         />
         <motion.div
-          className="absolute bottom-0 right-1/4 w-96 h-96 rounded-full opacity-10"
-          style={{
-            background: "linear-gradient(135deg, #dc2626, #a855f7)",
-          }}
+          className="absolute bottom-0 right-1/4 w-96 h-96 rounded-full opacity-5 bg-blue-700"
           animate={{
             scale: [1.2, 1, 1.2],
             rotate: [360, 180, 0],
@@ -68,14 +62,13 @@ export default function LoginPage() {
           }}
         />
         <motion.div
-          className="absolute top-1/2 left-1/2 w-80 h-80 rounded-full opacity-5"
+          className="absolute top-1/2 left-1/2 w-80 h-80 rounded-full opacity-3 bg-blue-800"
           style={{
-            background: "linear-gradient(135deg, #f97316, #dc2626)",
             transform: "translate(-50%, -50%)",
           }}
           animate={{
             scale: [1, 1.3, 1],
-            opacity: [0.05, 0.1, 0.05],
+            opacity: [0.03, 0.05, 0.03],
           }}
           transition={{
             duration: 15,
@@ -214,10 +207,7 @@ export default function LoginPage() {
             <motion.button
               type="submit"
               disabled={isLoading}
-              className="w-full py-4 px-6 rounded-xl font-bold text-white text-base relative overflow-hidden disabled:opacity-50 disabled:cursor-not-allowed"
-              style={{
-                background: "linear-gradient(135deg, #a855f7, #f97316)",
-              }}
+              className="w-full py-4 px-6 rounded-xl font-bold text-white text-base bg-blue-600 hover:bg-blue-700 transition-colors relative overflow-hidden disabled:opacity-50 disabled:cursor-not-allowed"
               whileHover={{ scale: 1.02, y: -1 }}
               whileTap={{ scale: 0.98 }}
               initial={{ opacity: 0, y: 20 }}

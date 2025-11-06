@@ -51,13 +51,13 @@ export default function Home() {
    * Shows a centered spinner with loading text
    */
   return (
-    <div className="min-h-screen bg-[#36393F] flex items-center justify-center">
+    <div className="min-h-screen bg-black flex items-center justify-center">
       <div className="text-center">
-        {/* Animated loading spinner with purple accent color */}
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#5B65F5] mx-auto mb-4"></div>
+        {/* Animated loading spinner with blue accent color */}
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-600 mx-auto mb-4"></div>
 
         {/* Loading text */}
-        <p className="text-[#DCDDDE]">Loading...</p>
+        <p className="text-white">Loading...</p>
       </div>
     </div>
   );

@@ -159,9 +159,6 @@ export default function AddFriend({ userId, onFriendAdded }: AddFriendProps) {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
     >
-      {/* Animated background gradient */}
-      <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 via-transparent to-orange-500/5" />
-
       {/* Header */}
       <motion.div
         className="flex items-center gap-3 mb-6 relative z-10"
@@ -170,10 +167,7 @@ export default function AddFriend({ userId, onFriendAdded }: AddFriendProps) {
         transition={{ delay: 0.2 }}
       >
         <motion.div
-          className="w-10 h-10 rounded-xl flex items-center justify-center"
-          style={{
-            background: "linear-gradient(135deg, #a855f7, #f97316)",
-          }}
+          className="w-10 h-10 rounded-xl flex items-center justify-center bg-blue-600"
           whileHover={{ scale: 1.05 }}
         >
           <UserPlus className="w-5 h-5 text-white" />
@@ -259,10 +253,7 @@ export default function AddFriend({ userId, onFriendAdded }: AddFriendProps) {
               key="searching"
             >
               <motion.div
-                className="w-12 h-12 rounded-xl flex items-center justify-center mb-4"
-                style={{
-                  background: "linear-gradient(135deg, #a855f7, #f97316)",
-                }}
+                className="w-12 h-12 rounded-xl flex items-center justify-center mb-4 bg-blue-600"
                 animate={{ rotate: 360 }}
                 transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
               >
@@ -291,10 +282,7 @@ export default function AddFriend({ userId, onFriendAdded }: AddFriendProps) {
                 >
                   <div className="flex items-center gap-4">
                     <motion.div
-                      className="w-12 h-12 rounded-xl overflow-hidden flex items-center justify-center flex-shrink-0"
-                      style={{
-                        background: "linear-gradient(135deg, #a855f7, #f97316)",
-                      }}
+                      className="w-12 h-12 rounded-xl overflow-hidden flex items-center justify-center flex-shrink-0 bg-blue-600"
                       whileHover={{ scale: 1.05 }}
                     >
                       {user.avatar?.startsWith("/avatars/") ? (
@@ -331,12 +319,9 @@ export default function AddFriend({ userId, onFriendAdded }: AddFriendProps) {
                     <motion.button
                       onClick={() => handleSendFriendRequest(user.id)}
                       disabled={sentRequests.has(user.id) || loading}
-                      className="px-4 py-2 rounded-lg font-medium text-white text-sm relative overflow-hidden disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
-                      style={{
-                        background: sentRequests.has(user.id)
-                          ? "linear-gradient(135deg, #10b981, #059669)"
-                          : "linear-gradient(135deg, #a855f7, #f97316)",
-                      }}
+                      className={`px-4 py-2 rounded-lg font-medium text-white text-sm relative overflow-hidden disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 ${
+                        sentRequests.has(user.id) ? 'bg-green-600' : 'bg-blue-600 hover:bg-blue-700'
+                      }`}
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
                     >
@@ -377,10 +362,7 @@ export default function AddFriend({ userId, onFriendAdded }: AddFriendProps) {
               key="no-results"
             >
               <motion.div
-                className="w-16 h-16 rounded-2xl flex items-center justify-center mb-4"
-                style={{
-                  background: "linear-gradient(135deg, #64748b, #475569)",
-                }}
+                className="w-16 h-16 rounded-2xl flex items-center justify-center mb-4 bg-neutral-800"
                 animate={{ rotate: [0, 5, -5, 0] }}
                 transition={{ duration: 2, repeat: Infinity }}
               >
@@ -402,10 +384,7 @@ export default function AddFriend({ userId, onFriendAdded }: AddFriendProps) {
               key="empty"
             >
               <motion.div
-                className="w-16 h-16 rounded-2xl flex items-center justify-center mb-4"
-                style={{
-                  background: "linear-gradient(135deg, #a855f7, #f97316)",
-                }}
+                className="w-16 h-16 rounded-2xl flex items-center justify-center mb-4 bg-blue-600"
                 animate={{ scale: [1, 1.05, 1] }}
                 transition={{ duration: 2, repeat: Infinity }}
               >

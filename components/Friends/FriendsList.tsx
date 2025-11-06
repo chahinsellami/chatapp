@@ -237,8 +237,7 @@ export default function FriendsList({
         <motion.div className="text-center">
           {/* Rotating icon spinner */}
           <motion.div
-            className="w-12 h-12 mx-auto mb-4 rounded-xl flex items-center justify-center"
-            style={{ background: "linear-gradient(135deg, #a855f7, #f97316)" }}
+            className="w-12 h-12 mx-auto mb-4 rounded-xl flex items-center justify-center bg-blue-600"
             animate={{ rotate: 360 }}
             transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
           >
@@ -337,13 +336,7 @@ export default function FriendsList({
                 Pending Requests
               </span>
               {/* Badge showing count */}
-              <span
-                className="px-2 py-1 rounded-full text-xs font-bold"
-                style={{
-                  background: "linear-gradient(135deg, #a855f7, #f97316)",
-                  color: "white",
-                }}
-              >
+              <span className="px-2 py-1 rounded-full text-xs font-bold bg-blue-600 text-white">
                 {pendingRequests.length}
               </span>
             </div>
@@ -373,11 +366,7 @@ export default function FriendsList({
                     <div className="flex items-center gap-3 mb-3">
                       {/* Avatar */}
                       <motion.div
-                        className="w-10 h-10 rounded-xl overflow-hidden flex items-center justify-center flex-shrink-0"
-                        style={{
-                          background:
-                            "linear-gradient(135deg, #64748b, #475569)",
-                        }}
+                        className="w-10 h-10 rounded-xl overflow-hidden flex items-center justify-center flex-shrink-0 bg-neutral-700"
                         whileHover={{ scale: 1.05 }}
                       >
                         {request.avatar?.startsWith("/avatars/") ? (
@@ -412,11 +401,7 @@ export default function FriendsList({
                       <motion.button
                         onClick={() => handleAcceptRequest(request.id)}
                         disabled={actionLoading === request.id}
-                        className="flex-1 py-2 px-4 rounded-lg font-medium text-white text-sm relative overflow-hidden disabled:opacity-50 disabled:cursor-not-allowed"
-                        style={{
-                          background:
-                            "linear-gradient(135deg, #10b981, #059669)",
-                        }}
+                        className="flex-1 py-2 px-4 rounded-lg font-medium text-white text-sm bg-green-600 hover:bg-green-700 transition-colors relative overflow-hidden disabled:opacity-50 disabled:cursor-not-allowed"
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                       >
@@ -445,11 +430,7 @@ export default function FriendsList({
                       <motion.button
                         onClick={() => handleRejectRequest(request.id)}
                         disabled={actionLoading === request.id}
-                        className="flex-1 py-2 px-4 rounded-lg font-medium text-white text-sm relative overflow-hidden disabled:opacity-50 disabled:cursor-not-allowed"
-                        style={{
-                          background:
-                            "linear-gradient(135deg, #ef4444, #dc2626)",
-                        }}
+                        className="flex-1 py-2 px-4 rounded-lg font-medium text-white text-sm bg-red-600 hover:bg-red-700 transition-colors relative overflow-hidden disabled:opacity-50 disabled:cursor-not-allowed"
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                       >
@@ -495,10 +476,7 @@ export default function FriendsList({
             >
               {/* Animated icon */}
               <motion.div
-                className="w-16 h-16 rounded-2xl flex items-center justify-center mb-4"
-                style={{
-                  background: "linear-gradient(135deg, #64748b, #475569)",
-                }}
+                className="w-16 h-16 rounded-2xl flex items-center justify-center mb-4 bg-neutral-800"
                 animate={{ rotate: [0, 5, -5, 0] }}
                 transition={{ duration: 2, repeat: Infinity }}
               >
