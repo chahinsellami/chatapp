@@ -508,9 +508,7 @@ export default function FriendsList({
                     whileHover={{ scale: 1.1 }}
                   >
                     {/* Avatar */}
-                    <div
-                      className="w-12 h-12 rounded-xl overflow-hidden flex items-center justify-center bg-blue-600"
-                    >
+                    <div className="w-12 h-12 rounded-xl overflow-hidden flex items-center justify-center bg-blue-600">
                       {friend.avatar?.startsWith("/avatars/") ? (
                         <img
                           src={friend.avatar}

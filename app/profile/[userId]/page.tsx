@@ -14,6 +14,8 @@ import Avatar from "@/components/Common/Avatar";
 import Badge from "@/components/Common/Badge";
 import Button from "@/components/Common/Button";
 import Card from "@/components/Common/Card";
+import { useAuth } from "@/context/AuthContext";
+import { useSocket } from "@/lib/useSocket";
 
 interface UserProfile {
   id: string;
@@ -30,13 +32,18 @@ export default function UserProfilePage() {
   const router = useRouter();
   const params = useParams();
   const userId = params.userId as string;
-  
+  const { user: currentUser } = useAuth();
+
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [friendRequestSent, setFriendRequestSent] = useState(false);
   const [sendingRequest, setSendingRequest] = useState(false);
   const [isFriend, setIsFriend] = useState(false);
+
+  // Get online status from Socket.IO
+  const { onlineUsers } = useSocket(currentUser?.id || "");
+  const isOnline = onlineUsers.has(userId);
 
   useEffect(() => {
     fetchProfile();
@@ -47,7 +54,7 @@ export default function UserProfilePage() {
     try {
       setLoading(true);
       const token = localStorage.getItem("auth_token");
-      
+
       if (!token) {
         router.push("/login");
         return;
@@ -108,14 +115,17 @@ export default function UserProfilePage() {
 
       setFriendRequestSent(true);
     } catch (err) {
-      alert(err instanceof Error ? err.message : "Error sending friend request");
+      alert(
+        err instanceof Error ? err.message : "Error sending friend request"
+      );
     } finally {
       setSendingRequest(false);
     }
   };
 
   const handleMessage = () => {
-    router.push(`/messenger?friendId=${userId}`);
+    // Redirect to messenger with the friend selected
+    router.push(`/messenger?friend=${userId}`);
   };
 
   if (loading) {
@@ -139,7 +149,9 @@ export default function UserProfilePage() {
         <div className="flex items-center justify-center h-[calc(100vh-64px)]">
           <Card className="max-w-md">
             <div className="text-center">
-              <p className="text-red-500 mb-4">{error || "Profile not found"}</p>
+              <p className="text-red-500 mb-4">
+                {error || "Profile not found"}
+              </p>
               <Button onClick={() => router.back()}>Go Back</Button>
             </div>
           </Card>
@@ -205,12 +217,21 @@ export default function UserProfilePage() {
               <h1 className="text-3xl font-bold text-white mb-2">
                 {profile.username}
               </h1>
-              <div className="flex items-center justify-center md:justify-start gap-2 mb-4">
-                <Badge variant="info" size="sm">
-                  {profile.status}
-                </Badge>
+              <div className="flex items-center justify-center md:justify-start gap-3 mb-4">
+                <div className="flex items-center gap-2">
+                  <div
+                    className={`w-3 h-3 rounded-full ${
+                      isOnline ? "bg-green-500" : "bg-gray-500"
+                    }`}
+                  />
+                  <span className="text-neutral-300 text-sm font-medium">
+                    {isOnline ? "online" : "offline"}
+                  </span>
+                </div>
+                <span className="text-neutral-500">•</span>
                 <span className="text-neutral-400 text-sm">
-                  Member since {new Date(profile.created_at).toLocaleDateString()}
+                  Member since{" "}
+                  {new Date(profile.created_at).toLocaleDateString()}
                 </span>
               </div>
               {profile.bio && (

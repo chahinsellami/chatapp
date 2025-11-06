@@ -320,7 +320,9 @@ export default function AddFriend({ userId, onFriendAdded }: AddFriendProps) {
                       onClick={() => handleSendFriendRequest(user.id)}
                       disabled={sentRequests.has(user.id) || loading}
                       className={`px-4 py-2 rounded-lg font-medium text-white text-sm relative overflow-hidden disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 ${
-                        sentRequests.has(user.id) ? 'bg-green-600' : 'bg-blue-600 hover:bg-blue-700'
+                        sentRequests.has(user.id)
+                          ? "bg-green-600"
+                          : "bg-blue-600 hover:bg-blue-700"
                       }`}
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}

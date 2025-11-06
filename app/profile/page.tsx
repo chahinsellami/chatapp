@@ -13,7 +13,6 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
-import AddFriend from "@/components/Friends/AddFriend";
 import FriendsList from "@/components/Friends/FriendsList";
 import NavigationBar from "@/components/Layout/NavigationBar";
 import ProfileHeader from "@/components/Profile/ProfileHeader";
@@ -581,27 +580,15 @@ export default function ProfilePage() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
-                className="space-y-6"
               >
                 {/* Friends List */}
                 <div className="glass-card p-6 rounded-2xl">
-                  <h2 className="text-2xl font-bold text-white mb-6">
-                    Your Friends
-                  </h2>
                   <FriendsList
                     userId={user.id}
                     onSelectFriend={(friendId) => {
                       router.push(`/messenger?friend=${friendId}`);
                     }}
                   />
-                </div>
-
-                {/* Add Friends Section */}
-                <div className="glass-card p-6 rounded-2xl">
-                  <h2 className="text-2xl font-bold text-white mb-6">
-                    Add New Friends
-                  </h2>
-                  <AddFriend userId={user.id} />
                 </div>
               </motion.div>
             )}

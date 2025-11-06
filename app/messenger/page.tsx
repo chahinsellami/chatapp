@@ -19,7 +19,7 @@
  */
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import FriendsList from "@/components/Friends/FriendsList";
 import DirectMessages from "@/components/Friends/DirectMessages";
@@ -48,6 +48,7 @@ interface Friend {
  */
 export default function MessengerPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { user, isLoading, logout } = useAuth();
 
   // Selected friend state for displaying chat
@@ -62,6 +63,31 @@ export default function MessengerPage() {
       router.push("/login");
     }
   }, [isLoading, user, router]);
+
+  // Handle friend parameter from URL
+  useEffect(() => {
+    const friendId = searchParams.get("friend");
+    if (friendId && user) {
+      // Fetch friend data and select them
+      fetch(`/api/users/${friendId}`, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.id) {
+            handleSelectFriend(data.id, {
+              id: data.id,
+              username: data.username,
+              avatar: data.avatar,
+              status: "online",
+            });
+          }
+        })
+        .catch((err) => console.error("Error fetching friend:", err));
+    }
+  }, [searchParams, user]);
 
   const handleSelectFriend = (friendId: string, friendData?: Friend) => {
     setSelectedFriendId(friendId);
@@ -133,7 +159,9 @@ export default function MessengerPage() {
               <h1 className="text-white font-bold text-base tracking-tight">
                 WebChat
               </h1>
-              <p className="text-xs text-neutral-500 truncate">{user.username}</p>
+              <p className="text-xs text-neutral-500 truncate">
+                {user.username}
+              </p>
             </div>
           </div>
 
@@ -204,9 +232,7 @@ export default function MessengerPage() {
               {/* Header */}
               <div className="h-16 border-b border-neutral-800 bg-neutral-950/80 backdrop-blur-xl flex items-center justify-between px-5">
                 <div className="flex items-center gap-3">
-                  <motion.div
-                    className="w-10 h-10 rounded-xl flex items-center justify-center bg-blue-600"
-                  >
+                  <motion.div className="w-10 h-10 rounded-xl flex items-center justify-center bg-blue-600">
                     <MessageCircle className="w-5 h-5 text-white" />
                   </motion.div>
                   <div>
@@ -363,7 +389,8 @@ export default function MessengerPage() {
                 animate={{ opacity: 1 }}
                 transition={{ delay: 1.1 }}
               >
-                Select a friend from the sidebar to start messaging,<br />
+                Select a friend from the sidebar to start messaging,
+                <br />
                 or find new friends to connect with.
               </motion.p>
 

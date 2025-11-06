@@ -40,7 +40,10 @@ export default function NavigationBar({ currentPage }: NavigationBarProps) {
   // Close search results when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
+      if (
+        searchRef.current &&
+        !searchRef.current.contains(event.target as Node)
+      ) {
         setShowResults(false);
       }
     };
@@ -52,7 +55,7 @@ export default function NavigationBar({ currentPage }: NavigationBarProps) {
   // Search for users
   const handleSearch = async (query: string) => {
     setSearchQuery(query);
-    
+
     if (query.trim().length < 2) {
       setSearchResults([]);
       setShowResults(false);
@@ -62,9 +65,12 @@ export default function NavigationBar({ currentPage }: NavigationBarProps) {
     try {
       setSearching(true);
       const token = localStorage.getItem("auth_token");
-      const res = await fetch(`/api/users/search?q=${encodeURIComponent(query)}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await fetch(
+        `/api/users/search?q=${encodeURIComponent(query)}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
 
       if (res.ok) {
         const data = await res.json();
@@ -93,7 +99,7 @@ export default function NavigationBar({ currentPage }: NavigationBarProps) {
     <div className="bg-neutral-950 border-b border-neutral-800 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-6 py-3 flex justify-between items-center gap-4">
         <h1 className="text-xl font-bold text-white">WebChat</h1>
-        
+
         {/* Search Bar */}
         <div className="flex-1 max-w-md relative" ref={searchRef}>
           <div className="relative">
@@ -144,7 +150,11 @@ export default function NavigationBar({ currentPage }: NavigationBarProps) {
                       >
                         <div className="w-10 h-10 rounded-full bg-blue-600 flex items-center justify-center flex-shrink-0">
                           {user.avatar?.startsWith("/avatars/") ? (
-                            <img src={user.avatar} alt={user.username} className="w-full h-full rounded-full object-cover" />
+                            <img
+                              src={user.avatar}
+                              alt={user.username}
+                              className="w-full h-full rounded-full object-cover"
+                            />
                           ) : (
                             <span className="text-white font-bold">
                               {user.avatar || user.username[0].toUpperCase()}
@@ -152,8 +162,12 @@ export default function NavigationBar({ currentPage }: NavigationBarProps) {
                           )}
                         </div>
                         <div className="flex-1 text-left">
-                          <p className="text-white font-medium">{user.username}</p>
-                          <p className="text-neutral-400 text-sm capitalize">{user.status}</p>
+                          <p className="text-white font-medium">
+                            {user.username}
+                          </p>
+                          <p className="text-neutral-400 text-sm capitalize">
+                            {user.status}
+                          </p>
                         </div>
                       </motion.button>
                     ))}

@@ -643,7 +643,7 @@ export default function DirectMessages({
                 {/* Avatar */}
                 <motion.div
                   className={`w-7 h-7 md:w-8 md:h-8 rounded-lg overflow-hidden flex items-center justify-center flex-shrink-0 shadow-md ${
-                    isOwnMessage ? 'bg-blue-600' : 'bg-neutral-700'
+                    isOwnMessage ? "bg-blue-600" : "bg-neutral-700"
                   }`}
                   whileHover={{ scale: 1.1 }}
                 >
@@ -675,7 +675,9 @@ export default function DirectMessages({
                 {/* Message bubble */}
                 <motion.div
                   className={`max-w-[75%] md:max-w-md px-3 md:px-4 py-2 md:py-2.5 rounded-2xl shadow-lg ${
-                    isOwnMessage ? "rounded-br-sm bg-blue-600 border border-blue-500/30" : "rounded-bl-sm bg-neutral-800/60 border border-neutral-700/15"
+                    isOwnMessage
+                      ? "rounded-br-sm bg-blue-600 border border-blue-500/30"
+                      : "rounded-bl-sm bg-neutral-800/60 border border-neutral-700/15"
                   }`}
                   style={{
                     backdropFilter: "blur(10px)",
