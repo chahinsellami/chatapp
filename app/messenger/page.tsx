@@ -18,7 +18,7 @@
  * - Fixed sidebar visibility on desktop
  */
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import FriendsList from "@/components/Friends/FriendsList";
@@ -46,7 +46,7 @@ interface Friend {
 /**
  * Messenger Page Component
  */
-export default function MessengerPage() {
+function MessengerContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { user, isLoading, logout } = useAuth();
@@ -436,5 +436,39 @@ export default function MessengerPage() {
         )}
       </motion.div>
     </div>
+  );
+}
+
+export default function MessengerPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex items-center justify-center h-screen bg-black">
+          <motion.div
+            className="text-center"
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5 }}
+          >
+            <motion.div
+              className="w-16 h-16 mx-auto mb-4 rounded-2xl flex items-center justify-center bg-blue-600"
+              animate={{ rotate: 360 }}
+              transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+            >
+              <MessageCircle className="w-8 h-8 text-white" />
+            </motion.div>
+            <motion.p
+              className="text-neutral-400 text-lg font-medium"
+              animate={{ opacity: [0.5, 1, 0.5] }}
+              transition={{ duration: 1.5, repeat: Infinity }}
+            >
+              Loading WebChat...
+            </motion.p>
+          </motion.div>
+        </div>
+      }
+    >
+      <MessengerContent />
+    </Suspense>
   );
 }
