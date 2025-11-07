@@ -103,7 +103,11 @@ export default function ProfileHeader({
                     title={status}
                   />
                 </div>
-                {bio && <p className="text-slate-300 text-xs sm:text-sm mt-1">"{bio}"</p>}
+                {bio && (
+                  <p className="text-slate-300 text-xs sm:text-sm mt-1">
+                    "{bio}"
+                  </p>
+                )}
               </div>
             </div>
           </div>

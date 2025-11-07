@@ -98,7 +98,9 @@ export default function NavigationBar({ currentPage }: NavigationBarProps) {
   return (
     <div className="bg-neutral-950 border-b border-neutral-800 sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-3 sm:px-6 py-3 flex justify-between items-center gap-2 sm:gap-4">
-        <h1 className="text-lg sm:text-xl font-bold text-white whitespace-nowrap">WebChat</h1>
+        <h1 className="text-lg sm:text-xl font-bold text-white whitespace-nowrap">
+          WebChat
+        </h1>
 
         {/* Search Bar */}
         <div className="flex-1 max-w-md relative" ref={searchRef}>
@@ -179,7 +181,9 @@ export default function NavigationBar({ currentPage }: NavigationBarProps) {
                       <Search className="w-12 h-12 mx-auto mb-3 opacity-50" />
                     </div>
                     <p className="text-neutral-400 text-sm">No users found</p>
-                    <p className="text-neutral-500 text-xs mt-1">Try a different search term</p>
+                    <p className="text-neutral-500 text-xs mt-1">
+                      Try a different search term
+                    </p>
                   </div>
                 )}
               </motion.div>

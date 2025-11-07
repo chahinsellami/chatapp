@@ -118,6 +118,8 @@ export default function ProfilePage() {
   const [postImage, setPostImage] = useState<File | null>(null);
   const [postImagePreview, setPostImagePreview] = useState<string | null>(null);
   const [posting, setPosting] = useState(false);
+  const [posts, setPosts] = useState<any[]>([]);
+  const [loadingPosts, setLoadingPosts] = useState(false);
 
   /**
    * Initialize profile data from user context
@@ -147,6 +149,47 @@ export default function ProfilePage() {
   useEffect(() => {
     if (!isLoading && !user) router.push("/login");
   }, [isLoading, user, router]);
+
+  /**
+   * Fetch user's posts
+   */
+  const fetchPosts = async () => {
+    try {
+      setLoadingPosts(true);
+      console.log("📥 Fetching posts...");
+      const token = localStorage.getItem("auth_token");
+
+      const response = await fetch("/api/posts/user", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      console.log("📡 Fetch posts response status:", response.status);
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log("📡 Fetch posts response data:", data);
+        console.log("📊 Number of posts:", data.posts?.length || 0);
+        setPosts(data.posts || []);
+      } else {
+        console.error("❌ Failed to fetch posts, status:", response.status);
+      }
+    } catch (error) {
+      console.error("❌ Error fetching posts:", error);
+    } finally {
+      setLoadingPosts(false);
+    }
+  };
+
+  /**
+   * Load posts when component mounts or tab changes to posts
+   */
+  useEffect(() => {
+    if (user && tab === "posts") {
+      fetchPosts();
+    }
+  }, [user, tab]);
 
   /**
    * Handle image file selection
@@ -316,9 +359,11 @@ export default function ProfilePage() {
     try {
       setPosting(true);
       setError("");
+      console.log("🚀 Creating post...");
 
       const token = localStorage.getItem("auth_token");
       if (!token) {
+        console.error("❌ No auth token found");
         router.push("/login");
         return;
       }
@@ -326,6 +371,7 @@ export default function ProfilePage() {
       // Upload image to Cloudinary if present
       let imageUrl = null;
       if (postImage) {
+        console.log("📸 Uploading image...");
         const formData = new FormData();
         formData.append("image", postImage);
 
@@ -338,10 +384,17 @@ export default function ProfilePage() {
         if (uploadRes.ok) {
           const uploadData = await uploadRes.json();
           imageUrl = uploadData.imageUrl;
+          console.log("✅ Image uploaded:", imageUrl);
+        } else {
+          console.error("❌ Image upload failed");
         }
       }
 
       // Create post
+      console.log("📝 Sending post request...", {
+        content: postContent.trim(),
+        imageUrl,
+      });
       const res = await fetch("/api/posts", {
         method: "POST",
         headers: {
@@ -354,18 +407,27 @@ export default function ProfilePage() {
         }),
       });
 
+      console.log("📡 Post response status:", res.status);
+      const responseData = await res.json();
+      console.log("📡 Post response data:", responseData);
+
       if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.error || "Failed to create post");
+        throw new Error(responseData.error || "Failed to create post");
       }
 
+      console.log("✅ Post created successfully!");
       setSuccess(true);
       setPostContent("");
       setPostImage(null);
       setPostImagePreview(null);
 
+      // Refresh posts list
+      console.log("🔄 Refreshing posts...");
+      await fetchPosts();
+
       setTimeout(() => setSuccess(false), 3000);
     } catch (err) {
+      console.error("❌ Error creating post:", err);
       setError(err instanceof Error ? err.message : "Error creating post");
     } finally {
       setPosting(false);
@@ -506,18 +568,86 @@ export default function ProfilePage() {
                   </div>
                 </div>
 
-                {/* Posts Feed - Placeholder */}
-                <div className="glass-card p-6 sm:p-8 rounded-2xl text-center">
-                  <div className="text-slate-400">
-                    <MessageCircle className="w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-4 opacity-50" />
-                    <h3 className="text-lg sm:text-xl font-semibold text-white mb-2">
-                      No posts yet
-                    </h3>
-                    <p className="text-sm sm:text-base text-slate-400">
-                      Share your first post with your friends!
-                    </p>
+                {/* Posts Feed */}
+                {loadingPosts ? (
+                  <div className="glass-card p-6 sm:p-8 rounded-2xl text-center">
+                    <div className="text-slate-400">Loading posts...</div>
                   </div>
-                </div>
+                ) : posts.length === 0 ? (
+                  <div className="glass-card p-6 sm:p-8 rounded-2xl text-center">
+                    <div className="text-slate-400">
+                      <MessageCircle className="w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-4 opacity-50" />
+                      <h3 className="text-lg sm:text-xl font-semibold text-white mb-2">
+                        No posts yet
+                      </h3>
+                      <p className="text-sm sm:text-base text-slate-400">
+                        Share your first post with your friends!
+                      </p>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {posts.map((post) => (
+                      <motion.div
+                        key={post.id}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="glass-card p-4 sm:p-6 rounded-2xl"
+                      >
+                        {/* Post Header */}
+                        <div className="flex items-center gap-3 mb-4">
+                          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-xl sm:text-2xl">
+                            {post.avatar}
+                          </div>
+                          <div className="flex-1">
+                            <h4 className="font-semibold text-white text-sm sm:text-base">
+                              {post.username}
+                            </h4>
+                            <p className="text-xs sm:text-sm text-slate-400">
+                              {new Date(post.created_at).toLocaleDateString()}{" "}
+                              at{" "}
+                              {new Date(post.created_at).toLocaleTimeString(
+                                [],
+                                {
+                                  hour: "2-digit",
+                                  minute: "2-digit",
+                                }
+                              )}
+                            </p>
+                          </div>
+                        </div>
+
+                        {/* Post Content */}
+                        {post.content && (
+                          <p className="text-white mb-4 text-sm sm:text-base whitespace-pre-wrap">
+                            {post.content}
+                          </p>
+                        )}
+
+                        {/* Post Image */}
+                        {post.image && (
+                          <img
+                            src={post.image}
+                            alt="Post"
+                            className="w-full rounded-lg mb-4 max-h-96 object-cover"
+                          />
+                        )}
+
+                        {/* Post Actions */}
+                        <div className="flex items-center gap-4 pt-4 border-t border-slate-700">
+                          <button className="flex items-center gap-2 text-slate-400 hover:text-blue-500 transition-colors text-sm">
+                            <span>❤️</span>
+                            <span>{post.likes || 0}</span>
+                          </button>
+                          <button className="flex items-center gap-2 text-slate-400 hover:text-green-500 transition-colors text-sm">
+                            <span>💬</span>
+                            <span>Comment</span>
+                          </button>
+                        </div>
+                      </motion.div>
+                    ))}
+                  </div>
+                )}
               </motion.div>
             )}
 

@@ -235,7 +235,9 @@ export default function UserProfilePage() {
                 </span>
               </div>
               {profile.bio && (
-                <p className="text-neutral-300 max-w-2xl text-sm sm:text-base">{profile.bio}</p>
+                <p className="text-neutral-300 max-w-2xl text-sm sm:text-base">
+                  {profile.bio}
+                </p>
               )}
             </div>
 
