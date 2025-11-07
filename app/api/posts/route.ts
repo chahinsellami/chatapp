@@ -79,6 +79,8 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { content, imageUrl } = body;
 
+    console.log("📥 Received post data:", { content, imageUrl });
+
     if (!content && !imageUrl) {
       return NextResponse.json(
         { error: "Post must have content or an image" },
@@ -93,12 +95,21 @@ export async function POST(request: NextRequest) {
       RETURNING *
     `;
 
+    console.log("💾 Inserting into database:", {
+      postId,
+      userId: decoded.userId,
+      content: content || null,
+      image: imageUrl || null,
+    });
+
     const result = await pool.query(query, [
       postId,
       decoded.userId,
       content || null,
       imageUrl || null,
     ]);
+
+    console.log("✅ Database insert result:", result.rows[0]);
 
     // Get user info for the response
     const userQuery = `SELECT username, avatar FROM users WHERE id = $1`;

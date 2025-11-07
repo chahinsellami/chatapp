@@ -156,7 +156,6 @@ export default function ProfilePage() {
   const fetchPosts = async () => {
     try {
       setLoadingPosts(true);
-      console.log("📥 Fetching posts...");
       const token = localStorage.getItem("auth_token");
 
       const response = await fetch("/api/posts/user", {
@@ -165,15 +164,9 @@ export default function ProfilePage() {
         },
       });
 
-      console.log("📡 Fetch posts response status:", response.status);
-
       if (response.ok) {
         const data = await response.json();
-        console.log("📡 Fetch posts response data:", data);
-        console.log("📊 Number of posts:", data.posts?.length || 0);
         setPosts(data.posts || []);
-      } else {
-        console.error("❌ Failed to fetch posts, status:", response.status);
       }
     } catch (error) {
       console.error("❌ Error fetching posts:", error);
@@ -359,11 +352,9 @@ export default function ProfilePage() {
     try {
       setPosting(true);
       setError("");
-      console.log("🚀 Creating post...");
 
       const token = localStorage.getItem("auth_token");
       if (!token) {
-        console.error("❌ No auth token found");
         router.push("/login");
         return;
       }
@@ -371,7 +362,6 @@ export default function ProfilePage() {
       // Upload image to Cloudinary if present
       let imageUrl = null;
       if (postImage) {
-        console.log("📸 Uploading image...");
         const formData = new FormData();
         formData.append("image", postImage);
 
@@ -381,22 +371,13 @@ export default function ProfilePage() {
           body: formData,
         });
 
-        console.log("📡 Upload response status:", uploadRes.status);
         if (uploadRes.ok) {
           const uploadData = await uploadRes.json();
           imageUrl = uploadData.imageUrl;
-          console.log("✅ Image uploaded:", imageUrl);
-        } else {
-          const errorData = await uploadRes.json();
-          console.error("❌ Image upload failed:", errorData);
         }
       }
 
       // Create post
-      console.log("📝 Sending post request...", {
-        content: postContent.trim(),
-        imageUrl,
-      });
       const res = await fetch("/api/posts", {
         method: "POST",
         headers: {
@@ -409,22 +390,17 @@ export default function ProfilePage() {
         }),
       });
 
-      console.log("📡 Post response status:", res.status);
-      const responseData = await res.json();
-      console.log("📡 Post response data:", responseData);
-
       if (!res.ok) {
-        throw new Error(responseData.error || "Failed to create post");
+        const data = await res.json();
+        throw new Error(data.error || "Failed to create post");
       }
 
-      console.log("✅ Post created successfully!");
       setSuccess(true);
       setPostContent("");
       setPostImage(null);
       setPostImagePreview(null);
 
       // Refresh posts list
-      console.log("🔄 Refreshing posts...");
       await fetchPosts();
 
       setTimeout(() => setSuccess(false), 3000);
@@ -593,10 +569,8 @@ export default function ProfilePage() {
                       // Ensure image URL is complete
                       const getImageUrl = (url: string | null) => {
                         if (!url) return null;
-                        console.log("🖼️ Processing image URL:", url);
                         // If URL starts with http/https, it's already complete
                         if (url.startsWith("http")) {
-                          console.log("✅ Already complete URL:", url);
                           return url;
                         }
                         // If it's a partial path, construct full Cloudinary URL
@@ -607,22 +581,12 @@ export default function ProfilePage() {
                           const cleanPath = url.startsWith("/")
                             ? url.substring(1)
                             : url;
-                          const fullUrl = `https://res.cloudinary.com/dhgsxwtwv/image/${cleanPath}`;
-                          console.log("🔧 Constructed URL:", fullUrl);
-                          return fullUrl;
+                          return `https://res.cloudinary.com/dhgsxwtwv/image/${cleanPath}`;
                         }
-                        console.log("⚠️ Unhandled URL format:", url);
                         return url;
                       };
 
                       const imageUrl = getImageUrl(post.image);
-                      console.log("📊 Post data:", { 
-                        id: post.id, 
-                        username: post.username,
-                        content: post.content,
-                        image: post.image,
-                        processedImageUrl: imageUrl
-                      });
 
                       return (
                         <motion.div
@@ -668,13 +632,6 @@ export default function ProfilePage() {
                                 src={imageUrl}
                                 alt="Post image"
                                 className="w-full h-auto max-h-[500px] object-contain"
-                                onError={(e) => {
-                                  console.error(
-                                    "Failed to load image:",
-                                    imageUrl
-                                  );
-                                  e.currentTarget.style.display = "none";
-                                }}
                               />
                             </div>
                           )}
