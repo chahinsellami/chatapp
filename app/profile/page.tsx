@@ -317,8 +317,48 @@ export default function ProfilePage() {
       setPosting(true);
       setError("");
 
-      // For now, just show success message since we don't have a posts API yet
-      // In the future, you can implement actual post creation
+      const token = localStorage.getItem("auth_token");
+      if (!token) {
+        router.push("/login");
+        return;
+      }
+
+      // Upload image to Cloudinary if present
+      let imageUrl = null;
+      if (postImage) {
+        const formData = new FormData();
+        formData.append("image", postImage);
+
+        const uploadRes = await fetch("/api/upload/profile-image", {
+          method: "POST",
+          headers: { Authorization: `Bearer ${token}` },
+          body: formData,
+        });
+
+        if (uploadRes.ok) {
+          const uploadData = await uploadRes.json();
+          imageUrl = uploadData.imageUrl;
+        }
+      }
+
+      // Create post
+      const res = await fetch("/api/posts", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          content: postContent.trim(),
+          imageUrl,
+        }),
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || "Failed to create post");
+      }
+
       setSuccess(true);
       setPostContent("");
       setPostImage(null);
@@ -385,6 +425,17 @@ export default function ProfilePage() {
                 exit={{ opacity: 0, y: -20 }}
                 className="space-y-4 sm:space-y-6"
               >
+                {/* Success/Error Messages */}
+                <AnimatePresence>
+                  {success && (
+                    <AlertMessage
+                      type="success"
+                      message="Post created successfully! 🎉"
+                    />
+                  )}
+                  {error && <AlertMessage type="error" message={error} />}
+                </AnimatePresence>
+
                 {/* Create Post Card */}
                 <div className="glass-card p-4 sm:p-6 rounded-2xl">
                   <h2 className="text-lg sm:text-xl font-bold text-white mb-4">
