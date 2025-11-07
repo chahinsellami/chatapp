@@ -587,13 +587,29 @@ export default function ProfilePage() {
                   </div>
                 ) : (
                   <div className="space-y-4 sm:space-y-6">
-                    {posts.map((post) => (
-                      <motion.div
-                        key={post.id}
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="glass-card p-4 sm:p-6 rounded-2xl overflow-hidden"
-                      >
+                    {posts.map((post) => {
+                      // Ensure image URL is complete
+                      const getImageUrl = (url: string | null) => {
+                        if (!url) return null;
+                        // If URL starts with http/https, it's already complete
+                        if (url.startsWith('http')) return url;
+                        // If it's a partial path, construct full Cloudinary URL
+                        if (url.startsWith('/upload/') || url.startsWith('upload/')) {
+                          const cleanPath = url.startsWith('/') ? url.substring(1) : url;
+                          return `https://res.cloudinary.com/dhgsxwtwv/image/${cleanPath}`;
+                        }
+                        return url;
+                      };
+
+                      const imageUrl = getImageUrl(post.image);
+
+                      return (
+                        <motion.div
+                          key={post.id}
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          className="glass-card p-4 sm:p-6 rounded-2xl overflow-hidden"
+                        >
                         {/* Post Header */}
                         <div className="flex items-center gap-3 mb-4">
                           <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-xl sm:text-2xl shrink-0">
@@ -625,14 +641,14 @@ export default function ProfilePage() {
                         )}
 
                         {/* Post Image */}
-                        {post.image && (
+                        {imageUrl && (
                           <div className="w-full rounded-lg overflow-hidden mb-4 bg-slate-800">
                             <img
-                              src={post.image}
+                              src={imageUrl}
                               alt="Post image"
                               className="w-full h-auto max-h-[500px] object-contain"
                               onError={(e) => {
-                                console.error("Failed to load image:", post.image);
+                                console.error("Failed to load image:", imageUrl);
                                 e.currentTarget.style.display = 'none';
                               }}
                             />
@@ -651,7 +667,8 @@ export default function ProfilePage() {
                           </button>
                         </div>
                       </motion.div>
-                    ))}
+                    );
+                    })}
                   </div>
                 )}
               </motion.div>
