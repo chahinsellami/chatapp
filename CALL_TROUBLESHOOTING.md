@@ -3,12 +3,15 @@
 ## What I Fixed
 
 ### 1. **Better TURN Servers**
+
 - Added Twilio's public TURN server as a backup
 - Added `iceTransportPolicy: 'all'` to try all connection methods
 - This should help with connections between different networks
 
 ### 2. **Comprehensive Logging**
+
 Now you can see what's happening in the browser console (F12):
+
 - `📞 Incoming call from...` - When receiving a call
 - `✅ Call accepted by remote peer` - When call is accepted
 - `❌ Call rejected by remote peer` - When call is rejected
@@ -16,13 +19,17 @@ Now you can see what's happening in the browser console (F12):
 - `✅ Received remote stream!` - When video/audio is flowing
 
 ### 3. **Pre-Call Checks**
+
 Before starting a call, the app now checks:
+
 - ✅ Is the friend online?
 - ✅ Is socket connected?
 - ✅ Shows console logs for debugging
 
 ### 4. **Diagnostic Tool**
+
 Click the **Settings** icon (⚙️) next to the call buttons to run diagnostics:
+
 - Tests browser WebRTC support
 - Checks for camera/microphone
 - Tests permissions
@@ -30,7 +37,9 @@ Click the **Settings** icon (⚙️) next to the call buttons to run diagnostics
 - Shows if friend is online
 
 ### 5. **Better Error Messages**
+
 Instead of silent failures, you now get clear alerts:
+
 - "Friend is offline" - Can't call if they're not connected
 - "Not connected to server" - Socket issue
 - "Call connection error: [reason]" - WebRTC issues
@@ -39,6 +48,7 @@ Instead of silent failures, you now get clear alerts:
 ## How to Test Calls
 
 ### Test 1: Same Network (Should Work ✅)
+
 1. Open two browser windows (or use incognito mode)
 2. Login as two different users
 3. Make sure both see each other as "Online"
@@ -47,6 +57,7 @@ Instead of silent failures, you now get clear alerts:
 6. **Expected**: Call should connect within 5-10 seconds
 
 ### Test 2: Different Networks (May Fail ⚠️)
+
 1. Have two people on different WiFi networks
 2. Both login and make sure they see each other online
 3. Try to start a call
@@ -55,13 +66,17 @@ Instead of silent failures, you now get clear alerts:
 ## What to Check If Calls Don't Work
 
 ### 1. **Browser Console (F12)**
+
 Press F12 to open developer console and look for:
+
 - ❌ Red errors about WebRTC
 - 🔍 Look for "call-user", "incoming-call", "call-accepted" events
 - 🧊 Look for ICE candidate messages
 
 ### 2. **Run Diagnostics**
+
 Click the Settings button (⚙️) in the chat header and check:
+
 - ✅ Browser WebRTC Support - Must show green checkmark
 - ✅ Media Devices - Must show your microphone/camera
 - ✅ Media Permissions - Must be granted
@@ -70,13 +85,13 @@ Click the Settings button (⚙️) in the chat header and check:
 
 ### 3. **Common Issues & Solutions**
 
-| Problem | Cause | Solution |
-|---------|-------|----------|
-| Friend shows as offline | Not connected or different instance | Refresh both pages |
-| Permission denied | Camera/mic blocked | Go to browser settings → Site settings → Allow camera/mic |
-| Call never connects | NAT/Firewall blocking | See "TURN Server Setup" below |
-| Only one-way audio/video | Asymmetric NAT | Use better TURN server |
-| "Not connected to server" | Socket.IO disconnected | Refresh the page |
+| Problem                   | Cause                               | Solution                                                  |
+| ------------------------- | ----------------------------------- | --------------------------------------------------------- |
+| Friend shows as offline   | Not connected or different instance | Refresh both pages                                        |
+| Permission denied         | Camera/mic blocked                  | Go to browser settings → Site settings → Allow camera/mic |
+| Call never connects       | NAT/Firewall blocking               | See "TURN Server Setup" below                             |
+| Only one-way audio/video  | Asymmetric NAT                      | Use better TURN server                                    |
+| "Not connected to server" | Socket.IO disconnected              | Refresh the page                                          |
 
 ## TURN Server Setup (For Different Networks)
 
@@ -112,6 +127,7 @@ The current free TURN servers may not work reliably. For production use:
 ## Testing WebRTC Connection
 
 ### Online Tools:
+
 - **Trickle ICE Test**: https://webrtc.github.io/samples/src/content/peerconnection/trickle-ice/
   - Paste this in "ICE servers" field:
     ```
@@ -122,33 +138,35 @@ The current free TURN servers may not work reliably. For production use:
   - If you see "relay" candidates, TURN is working
 
 ### Browser Test:
+
 1. Open browser console (F12)
 2. Paste this code:
+
 ```javascript
 const pc = new RTCPeerConnection({
   iceServers: [
-    { urls: 'stun:stun.l.google.com:19302' },
+    { urls: "stun:stun.l.google.com:19302" },
     {
-      urls: 'turn:openrelay.metered.ca:80',
-      username: 'openrelayproject',
-      credential: 'openrelayproject'
-    }
-  ]
+      urls: "turn:openrelay.metered.ca:80",
+      username: "openrelayproject",
+      credential: "openrelayproject",
+    },
+  ],
 });
 
-pc.createDataChannel('test');
-pc.createOffer().then(offer => pc.setLocalDescription(offer));
+pc.createDataChannel("test");
+pc.createOffer().then((offer) => pc.setLocalDescription(offer));
 
-pc.onicecandidate = e => {
+pc.onicecandidate = (e) => {
   if (e.candidate) {
-    console.log('ICE Candidate:', e.candidate.type, e.candidate.candidate);
+    console.log("ICE Candidate:", e.candidate.type, e.candidate.candidate);
   } else {
-    console.log('All ICE candidates gathered');
+    console.log("All ICE candidates gathered");
   }
 };
 
 pc.onicegatheringstatechange = () => {
-  console.log('ICE Gathering State:', pc.iceGatheringState);
+  console.log("ICE Gathering State:", pc.iceGatheringState);
 };
 ```
 
@@ -188,6 +206,7 @@ pc.onicegatheringstatechange = () => {
 ## Need More Help?
 
 Share:
+
 1. Browser console logs (F12)
 2. Diagnostic test results
 3. Network setup (same WiFi? different locations?)

@@ -121,10 +121,7 @@ export function useLazyLoad(ref: React.RefObject<HTMLElement>): boolean {
 export function useMemoized<T>(fn: () => T, deps: React.DependencyList): T {
   const ref = useRef<{ value: T; deps: React.DependencyList } | null>(null);
 
-  if (
-    !ref.current ||
-    !deps.every((dep, i) => dep === ref.current!.deps[i])
-  ) {
+  if (!ref.current || !deps.every((dep, i) => dep === ref.current!.deps[i])) {
     ref.current = { value: fn(), deps };
   }
 
@@ -177,7 +174,9 @@ export function useRenderPerformance(name: string) {
 
     if (process.env.NODE_ENV === "development") {
       console.log(
-        `[Performance] ${name} render #${renderCount.current}: ${renderTime.toFixed(2)}ms`
+        `[Performance] ${name} render #${
+          renderCount.current
+        }: ${renderTime.toFixed(2)}ms`
       );
     }
 

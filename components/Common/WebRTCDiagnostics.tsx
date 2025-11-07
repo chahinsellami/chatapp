@@ -83,7 +83,11 @@ export default function WebRTCDiagnostics() {
               ? {
                   ...r,
                   status: "success",
-                  message: `✅ Found ${devices.filter((d) => d.kind === "audioinput").length} microphone(s) and ${devices.filter((d) => d.kind === "videoinput").length} camera(s)`,
+                  message: `✅ Found ${
+                    devices.filter((d) => d.kind === "audioinput").length
+                  } microphone(s) and ${
+                    devices.filter((d) => d.kind === "videoinput").length
+                  } camera(s)`,
                 }
               : r
           )
@@ -210,7 +214,9 @@ export default function WebRTCDiagnostics() {
               ? {
                   ...r,
                   status: "success",
-                  message: `✅ STUN server reachable (${iceCandidate.address || "ICE candidate found"})`,
+                  message: `✅ STUN server reachable (${
+                    iceCandidate.address || "ICE candidate found"
+                  })`,
                 }
               : r
           )
@@ -222,8 +228,7 @@ export default function WebRTCDiagnostics() {
               ? {
                   ...r,
                   status: "warning",
-                  message:
-                    "⚠️ STUN server timeout - may affect call quality",
+                  message: "⚠️ STUN server timeout - may affect call quality",
                 }
               : r
           )
@@ -247,7 +252,9 @@ export default function WebRTCDiagnostics() {
     addResult({
       test: "Network Information",
       status: "success",
-      message: `📡 Connection type: ${(navigator as any).connection?.effectiveType || "Unknown"}`,
+      message: `📡 Connection type: ${
+        (navigator as any).connection?.effectiveType || "Unknown"
+      }`,
     });
 
     setTesting(false);
@@ -268,9 +275,7 @@ export default function WebRTCDiagnostics() {
 
   return (
     <div className="p-6 glass-card">
-      <h2 className="text-xl font-bold text-white mb-4">
-        WebRTC Diagnostics
-      </h2>
+      <h2 className="text-xl font-bold text-white mb-4">WebRTC Diagnostics</h2>
       <p className="text-slate-300 text-sm mb-6">
         Run this test if voice/video calls aren't working. This will check your
         browser, devices, permissions, and network connectivity.

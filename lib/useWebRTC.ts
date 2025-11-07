@@ -67,7 +67,12 @@ export function useWebRTC({ socket, userId }: UseWebRTCProps) {
     socket.on(
       "incoming-call",
       (data: { from: string; signal: any; callType: CallType }) => {
-        console.log("📞 Incoming call from:", data.from, "Type:", data.callType);
+        console.log(
+          "📞 Incoming call from:",
+          data.from,
+          "Type:",
+          data.callType
+        );
         setIsIncomingCall(true);
         setCallType(data.callType);
         setCallerInfo({
@@ -222,11 +227,12 @@ export function useWebRTC({ socket, userId }: UseWebRTCProps) {
               { urls: "stun:global.stun.twilio.com:3478" },
               {
                 urls: "turn:global.turn.twilio.com:3478?transport=tcp",
-                username: "f4b4035eaa76f4a55de5f4351567653ee4ff6fa97b50b6b334fcc1be9c27212d",
+                username:
+                  "f4b4035eaa76f4a55de5f4351567653ee4ff6fa97b50b6b334fcc1be9c27212d",
                 credential: "w1uxM55V9yVoqyVFjt+mxDBV0F87AUCemaYVQGxsPLw=",
               },
             ],
-            iceTransportPolicy: 'all', // Use all available connection methods
+            iceTransportPolicy: "all", // Use all available connection methods
           },
         });
 
@@ -255,7 +261,11 @@ export function useWebRTC({ socket, userId }: UseWebRTCProps) {
         // Handle WebRTC connection errors
         peer.on("error", (err) => {
           console.error("❌ WebRTC Error:", err);
-          alert(`Call connection error: ${err.message || "Connection failed"}. This may be due to network/firewall restrictions.`);
+          alert(
+            `Call connection error: ${
+              err.message || "Connection failed"
+            }. This may be due to network/firewall restrictions.`
+          );
           cleanup();
         });
 
@@ -419,11 +429,12 @@ export function useWebRTC({ socket, userId }: UseWebRTCProps) {
             { urls: "stun:global.stun.twilio.com:3478" },
             {
               urls: "turn:global.turn.twilio.com:3478?transport=tcp",
-              username: "f4b4035eaa76f4a55de5f4351567653ee4ff6fa97b50b6b334fcc1be9c27212d",
+              username:
+                "f4b4035eaa76f4a55de5f4351567653ee4ff6fa97b50b6b334fcc1be9c27212d",
               credential: "w1uxM55V9yVoqyVFjt+mxDBV0F87AUCemaYVQGxsPLw=",
             },
           ],
-          iceTransportPolicy: 'all', // Use all available connection methods
+          iceTransportPolicy: "all", // Use all available connection methods
         },
       });
 
@@ -446,7 +457,11 @@ export function useWebRTC({ socket, userId }: UseWebRTCProps) {
       // Handle connection errors
       peer.on("error", (err) => {
         console.error("❌ WebRTC Error during call acceptance:", err);
-        alert(`Call connection error: ${err.message || "Connection failed"}. This may be due to network/firewall restrictions.`);
+        alert(
+          `Call connection error: ${
+            err.message || "Connection failed"
+          }. This may be due to network/firewall restrictions.`
+        );
         cleanup();
       });
 

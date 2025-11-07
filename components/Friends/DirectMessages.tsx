@@ -435,7 +435,7 @@ export default function DirectMessages({
    */
   const runDiagnostics = async () => {
     setShowDiagnostics(true);
-    
+
     let diagnosticMessage = "🔍 WebRTC Diagnostics:\n\n";
 
     // Check browser support
@@ -449,9 +449,9 @@ export default function DirectMessages({
     // Check devices
     try {
       const devices = await navigator.mediaDevices.enumerateDevices();
-      const audioDevices = devices.filter(d => d.kind === 'audioinput');
-      const videoDevices = devices.filter(d => d.kind === 'videoinput');
-      
+      const audioDevices = devices.filter((d) => d.kind === "audioinput");
+      const videoDevices = devices.filter((d) => d.kind === "videoinput");
+
       diagnosticMessage += `✅ Found ${audioDevices.length} microphone(s)\n`;
       diagnosticMessage += `✅ Found ${videoDevices.length} camera(s)\n`;
     } catch (err: any) {
@@ -461,7 +461,7 @@ export default function DirectMessages({
     // Check permissions
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      stream.getTracks().forEach(track => track.stop());
+      stream.getTracks().forEach((track) => track.stop());
       diagnosticMessage += "✅ Microphone permission granted\n";
     } catch (err: any) {
       diagnosticMessage += `❌ Microphone permission: ${err.name}\n`;
@@ -474,8 +474,10 @@ export default function DirectMessages({
       diagnosticMessage += "❌ Socket.IO not connected\n";
     }
 
-    // Check if friend is online
-    if (onlineUsers.has(friendId)) {
+    // Check if friend is online or if there's an incoming call
+    if (isIncomingCall && callerInfo?.id === friendId) {
+      diagnosticMessage += "✅ Incoming call detected - friend is calling you\n";
+    } else if (onlineUsers.has(friendId)) {
       diagnosticMessage += "✅ Friend is online\n";
     } else {
       diagnosticMessage += "⚠️ Friend is offline - calls won't work\n";
@@ -499,7 +501,9 @@ export default function DirectMessages({
   const handleStartCall = async (type: "voice" | "video") => {
     // Check if friend is online first
     if (!onlineUsers.has(friendId)) {
-      alert(`${friendName} is offline. Calls only work when both users are online.`);
+      alert(
+        `${friendName} is offline. Calls only work when both users are online.`
+      );
       return;
     }
 

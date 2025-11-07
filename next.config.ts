@@ -3,7 +3,7 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   /* config options here */
   reactCompiler: true,
-  
+
   // Image optimization
   images: {
     remotePatterns: [
@@ -64,7 +64,7 @@ const nextConfig: NextConfig = {
 
   // Compression and optimization
   compress: true,
-  
+
   // PWA support (optional)
   // You can enable this later with next-pwa configuration
 };

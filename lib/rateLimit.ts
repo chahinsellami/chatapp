@@ -32,17 +32,17 @@ export interface RateLimitConfig {
    * Maximum number of requests allowed in the window
    */
   maxRequests: number;
-  
+
   /**
    * Time window in milliseconds
    */
   windowMs: number;
-  
+
   /**
    * Custom message when rate limit is exceeded
    */
   message?: string;
-  
+
   /**
    * Key generator function (defaults to IP address)
    */
@@ -59,28 +59,28 @@ export const RATE_LIMITS = {
     windowMs: 15 * 60 * 1000, // 15 minutes
     message: "Too many login attempts. Please try again later.",
   },
-  
+
   // API endpoints - general limit for most operations
   API: {
     maxRequests: 100,
     windowMs: 15 * 60 * 1000, // 15 minutes
     message: "Too many requests. Please slow down.",
   },
-  
+
   // Message sending - moderate limit
   MESSAGES: {
     maxRequests: 60,
     windowMs: 60 * 1000, // 1 minute
     message: "Too many messages sent. Please wait before sending more.",
   },
-  
+
   // File uploads - strict limit due to resource usage
   UPLOAD: {
     maxRequests: 10,
     windowMs: 60 * 60 * 1000, // 1 hour
     message: "Upload limit reached. Please try again later.",
   },
-  
+
   // Search queries - moderate limit
   SEARCH: {
     maxRequests: 30,
@@ -121,7 +121,7 @@ export function rateLimit(
   // Check if limit exceeded
   if (entry.count > config.maxRequests) {
     const resetIn = Math.ceil((entry.resetTime - now) / 1000);
-    
+
     return NextResponse.json(
       {
         error: config.message || "Rate limit exceeded",
@@ -161,7 +161,7 @@ function getDefaultKey(request: Request): string {
   // Fall back to IP address
   const forwarded = request.headers.get("x-forwarded-for");
   const ip = forwarded ? forwarded.split(",")[0].trim() : "unknown";
-  
+
   return `ip:${ip}`;
 }
 
