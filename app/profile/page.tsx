@@ -373,9 +373,9 @@ export default function ProfilePage() {
       if (postImage) {
         console.log("📸 Uploading image...");
         const formData = new FormData();
-        formData.append("file", postImage);
+        formData.append("image", postImage);
 
-        const uploadRes = await fetch("/api/upload/profile-image", {
+        const uploadRes = await fetch("/api/upload/post-image", {
           method: "POST",
           headers: { Authorization: `Bearer ${token}` },
           body: formData,
