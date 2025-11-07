@@ -102,7 +102,7 @@ export default function NavigationBar({ currentPage }: NavigationBarProps) {
 
         {/* Search Bar */}
         <div className="flex-1 max-w-md relative" ref={searchRef}>
-          <motion.div 
+          <motion.div
             className="relative"
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -152,16 +152,24 @@ export default function NavigationBar({ currentPage }: NavigationBarProps) {
                   <div className="p-6 text-center">
                     <motion.div
                       animate={{ rotate: 360 }}
-                      transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                      transition={{
+                        duration: 1,
+                        repeat: Infinity,
+                        ease: "linear",
+                      }}
                       className="w-8 h-8 border-2 border-blue-600 border-t-transparent rounded-full mx-auto mb-3"
                     />
-                    <p className="text-neutral-400 text-sm font-medium">Searching...</p>
+                    <p className="text-neutral-400 text-sm font-medium">
+                      Searching...
+                    </p>
                   </div>
                 ) : searchResults.length > 0 ? (
                   <div className="overflow-y-auto max-h-[400px] custom-scrollbar">
                     <div className="p-2 border-b border-neutral-800">
                       <p className="text-xs font-semibold text-neutral-500 uppercase tracking-wide px-3 py-2">
-                        {searchResults.length} {searchResults.length === 1 ? 'result' : 'results'} found
+                        {searchResults.length}{" "}
+                        {searchResults.length === 1 ? "result" : "results"}{" "}
+                        found
                       </p>
                     </div>
                     <div className="py-2">
@@ -186,23 +194,32 @@ export default function NavigationBar({ currentPage }: NavigationBarProps) {
                                 />
                               ) : (
                                 <span className="text-white text-lg font-bold">
-                                  {user.avatar || user.username[0].toUpperCase()}
+                                  {user.avatar ||
+                                    user.username[0].toUpperCase()}
                                 </span>
                               )}
                             </div>
                             {/* Online status indicator */}
-                            <div className={`absolute bottom-0 right-0 w-3.5 h-3.5 rounded-full border-2 border-neutral-900 ${
-                              user.status === 'online' ? 'bg-green-500' : 'bg-gray-500'
-                            }`} />
+                            <div
+                              className={`absolute bottom-0 right-0 w-3.5 h-3.5 rounded-full border-2 border-neutral-900 ${
+                                user.status === "online"
+                                  ? "bg-green-500"
+                                  : "bg-gray-500"
+                              }`}
+                            />
                           </div>
                           <div className="flex-1 text-left min-w-0">
                             <p className="text-white font-semibold text-base truncate group-hover:text-blue-400 transition-colors">
                               {user.username}
                             </p>
                             <p className="text-neutral-400 text-sm capitalize flex items-center gap-2">
-                              <span className={`w-2 h-2 rounded-full ${
-                                user.status === 'online' ? 'bg-green-500' : 'bg-gray-500'
-                              }`} />
+                              <span
+                                className={`w-2 h-2 rounded-full ${
+                                  user.status === "online"
+                                    ? "bg-green-500"
+                                    : "bg-gray-500"
+                                }`}
+                              />
                               {user.status}
                             </p>
                           </div>
@@ -211,8 +228,18 @@ export default function NavigationBar({ currentPage }: NavigationBarProps) {
                             whileHover={{ opacity: 1 }}
                             className="text-neutral-500 group-hover:text-blue-400 transition-colors"
                           >
-                            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                            <svg
+                              className="w-5 h-5"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              stroke="currentColor"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M9 5l7 7-7 7"
+                              />
                             </svg>
                           </motion.div>
                         </motion.button>
@@ -224,8 +251,12 @@ export default function NavigationBar({ currentPage }: NavigationBarProps) {
                     <div className="w-16 h-16 rounded-full bg-neutral-800 flex items-center justify-center mx-auto mb-3">
                       <Search className="w-8 h-8 text-neutral-600" />
                     </div>
-                    <p className="text-neutral-400 text-sm font-medium mb-1">No users found</p>
-                    <p className="text-neutral-500 text-xs">Try searching with a different name</p>
+                    <p className="text-neutral-400 text-sm font-medium mb-1">
+                      No users found
+                    </p>
+                    <p className="text-neutral-500 text-xs">
+                      Try searching with a different name
+                    </p>
                   </div>
                 )}
               </motion.div>

@@ -398,7 +398,7 @@ export default function ProfilePage() {
                       className="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
                       rows={4}
                     />
-                    
+
                     {/* Image Preview */}
                     {postImagePreview && (
                       <div className="relative">
@@ -442,7 +442,9 @@ export default function ProfilePage() {
                       </div>
                       <motion.button
                         onClick={handleCreatePost}
-                        disabled={posting || (!postContent.trim() && !postImage)}
+                        disabled={
+                          posting || (!postContent.trim() && !postImage)
+                        }
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                         className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
