@@ -597,8 +597,16 @@ export default function ProfilePage() {
                         >
                           {/* Post Header */}
                           <div className="flex items-center gap-3 mb-4">
-                            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-xl sm:text-2xl shrink-0">
-                              {post.avatar}
+                            <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-xl sm:text-2xl shrink-0 overflow-hidden">
+                              {post.avatar && (post.avatar.startsWith('http') || post.avatar.startsWith('/')) ? (
+                                <img
+                                  src={post.avatar}
+                                  alt={post.username}
+                                  className="w-full h-full object-cover"
+                                />
+                              ) : (
+                                <span>{post.avatar || '👤'}</span>
+                              )}
                             </div>
                             <div className="flex-1 min-w-0">
                               <h4 className="font-semibold text-white text-sm sm:text-base truncate">
