@@ -71,7 +71,11 @@ export function useWebRTC({ socket, userId }: UseWebRTCProps) {
           "📞 Incoming call from:",
           data.from,
           "Type:",
-          data.callType
+          data.callType,
+          "Signal:",
+          data.signal?.type || "unknown",
+          "Timestamp:",
+          new Date().toISOString()
         );
         setIsIncomingCall(true);
         setCallType(data.callType);
@@ -355,7 +359,21 @@ export function useWebRTC({ socket, userId }: UseWebRTCProps) {
    * Sets up local media stream and responds to the call offer
    */
   const acceptCall = useCallback(async () => {
+    console.log("🎯 Accept call started:", {
+      hasSocket: !!socket,
+      hasUserId: !!userId,
+      hasCallerInfo: !!callerInfo,
+      callerId: callerInfo?.id,
+      callType,
+      timestamp: new Date().toISOString()
+    });
+
     if (!socket || !userId || !callerInfo) {
+      console.error("❌ Cannot accept call - missing required data:", {
+        socket: !!socket,
+        userId: !!userId,
+        callerInfo: !!callerInfo
+      });
       return;
     }
 
@@ -390,7 +408,12 @@ export function useWebRTC({ socket, userId }: UseWebRTCProps) {
       };
 
       // Get local media access
+      console.log("🎥 Requesting media access with constraints:", constraints);
       const stream = await navigator.mediaDevices.getUserMedia(constraints);
+      console.log("✅ Media access granted. Tracks:", {
+        audio: stream.getAudioTracks().length,
+        video: stream.getVideoTracks().length
+      });
 
       // Store and set local stream
       localStreamRef.current = stream;
