@@ -25,6 +25,7 @@ import {
   MessageCircle,
   ChevronDown,
   Check,
+  Settings,
 } from "lucide-react";
 
 /**
@@ -82,6 +83,7 @@ export default function DirectMessages({
   // User interface state
   const [userAvatar, setUserAvatar] = useState<string>("??"); // Current user's avatar
   const [isMobile, setIsMobile] = useState(false); // Mobile device detection
+  const [showDiagnostics, setShowDiagnostics] = useState(false); // Diagnostics modal visibility
 
   // Auth context for user status
   const { user, updateUser } = useAuth();
@@ -429,10 +431,92 @@ export default function DirectMessages({
   };
 
   /**
+   * Run WebRTC diagnostics
+   */
+  const runDiagnostics = async () => {
+    setShowDiagnostics(true);
+    
+    let diagnosticMessage = "🔍 WebRTC Diagnostics:\n\n";
+
+    // Check browser support
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      diagnosticMessage += "❌ Browser does not support WebRTC\n";
+      alert(diagnosticMessage);
+      return;
+    }
+    diagnosticMessage += "✅ Browser supports WebRTC\n";
+
+    // Check devices
+    try {
+      const devices = await navigator.mediaDevices.enumerateDevices();
+      const audioDevices = devices.filter(d => d.kind === 'audioinput');
+      const videoDevices = devices.filter(d => d.kind === 'videoinput');
+      
+      diagnosticMessage += `✅ Found ${audioDevices.length} microphone(s)\n`;
+      diagnosticMessage += `✅ Found ${videoDevices.length} camera(s)\n`;
+    } catch (err: any) {
+      diagnosticMessage += `❌ Error checking devices: ${err.message}\n`;
+    }
+
+    // Check permissions
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      stream.getTracks().forEach(track => track.stop());
+      diagnosticMessage += "✅ Microphone permission granted\n";
+    } catch (err: any) {
+      diagnosticMessage += `❌ Microphone permission: ${err.name}\n`;
+    }
+
+    // Check socket connection
+    if (socket && isConnected) {
+      diagnosticMessage += "✅ Socket.IO connected\n";
+    } else {
+      diagnosticMessage += "❌ Socket.IO not connected\n";
+    }
+
+    // Check if friend is online
+    if (onlineUsers.has(friendId)) {
+      diagnosticMessage += "✅ Friend is online\n";
+    } else {
+      diagnosticMessage += "⚠️ Friend is offline - calls won't work\n";
+    }
+
+    diagnosticMessage += "\n💡 Tips:\n";
+    diagnosticMessage += "• Both users must be online\n";
+    diagnosticMessage += "• Grant camera/microphone permissions\n";
+    diagnosticMessage += "• Check browser console (F12) for errors\n";
+    diagnosticMessage += "• Calls may fail between different networks\n";
+    diagnosticMessage += "• Use Chrome/Firefox for best compatibility\n";
+
+    alert(diagnosticMessage);
+    setShowDiagnostics(false);
+  };
+
+  /**
    * Initiate a voice or video call with mobile-specific warnings
    * Checks permissions and provides user guidance for mobile devices
    */
   const handleStartCall = async (type: "voice" | "video") => {
+    // Check if friend is online first
+    if (!onlineUsers.has(friendId)) {
+      alert(`${friendName} is offline. Calls only work when both users are online.`);
+      return;
+    }
+
+    // Check socket connection
+    if (!socket || !isConnected) {
+      alert("Not connected to server. Please refresh the page and try again.");
+      return;
+    }
+
+    console.log("🎯 Starting call:", {
+      type,
+      to: friendId,
+      from: userId,
+      socketConnected: isConnected,
+      friendOnline: onlineUsers.has(friendId),
+    });
+
     if (isMobile && type === "video") {
       const confirmed = confirm(
         "Video calls on mobile devices may use more data and battery. Make sure you have a stable connection. Continue?"
@@ -503,7 +587,9 @@ export default function DirectMessages({
         <div className="flex items-center gap-3">
           <motion.div className="relative" whileHover={{ scale: 1.05 }}>
             <div className="w-10 h-10 md:w-12 md:h-12 rounded-full overflow-hidden flex items-center justify-center bg-gradient-to-br from-blue-500 to-indigo-600">
-              {friendAvatar && (friendAvatar.startsWith('http') || friendAvatar.startsWith('/')) ? (
+              {friendAvatar &&
+              (friendAvatar.startsWith("http") ||
+                friendAvatar.startsWith("/")) ? (
                 <img
                   src={friendAvatar}
                   alt={friendName}
@@ -603,6 +689,15 @@ export default function DirectMessages({
 
           {/* Call buttons */}
           <motion.button
+            onClick={runDiagnostics}
+            className="p-2.5 md:p-3 rounded-xl bg-slate-800/60 hover:bg-slate-700/60 border border-slate-700/50 transition-all"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            title="Test Call Setup"
+          >
+            <Settings className="w-4 h-4 md:w-5 md:h-5 text-slate-400" />
+          </motion.button>
+          <motion.button
             onClick={() => handleStartCall("voice")}
             disabled={isCallActive}
             className="p-2.5 md:p-3 rounded-xl bg-slate-800/60 hover:bg-teal-500/20 border border-slate-700/50 hover:border-teal-500/50 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
@@ -648,7 +743,9 @@ export default function DirectMessages({
                   whileHover={{ scale: 1.1 }}
                 >
                   {isOwnMessage ? (
-                    userAvatar && (userAvatar.startsWith('http') || userAvatar.startsWith('/')) ? (
+                    userAvatar &&
+                    (userAvatar.startsWith("http") ||
+                      userAvatar.startsWith("/")) ? (
                       <img
                         src={userAvatar}
                         alt="You"
@@ -659,7 +756,9 @@ export default function DirectMessages({
                         {userAvatar || "👤"}
                       </span>
                     )
-                  ) : friendAvatar && (friendAvatar.startsWith('http') || friendAvatar.startsWith('/')) ? (
+                  ) : friendAvatar &&
+                    (friendAvatar.startsWith("http") ||
+                      friendAvatar.startsWith("/")) ? (
                     <img
                       src={friendAvatar}
                       alt={friendName}
@@ -714,7 +813,9 @@ export default function DirectMessages({
               exit={{ opacity: 0, y: -10 }}
             >
               <div className="w-8 h-8 rounded-full bg-neutral-600 flex items-center justify-center overflow-hidden">
-                {friendAvatar && (friendAvatar.startsWith('http') || friendAvatar.startsWith('/')) ? (
+                {friendAvatar &&
+                (friendAvatar.startsWith("http") ||
+                  friendAvatar.startsWith("/")) ? (
                   <img
                     src={friendAvatar}
                     alt={friendName}

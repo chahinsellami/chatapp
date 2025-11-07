@@ -58,6 +58,8 @@ export function useWebRTC({ socket, userId }: UseWebRTCProps) {
     // Only set up call listeners if socket and user are available
     if (!socket || !userId) return;
 
+    console.log("🔌 Setting up WebRTC listeners for user:", userId);
+
     /**
      * Handle incoming call offers from other users
      * Sets up the incoming call state and caller information
@@ -65,6 +67,7 @@ export function useWebRTC({ socket, userId }: UseWebRTCProps) {
     socket.on(
       "incoming-call",
       (data: { from: string; signal: any; callType: CallType }) => {
+        console.log("📞 Incoming call from:", data.from, "Type:", data.callType);
         setIsIncomingCall(true);
         setCallType(data.callType);
         setCallerInfo({
@@ -80,6 +83,7 @@ export function useWebRTC({ socket, userId }: UseWebRTCProps) {
      * Signals the WebRTC peer with the acceptance signal
      */
     socket.on("call-accepted", (data: { signal: any }) => {
+      console.log("✅ Call accepted by remote peer");
       if (peerRef.current) {
         peerRef.current.signal(data.signal);
       }
@@ -90,6 +94,8 @@ export function useWebRTC({ socket, userId }: UseWebRTCProps) {
      * Cleans up the call state
      */
     socket.on("call-rejected", () => {
+      console.log("❌ Call rejected by remote peer");
+      alert("Call was rejected");
       endCall();
     });
 
@@ -98,7 +104,17 @@ export function useWebRTC({ socket, userId }: UseWebRTCProps) {
      * Cleans up the call state
      */
     socket.on("call-ended", () => {
+      console.log("📵 Call ended by remote peer");
       endCall();
+    });
+
+    /**
+     * Handle call failure notification from server
+     */
+    socket.on("call-failed", (data: { reason: string }) => {
+      console.error("❌ Call failed:", data.reason);
+      alert(`Call failed: ${data.reason}`);
+      cleanup();
     });
 
     /**
@@ -106,6 +122,7 @@ export function useWebRTC({ socket, userId }: UseWebRTCProps) {
      * ICE candidates help establish the peer-to-peer connection
      */
     socket.on("ice-candidate", (data: { candidate: any }) => {
+      console.log("🧊 Received ICE candidate");
       if (peerRef.current) {
         peerRef.current.signal(data.candidate);
       }
@@ -113,10 +130,12 @@ export function useWebRTC({ socket, userId }: UseWebRTCProps) {
 
     // Cleanup: remove all socket listeners when component unmounts
     return () => {
+      console.log("🔌 Cleaning up WebRTC listeners");
       socket.off("incoming-call");
       socket.off("call-accepted");
       socket.off("call-rejected");
       socket.off("call-ended");
+      socket.off("call-failed");
       socket.off("ice-candidate");
     };
   }, [socket, userId]);
@@ -183,9 +202,7 @@ export function useWebRTC({ socket, userId }: UseWebRTCProps) {
               { urls: "stun:stun2.l.google.com:19302" },
               { urls: "stun:stun3.l.google.com:19302" },
               { urls: "stun:stun4.l.google.com:19302" },
-              // TURN servers relay traffic when direct connection fails
-              // These are free public TURN servers (limited reliability)
-              // For production, use your own TURN server or services like Twilio
+              // Multiple TURN servers for better reliability
               {
                 urls: "turn:openrelay.metered.ca:80",
                 username: "openrelayproject",
@@ -201,7 +218,15 @@ export function useWebRTC({ socket, userId }: UseWebRTCProps) {
                 username: "openrelayproject",
                 credential: "openrelayproject",
               },
+              // Additional reliable STUN/TURN servers
+              { urls: "stun:global.stun.twilio.com:3478" },
+              {
+                urls: "turn:global.turn.twilio.com:3478?transport=tcp",
+                username: "f4b4035eaa76f4a55de5f4351567653ee4ff6fa97b50b6b334fcc1be9c27212d",
+                credential: "w1uxM55V9yVoqyVFjt+mxDBV0F87AUCemaYVQGxsPLw=",
+              },
             ],
+            iceTransportPolicy: 'all', // Use all available connection methods
           },
         });
 
@@ -210,6 +235,7 @@ export function useWebRTC({ socket, userId }: UseWebRTCProps) {
           // Only send the initial offer signal, not ICE candidates
           if (!hasInitiatedCallRef.current) {
             hasInitiatedCallRef.current = true;
+            console.log("📤 Sending call offer to:", receiverId);
             socket.emit("call-user", {
               to: receiverId,
               from: userId,
@@ -221,23 +247,27 @@ export function useWebRTC({ socket, userId }: UseWebRTCProps) {
 
         // Handle receiving remote media stream
         peer.on("stream", (stream) => {
+          console.log("✅ Received remote stream!");
           remoteStreamRef.current = stream;
           setRemoteStream(stream);
         });
 
         // Handle WebRTC connection errors
         peer.on("error", (err) => {
+          console.error("❌ WebRTC Error:", err);
+          alert(`Call connection error: ${err.message || "Connection failed"}. This may be due to network/firewall restrictions.`);
           cleanup();
         });
 
         // Handle successful peer connection
         peer.on("connect", () => {
-          // Connection established, call is now active
+          console.log("✅ WebRTC peer connected successfully!");
         });
 
         // Handle peer connection closure
         peer.on("close", () => {
-          // Connection closed, clean up resources
+          console.log("📞 WebRTC peer connection closed");
+          cleanup();
         });
 
         // Store peer reference and update call state
@@ -369,9 +399,7 @@ export function useWebRTC({ socket, userId }: UseWebRTCProps) {
             { urls: "stun:stun2.l.google.com:19302" },
             { urls: "stun:stun3.l.google.com:19302" },
             { urls: "stun:stun4.l.google.com:19302" },
-            // TURN servers relay traffic when direct connection fails
-            // These are free public TURN servers (limited reliability)
-            // For production, use your own TURN server or services like Twilio
+            // Multiple TURN servers for better reliability
             {
               urls: "turn:openrelay.metered.ca:80",
               username: "openrelayproject",
@@ -387,12 +415,21 @@ export function useWebRTC({ socket, userId }: UseWebRTCProps) {
               username: "openrelayproject",
               credential: "openrelayproject",
             },
+            // Additional reliable STUN/TURN servers
+            { urls: "stun:global.stun.twilio.com:3478" },
+            {
+              urls: "turn:global.turn.twilio.com:3478?transport=tcp",
+              username: "f4b4035eaa76f4a55de5f4351567653ee4ff6fa97b50b6b334fcc1be9c27212d",
+              credential: "w1uxM55V9yVoqyVFjt+mxDBV0F87AUCemaYVQGxsPLw=",
+            },
           ],
+          iceTransportPolicy: 'all', // Use all available connection methods
         },
       });
 
       // Handle signaling for call acceptance
       peer.on("signal", (signal) => {
+        console.log("📤 Sending call acceptance to:", callerInfo.id);
         socket.emit("accept-call", {
           to: callerInfo.id,
           signal,
@@ -401,23 +438,27 @@ export function useWebRTC({ socket, userId }: UseWebRTCProps) {
 
       // Handle receiving caller's media stream
       peer.on("stream", (stream) => {
+        console.log("✅ Received caller's stream!");
         remoteStreamRef.current = stream;
         setRemoteStream(stream);
       });
 
       // Handle connection errors
       peer.on("error", (err) => {
+        console.error("❌ WebRTC Error during call acceptance:", err);
+        alert(`Call connection error: ${err.message || "Connection failed"}. This may be due to network/firewall restrictions.`);
         cleanup();
       });
 
       // Handle successful connection
       peer.on("connect", () => {
-        // Call is now active
+        console.log("✅ WebRTC peer connected successfully!");
       });
 
       // Handle connection closure
       peer.on("close", () => {
-        // Connection ended
+        console.log("📞 WebRTC peer connection closed");
+        cleanup();
       });
 
       // Signal the incoming call offer to establish connection

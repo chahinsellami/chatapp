@@ -152,7 +152,9 @@ export default function NavigationBar({ currentPage }: NavigationBarProps) {
                         whileHover={{ x: 4 }}
                       >
                         <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gradient-to-br from-blue-600 to-blue-700 flex items-center justify-center flex-shrink-0 shadow-lg overflow-hidden">
-                          {user.avatar && (user.avatar.startsWith('http') || user.avatar.startsWith('/')) ? (
+                          {user.avatar &&
+                          (user.avatar.startsWith("http") ||
+                            user.avatar.startsWith("/")) ? (
                             <img
                               src={user.avatar}
                               alt={user.username}

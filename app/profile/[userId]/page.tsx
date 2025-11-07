@@ -232,7 +232,9 @@ export default function UserProfilePage() {
             {/* Avatar */}
             <div className="relative -mt-12 sm:-mt-16">
               <div className="w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 rounded-full border-4 border-neutral-900 overflow-hidden bg-blue-600 flex items-center justify-center">
-                {profile.avatar && (profile.avatar.startsWith('http') || profile.avatar.startsWith('/')) ? (
+                {profile.avatar &&
+                (profile.avatar.startsWith("http") ||
+                  profile.avatar.startsWith("/")) ? (
                   <img
                     src={profile.avatar}
                     alt={profile.username}
@@ -334,7 +336,9 @@ export default function UserProfilePage() {
           <Card>
             <h2 className="text-xl font-bold text-white mb-4">Posts</h2>
             {loadingPosts ? (
-              <p className="text-neutral-400 text-center py-8">Loading posts...</p>
+              <p className="text-neutral-400 text-center py-8">
+                Loading posts...
+              </p>
             ) : posts.length === 0 ? (
               <p className="text-neutral-400 text-center py-8">No posts yet</p>
             ) : (
@@ -343,8 +347,13 @@ export default function UserProfilePage() {
                   const getImageUrl = (url: string | null) => {
                     if (!url) return null;
                     if (url.startsWith("http")) return url;
-                    if (url.startsWith("/upload/") || url.startsWith("upload/")) {
-                      const cleanPath = url.startsWith("/") ? url.substring(1) : url;
+                    if (
+                      url.startsWith("/upload/") ||
+                      url.startsWith("upload/")
+                    ) {
+                      const cleanPath = url.startsWith("/")
+                        ? url.substring(1)
+                        : url;
                       return `https://res.cloudinary.com/dhgsxwtwv/image/${cleanPath}`;
                     }
                     return url;
@@ -360,7 +369,9 @@ export default function UserProfilePage() {
                       {/* Post Header */}
                       <div className="flex items-center gap-3 mb-3">
                         <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center overflow-hidden shrink-0">
-                          {post.avatar && (post.avatar.startsWith('http') || post.avatar.startsWith('/')) ? (
+                          {post.avatar &&
+                          (post.avatar.startsWith("http") ||
+                            post.avatar.startsWith("/")) ? (
                             <img
                               src={post.avatar}
                               alt={post.username}
@@ -368,7 +379,7 @@ export default function UserProfilePage() {
                             />
                           ) : (
                             <span className="text-white text-lg">
-                              {post.avatar || '👤'}
+                              {post.avatar || "👤"}
                             </span>
                           )}
                         </div>

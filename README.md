@@ -29,6 +29,7 @@ A professional real-time messaging platform with direct messaging, friend manage
 ## Quick Start
 
 ### Prerequisites
+
 - Node.js 18+
 - PostgreSQL database
 - Cloudinary account (free tier)
@@ -52,6 +53,7 @@ npm install
 ### Environment Setup
 
 **Frontend** (`webchat-app/.env.local`):
+
 ```env
 DATABASE_URL=postgresql://username:password@host:port/database
 JWT_SECRET=your_secret_key_here
@@ -63,6 +65,7 @@ NODE_ENV=development
 ```
 
 **Backend** (`backend-server/.env`):
+
 ```env
 PORT=3001
 FRONTEND_URL=http://localhost:3000
@@ -307,21 +310,25 @@ npm run dev      # Start with auto-reload
 ## Troubleshooting
 
 **Socket.IO Connection Issues**
+
 - Verify `NEXT_PUBLIC_SOCKET_URL` matches backend URL
 - Check backend server is running
 - Review CORS settings in backend
 
 **Database Errors**
+
 - Confirm `DATABASE_URL` is correct
 - Run `/api/db-init` to create tables
 - Check PostgreSQL service is active
 
 **Image Upload Fails**
+
 - Verify Cloudinary credentials
 - Check file size < 10MB
 - Ensure proper FormData format
 
 **WebRTC Calls Not Working**
+
 - Grant browser camera/microphone permissions
 - Check if device is available
 - Verify network allows WebRTC (some corporate networks block it)

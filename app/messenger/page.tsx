@@ -5,13 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import FriendsList from "@/components/Friends/FriendsList";
 import DirectMessages from "@/components/Friends/DirectMessages";
-import {
-  MessageCircle,
-  LogOut,
-  Menu,
-  X,
-  UserCircle2,
-} from "lucide-react";
+import { MessageCircle, LogOut, Menu, X, UserCircle2 } from "lucide-react";
 
 interface Friend {
   id: string;
@@ -101,7 +95,9 @@ function MessengerContent() {
             </div>
             <div className="min-w-0">
               <h1 className="text-white font-semibold text-sm">WebChat</h1>
-              <p className="text-xs text-neutral-500 truncate">{user.username}</p>
+              <p className="text-xs text-neutral-500 truncate">
+                {user.username}
+              </p>
             </div>
           </div>
 
@@ -160,7 +156,10 @@ function MessengerContent() {
             </div>
 
             <div className="flex-1 overflow-hidden">
-              <FriendsList userId={user.id} onSelectFriend={handleSelectFriend} />
+              <FriendsList
+                userId={user.id}
+                onSelectFriend={handleSelectFriend}
+              />
             </div>
 
             <div className="p-3 border-t border-neutral-800">
