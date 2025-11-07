@@ -262,13 +262,18 @@ export function useWebRTC({ socket, userId }: UseWebRTCProps) {
           setRemoteStream(stream);
         });
 
-        // Handle WebRTC connection errors
+        // Handle WebRTC errors with detailed logging
         peer.on("error", (err) => {
-          console.error("❌ WebRTC Error:", err);
+          console.error("❌ WebRTC Error (caller):", {
+            message: err.message,
+            code: (err as any).code,
+            name: err.name,
+            stack: err.stack
+          });
           alert(
             `Call connection error: ${
               err.message || "Connection failed"
-            }. This may be due to network/firewall restrictions.`
+            }. This may be due to network/firewall restrictions or the other person didn't accept.`
           );
           cleanup();
         });
@@ -280,8 +285,17 @@ export function useWebRTC({ socket, userId }: UseWebRTCProps) {
 
         // Handle peer connection closure
         peer.on("close", () => {
-          console.log("📞 WebRTC peer connection closed");
+          console.log("📞 WebRTC peer connection closed - caller side");
           cleanup();
+        });
+
+        // Add ICE connection state monitoring
+        peer.on("iceStateChange", (iceConnectionState: string, iceGatheringState: string) => {
+          console.log("🧊 ICE State Change:", {
+            connection: iceConnectionState,
+            gathering: iceGatheringState,
+            timestamp: new Date().toISOString()
+          });
         });
 
         // Store peer reference and update call state
@@ -479,7 +493,12 @@ export function useWebRTC({ socket, userId }: UseWebRTCProps) {
 
       // Handle connection errors
       peer.on("error", (err) => {
-        console.error("❌ WebRTC Error during call acceptance:", err);
+        console.error("❌ WebRTC Error during call acceptance (receiver):", {
+          message: err.message,
+          code: (err as any).code,
+          name: err.name,
+          stack: err.stack
+        });
         alert(
           `Call connection error: ${
             err.message || "Connection failed"
@@ -495,8 +514,17 @@ export function useWebRTC({ socket, userId }: UseWebRTCProps) {
 
       // Handle connection closure
       peer.on("close", () => {
-        console.log("📞 WebRTC peer connection closed");
+        console.log("📞 WebRTC peer connection closed - receiver side");
         cleanup();
+      });
+
+      // Add ICE connection state monitoring
+      peer.on("iceStateChange", (iceConnectionState: string, iceGatheringState: string) => {
+        console.log("🧊 ICE State Change (receiver):", {
+          connection: iceConnectionState,
+          gathering: iceGatheringState,
+          timestamp: new Date().toISOString()
+        });
       });
 
       // Signal the incoming call offer to establish connection
@@ -566,11 +594,16 @@ export function useWebRTC({ socket, userId }: UseWebRTCProps) {
    * Notifies the other participant and cleans up resources
    */
   const endCall = useCallback(() => {
+    console.log("📵 Ending call, otherUserId:", otherUserIdRef.current);
+    
     // Notify the other user that call is ending
     if (socket && otherUserIdRef.current) {
+      console.log("📤 Sending end-call signal to:", otherUserIdRef.current);
       socket.emit("end-call", {
         to: otherUserIdRef.current,
       });
+    } else {
+      console.log("⚠️ Cannot send end-call signal - missing socket or otherUserId");
     }
 
     cleanup();
