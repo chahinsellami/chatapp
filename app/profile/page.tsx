@@ -586,21 +586,21 @@ export default function ProfilePage() {
                     </div>
                   </div>
                 ) : (
-                  <div className="space-y-4">
+                  <div className="space-y-4 sm:space-y-6">
                     {posts.map((post) => (
                       <motion.div
                         key={post.id}
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="glass-card p-4 sm:p-6 rounded-2xl"
+                        className="glass-card p-4 sm:p-6 rounded-2xl overflow-hidden"
                       >
                         {/* Post Header */}
                         <div className="flex items-center gap-3 mb-4">
-                          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-xl sm:text-2xl">
+                          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-xl sm:text-2xl shrink-0">
                             {post.avatar}
                           </div>
-                          <div className="flex-1">
-                            <h4 className="font-semibold text-white text-sm sm:text-base">
+                          <div className="flex-1 min-w-0">
+                            <h4 className="font-semibold text-white text-sm sm:text-base truncate">
                               {post.username}
                             </h4>
                             <p className="text-xs sm:text-sm text-slate-400">
@@ -619,27 +619,33 @@ export default function ProfilePage() {
 
                         {/* Post Content */}
                         {post.content && (
-                          <p className="text-white mb-4 text-sm sm:text-base whitespace-pre-wrap">
+                          <p className="text-white mb-4 text-sm sm:text-base whitespace-pre-wrap break-words">
                             {post.content}
                           </p>
                         )}
 
                         {/* Post Image */}
                         {post.image && (
-                          <img
-                            src={post.image}
-                            alt="Post"
-                            className="w-full rounded-lg mb-4 max-h-96 object-cover"
-                          />
+                          <div className="w-full rounded-lg overflow-hidden mb-4 bg-slate-800">
+                            <img
+                              src={post.image}
+                              alt="Post image"
+                              className="w-full h-auto max-h-[500px] object-contain"
+                              onError={(e) => {
+                                console.error("Failed to load image:", post.image);
+                                e.currentTarget.style.display = 'none';
+                              }}
+                            />
+                          </div>
                         )}
 
                         {/* Post Actions */}
-                        <div className="flex items-center gap-4 pt-4 border-t border-slate-700">
-                          <button className="flex items-center gap-2 text-slate-400 hover:text-blue-500 transition-colors text-sm">
+                        <div className="flex items-center gap-4 sm:gap-6 pt-4 border-t border-slate-700">
+                          <button className="flex items-center gap-2 text-slate-400 hover:text-red-500 transition-colors text-sm">
                             <span>❤️</span>
                             <span>{post.likes || 0}</span>
                           </button>
-                          <button className="flex items-center gap-2 text-slate-400 hover:text-green-500 transition-colors text-sm">
+                          <button className="flex items-center gap-2 text-slate-400 hover:text-blue-500 transition-colors text-sm">
                             <span>💬</span>
                             <span>Comment</span>
                           </button>
