@@ -54,19 +54,42 @@ export function useSocket(userId: string | null) {
     const socket = io(socketUrl, {
       transports: ["websocket", "polling"], // Try WebSocket first, fallback to polling
       withCredentials: true, // Include credentials for authentication
+      reconnection: true, // Enable auto-reconnection
+      reconnectionDelay: 5000, // Wait 5 seconds before reconnecting
+      reconnectionAttempts: 3, // Only try 3 times to avoid spam
+      timeout: 10000, // Connection timeout
     });
 
     socketRef.current = socket;
 
     // Handle successful connection
     socket.on("connect", () => {
+      console.log("✅ Socket.IO connected");
       setIsConnected(true);
       // Join the user's personal room for direct messaging
       socket.emit("join", userId);
     });
 
     // Handle disconnection
-    socket.on("disconnect", () => {
+    socket.on("disconnect", (reason) => {
+      console.log("❌ Socket.IO disconnected:", reason);
+      setIsConnected(false);
+    });
+
+    // Handle connection errors
+    socket.on("connect_error", (error) => {
+      console.warn("⚠️ Socket.IO connection error:", error.message);
+      setIsConnected(false);
+    });
+
+    // Handle reconnection attempts
+    socket.on("reconnect_attempt", (attemptNumber) => {
+      console.log(`🔄 Reconnection attempt ${attemptNumber}/3`);
+    });
+
+    // Handle failed reconnection
+    socket.on("reconnect_failed", () => {
+      console.error("❌ Socket.IO reconnection failed after 3 attempts");
       setIsConnected(false);
     });
 
