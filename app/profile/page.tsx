@@ -373,7 +373,7 @@ export default function ProfilePage() {
       if (postImage) {
         console.log("📸 Uploading image...");
         const formData = new FormData();
-        formData.append("image", postImage);
+        formData.append("file", postImage);
 
         const uploadRes = await fetch("/api/upload/profile-image", {
           method: "POST",
@@ -381,12 +381,14 @@ export default function ProfilePage() {
           body: formData,
         });
 
+        console.log("📡 Upload response status:", uploadRes.status);
         if (uploadRes.ok) {
           const uploadData = await uploadRes.json();
           imageUrl = uploadData.imageUrl;
           console.log("✅ Image uploaded:", imageUrl);
         } else {
-          console.error("❌ Image upload failed");
+          const errorData = await uploadRes.json();
+          console.error("❌ Image upload failed:", errorData);
         }
       }
 
