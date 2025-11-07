@@ -229,7 +229,7 @@ export default function FriendsList({
   if (loading) {
     return (
       <motion.div
-        className="flex-1 flex items-center justify-center glass-card m-2"
+        className="absolute inset-0 flex items-center justify-center"
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.5 }}
@@ -237,13 +237,13 @@ export default function FriendsList({
         <motion.div className="text-center">
           {/* Rotating icon spinner */}
           <motion.div
-            className="w-12 h-12 mx-auto mb-4 rounded-xl flex items-center justify-center bg-blue-600"
+            className="w-16 h-16 mx-auto mb-4 rounded-2xl flex items-center justify-center bg-blue-600"
             animate={{ rotate: 360 }}
-            transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+            transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
           >
-            <Users className="w-6 h-6 text-white" />
+            <Users className="w-8 h-8 text-white" />
           </motion.div>
-          <p className="text-neutral-300">Loading friends...</p>
+          <p className="text-neutral-400 text-lg font-medium">Loading friends...</p>
         </motion.div>
       </motion.div>
     );
