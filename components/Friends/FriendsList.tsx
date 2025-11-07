@@ -369,7 +369,7 @@ export default function FriendsList({
                         className="w-10 h-10 rounded-xl overflow-hidden flex items-center justify-center flex-shrink-0 bg-neutral-700"
                         whileHover={{ scale: 1.05 }}
                       >
-                        {request.avatar?.startsWith("/avatars/") ? (
+                        {request.avatar && (request.avatar.startsWith('http') || request.avatar.startsWith('/')) ? (
                           <img
                             src={request.avatar}
                             alt={request.username}
@@ -509,7 +509,7 @@ export default function FriendsList({
                   >
                     {/* Avatar */}
                     <div className="w-12 h-12 rounded-xl overflow-hidden flex items-center justify-center bg-blue-600">
-                      {friend.avatar?.startsWith("/avatars/") ? (
+                      {friend.avatar && (friend.avatar.startsWith('http') || friend.avatar.startsWith('/')) ? (
                         <img
                           src={friend.avatar}
                           alt={friend.username}

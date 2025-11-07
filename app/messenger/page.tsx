@@ -179,55 +179,15 @@ function MessengerContent() {
       {/* Main Content */}
       <div className="flex-1 flex flex-col bg-neutral-950">
         {selectedFriend ? (
-          <>
-            {/* Chat Header */}
-            <div className="h-14 border-b border-neutral-800 flex items-center justify-between px-4">
-              <button
-                onClick={() => {
-                  setSelectedFriend(null);
-                  setSelectedFriendId(null);
-                }}
-                className="p-1.5 rounded-lg hover:bg-neutral-800 lg:hidden"
-              >
-                <X className="w-5 h-5 text-neutral-400" />
-              </button>
-
-              <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-full flex items-center justify-center bg-neutral-800 overflow-hidden">
-                  {selectedFriend.avatar && (selectedFriend.avatar.startsWith('http') || selectedFriend.avatar.startsWith('/')) ? (
-                    <img
-                      src={selectedFriend.avatar}
-                      alt={selectedFriend.username}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <span className="text-sm text-white">
-                      {selectedFriend.avatar || selectedFriend.username[0].toUpperCase()}
-                    </span>
-                  )}
-                </div>
-                <div>
-                  <h2 className="text-white font-medium text-sm">
-                    {selectedFriend.username}
-                  </h2>
-                  <p className="text-xs text-neutral-500">
-                    {selectedFriend.status}
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            {/* Messages */}
-            <div className="flex-1 overflow-hidden">
-              <DirectMessages
-                userId={user.id}
-                friendId={selectedFriend.id}
-                friendName={selectedFriend.username}
-                friendAvatar={selectedFriend.avatar}
-                friendStatus={selectedFriend.status}
-              />
-            </div>
-          </>
+          <div className="flex-1 overflow-hidden">
+            <DirectMessages
+              userId={user.id}
+              friendId={selectedFriend.id}
+              friendName={selectedFriend.username}
+              friendAvatar={selectedFriend.avatar}
+              friendStatus={selectedFriend.status}
+            />
+          </div>
         ) : (
           <div className="h-full flex flex-col items-center justify-center relative">
             <button
