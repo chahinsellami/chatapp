@@ -41,7 +41,7 @@ export default function ProfileHeader({
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="relative w-full h-[350px] bg-gradient-to-br from-slate-700 via-slate-600 to-slate-700 overflow-hidden"
+          className="relative w-full h-48 sm:h-64 md:h-80 lg:h-[350px] bg-gradient-to-br from-slate-700 via-slate-600 to-slate-700 overflow-hidden"
         >
           {coverImage ? (
             <img
@@ -52,24 +52,24 @@ export default function ProfileHeader({
           ) : (
             <div className="w-full h-full flex items-center justify-center">
               <div className="text-center text-slate-400">
-                <Upload className="w-16 h-16 mx-auto mb-4 opacity-50" />
-                <p className="text-lg">No cover photo</p>
+                <Upload className="w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-2 sm:mb-4 opacity-50" />
+                <p className="text-sm sm:text-lg">No cover photo</p>
               </div>
             </div>
           )}
         </motion.div>
 
         {/* Profile Picture and Info Section */}
-        <div className="max-w-6xl mx-auto px-6">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="relative">
             {/* Profile Picture and Name - Facebook style */}
-            <div className="flex items-end justify-start gap-8 pb-8 border-b border-slate-700">
+            <div className="flex flex-col sm:flex-row items-center sm:items-end justify-start gap-4 sm:gap-8 pb-6 sm:pb-8 border-b border-slate-700">
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="relative -mt-16 -ml-2 md:-ml-6"
+                className="relative -mt-12 sm:-mt-16 sm:-ml-2 md:-ml-6"
               >
-                <div className="w-44 h-44 md:w-44 md:h-44 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 overflow-hidden shadow-2xl">
+                <div className="w-32 h-32 sm:w-36 sm:h-36 md:w-44 md:h-44 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 overflow-hidden shadow-2xl border-4 border-black">
                   {customImage ? (
                     <img
                       src={customImage}
@@ -77,33 +77,33 @@ export default function ProfileHeader({
                       className="w-full h-full object-cover"
                     />
                   ) : avatar && !avatar.startsWith("http") ? (
-                    <div className="w-full h-full flex items-center justify-center text-7xl">
+                    <div className="w-full h-full flex items-center justify-center text-5xl sm:text-6xl md:text-7xl">
                       {avatar}
                     </div>
                   ) : (
                     <div className="w-full h-full flex items-center justify-center">
-                      <User className="w-20 h-20 text-white" />
+                      <User className="w-16 h-16 sm:w-20 sm:h-20 text-white" />
                     </div>
                   )}
                 </div>
               </motion.div>
 
               {/* Name and Bio with Status - aligned to the bottom of the avatar */}
-              <div className="flex flex-col justify-end pb-6">
-                <div className="flex items-center gap-3">
-                  <h1 className="text-3xl md:text-4xl font-bold text-white leading-tight">
+              <div className="flex flex-col justify-end pb-0 sm:pb-6 text-center sm:text-left">
+                <div className="flex items-center justify-center sm:justify-start gap-2 sm:gap-3">
+                  <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white leading-tight">
                     {username}
                   </h1>
                   {/* Status Indicator next to name */}
                   <div
-                    className="w-4 h-4 rounded-full shadow-lg"
+                    className="w-3 h-3 sm:w-4 sm:h-4 rounded-full shadow-lg"
                     style={{
                       backgroundColor: statusColor,
                     }}
                     title={status}
                   />
                 </div>
-                {bio && <p className="text-slate-300 text-sm mt-1">"{bio}"</p>}
+                {bio && <p className="text-slate-300 text-xs sm:text-sm mt-1">"{bio}"</p>}
               </div>
             </div>
           </div>

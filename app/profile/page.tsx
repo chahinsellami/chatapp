@@ -366,7 +366,7 @@ export default function ProfilePage() {
       />
 
       {/* Profile Content */}
-      <div className="max-w-6xl mx-auto px-6">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6">
         {/* Navigation Tabs */}
         <TabNavigation
           tabs={tabs}
@@ -375,7 +375,7 @@ export default function ProfilePage() {
         />
 
         {/* Content Area */}
-        <div className="max-w-6xl mx-auto px-6 py-8">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
           <AnimatePresence mode="wait">
             {tab === "posts" && (
               <motion.div
@@ -383,11 +383,11 @@ export default function ProfilePage() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
-                className="space-y-6"
+                className="space-y-4 sm:space-y-6"
               >
                 {/* Create Post Card */}
-                <div className="glass-card p-6 rounded-2xl">
-                  <h2 className="text-xl font-bold text-white mb-4">
+                <div className="glass-card p-4 sm:p-6 rounded-2xl">
+                  <h2 className="text-lg sm:text-xl font-bold text-white mb-4">
                     Create a Post
                   </h2>
                   <div className="space-y-4">
@@ -395,7 +395,7 @@ export default function ProfilePage() {
                       value={postContent}
                       onChange={(e) => setPostContent(e.target.value)}
                       placeholder="What's on your mind?"
-                      className="w-full px-4 py-3 bg-slate-800 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                      className="w-full px-3 sm:px-4 py-2 sm:py-3 bg-slate-800 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none text-sm sm:text-base"
                       rows={4}
                     />
 
@@ -405,23 +405,23 @@ export default function ProfilePage() {
                         <img
                           src={postImagePreview}
                           alt="Post preview"
-                          className="w-full max-h-64 object-cover rounded-lg"
+                          className="w-full max-h-48 sm:max-h-64 object-cover rounded-lg"
                         />
                         <motion.button
                           onClick={() => {
                             setPostImage(null);
                             setPostImagePreview(null);
                           }}
-                          className="absolute top-2 right-2 p-2 bg-red-500/80 hover:bg-red-500 rounded-full"
+                          className="absolute top-2 right-2 p-1.5 sm:p-2 bg-red-500/80 hover:bg-red-500 rounded-full"
                           whileHover={{ scale: 1.1 }}
                           whileTap={{ scale: 0.9 }}
                         >
-                          <X className="w-4 h-4 text-white" />
+                          <X className="w-3 h-3 sm:w-4 sm:h-4 text-white" />
                         </motion.button>
                       </div>
                     )}
 
-                    <div className="flex justify-between items-center">
+                    <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-3">
                       <div className="flex gap-2">
                         <input
                           type="file"
@@ -434,7 +434,7 @@ export default function ProfilePage() {
                           htmlFor="post-image-upload"
                           whileHover={{ scale: 1.05 }}
                           whileTap={{ scale: 0.95 }}
-                          className="px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg flex items-center gap-2 cursor-pointer"
+                          className="px-3 sm:px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg flex items-center gap-2 cursor-pointer text-sm sm:text-base"
                         >
                           <Upload className="w-4 h-4" />
                           Photo
@@ -447,7 +447,7 @@ export default function ProfilePage() {
                         }
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
-                        className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="px-4 sm:px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
                       >
                         {posting ? "Posting..." : "Post"}
                       </motion.button>
@@ -456,13 +456,13 @@ export default function ProfilePage() {
                 </div>
 
                 {/* Posts Feed - Placeholder */}
-                <div className="glass-card p-8 rounded-2xl text-center">
+                <div className="glass-card p-6 sm:p-8 rounded-2xl text-center">
                   <div className="text-slate-400">
-                    <MessageCircle className="w-16 h-16 mx-auto mb-4 opacity-50" />
-                    <h3 className="text-xl font-semibold text-white mb-2">
+                    <MessageCircle className="w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-4 opacity-50" />
+                    <h3 className="text-lg sm:text-xl font-semibold text-white mb-2">
                       No posts yet
                     </h3>
-                    <p className="text-slate-400">
+                    <p className="text-sm sm:text-base text-slate-400">
                       Share your first post with your friends!
                     </p>
                   </div>

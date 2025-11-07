@@ -176,12 +176,12 @@ export default function UserProfilePage() {
         </motion.button>
       </div>
 
-      <div className="max-w-4xl mx-auto px-4 pb-8">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 pb-8">
         {/* Cover Image */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="relative h-48 bg-gradient-to-br from-blue-600 to-blue-800 rounded-t-2xl overflow-hidden"
+          className="relative h-32 sm:h-40 md:h-48 bg-gradient-to-br from-blue-600 to-blue-800 rounded-t-2xl overflow-hidden"
         >
           {profile.cover_image && (
             <img
@@ -193,11 +193,11 @@ export default function UserProfilePage() {
         </motion.div>
 
         {/* Profile Header */}
-        <Card className="relative -mt-16 pb-6">
-          <div className="flex flex-col md:flex-row items-end md:items-start gap-6 px-6">
+        <Card className="relative -mt-12 sm:-mt-16 pb-6">
+          <div className="flex flex-col items-center sm:items-start gap-4 sm:gap-6 px-4 sm:px-6">
             {/* Avatar */}
-            <div className="relative -mt-16">
-              <div className="w-32 h-32 rounded-full border-4 border-neutral-900 overflow-hidden bg-blue-600 flex items-center justify-center">
+            <div className="relative -mt-12 sm:-mt-16">
+              <div className="w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 rounded-full border-4 border-neutral-900 overflow-hidden bg-blue-600 flex items-center justify-center">
                 {profile.avatar?.startsWith("/avatars/") ? (
                   <img
                     src={profile.avatar}
@@ -205,7 +205,7 @@ export default function UserProfilePage() {
                     className="w-full h-full object-cover"
                   />
                 ) : (
-                  <span className="text-white text-5xl font-bold">
+                  <span className="text-white text-4xl sm:text-5xl font-bold">
                     {profile.avatar || profile.username[0].toUpperCase()}
                   </span>
                 )}
@@ -213,11 +213,11 @@ export default function UserProfilePage() {
             </div>
 
             {/* User Info */}
-            <div className="flex-1 text-center md:text-left pt-4">
-              <h1 className="text-3xl font-bold text-white mb-2">
+            <div className="flex-1 text-center sm:text-left pt-2 sm:pt-4 w-full">
+              <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2">
                 {profile.username}
               </h1>
-              <div className="flex items-center justify-center md:justify-start gap-3 mb-4">
+              <div className="flex flex-col sm:flex-row items-center justify-center sm:justify-start gap-2 sm:gap-3 mb-4">
                 <div className="flex items-center gap-2">
                   <div
                     className={`w-3 h-3 rounded-full ${
@@ -228,19 +228,19 @@ export default function UserProfilePage() {
                     {isOnline ? "online" : "offline"}
                   </span>
                 </div>
-                <span className="text-neutral-500">•</span>
-                <span className="text-neutral-400 text-sm">
+                <span className="text-neutral-500 hidden sm:inline">•</span>
+                <span className="text-neutral-400 text-xs sm:text-sm">
                   Member since{" "}
                   {new Date(profile.created_at).toLocaleDateString()}
                 </span>
               </div>
               {profile.bio && (
-                <p className="text-neutral-300 max-w-2xl">{profile.bio}</p>
+                <p className="text-neutral-300 max-w-2xl text-sm sm:text-base">{profile.bio}</p>
               )}
             </div>
 
             {/* Action Buttons */}
-            <div className="flex gap-3 pt-4">
+            <div className="flex gap-3 pt-4 w-full sm:w-auto justify-center sm:justify-start">
               {isFriend ? (
                 <Button
                   variant="primary"
