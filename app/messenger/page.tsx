@@ -307,12 +307,12 @@ function MessengerContent() {
               </motion.button>
 
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-blue-600">
-                  {selectedFriend.avatar?.startsWith("/avatars/") ? (
+                <div className="w-10 h-10 rounded-full flex items-center justify-center bg-blue-600 overflow-hidden">
+                  {selectedFriend.avatar && (selectedFriend.avatar.startsWith('http') || selectedFriend.avatar.startsWith('/')) ? (
                     <img
                       src={selectedFriend.avatar}
                       alt={selectedFriend.username}
-                      className="w-full h-full object-cover rounded-lg"
+                      className="w-full h-full object-cover"
                     />
                   ) : (
                     <span className="text-lg text-white">

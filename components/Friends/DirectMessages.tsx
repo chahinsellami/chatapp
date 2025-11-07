@@ -502,8 +502,8 @@ export default function DirectMessages({
       >
         <div className="flex items-center gap-3">
           <motion.div className="relative" whileHover={{ scale: 1.05 }}>
-            <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl overflow-hidden flex items-center justify-center bg-gradient-to-br from-blue-500 to-indigo-600">
-              {friendAvatar?.startsWith("/avatars/") ? (
+            <div className="w-10 h-10 md:w-12 md:h-12 rounded-full overflow-hidden flex items-center justify-center bg-gradient-to-br from-blue-500 to-indigo-600">
+              {friendAvatar && (friendAvatar.startsWith('http') || friendAvatar.startsWith('/')) ? (
                 <img
                   src={friendAvatar}
                   alt={friendName}
@@ -511,7 +511,7 @@ export default function DirectMessages({
                 />
               ) : (
                 <span className="text-xl md:text-2xl">
-                  {friendAvatar || "??"}
+                  {friendAvatar || "👤"}
                 </span>
               )}
             </div>
@@ -648,7 +648,7 @@ export default function DirectMessages({
                   whileHover={{ scale: 1.1 }}
                 >
                   {isOwnMessage ? (
-                    userAvatar?.startsWith("/avatars/") ? (
+                    userAvatar && (userAvatar.startsWith('http') || userAvatar.startsWith('/')) ? (
                       <img
                         src={userAvatar}
                         alt="You"
@@ -656,10 +656,10 @@ export default function DirectMessages({
                       />
                     ) : (
                       <span className="text-xs md:text-sm">
-                        {userAvatar || "??"}
+                        {userAvatar || "👤"}
                       </span>
                     )
-                  ) : friendAvatar?.startsWith("/avatars/") ? (
+                  ) : friendAvatar && (friendAvatar.startsWith('http') || friendAvatar.startsWith('/')) ? (
                     <img
                       src={friendAvatar}
                       alt={friendName}
@@ -667,7 +667,7 @@ export default function DirectMessages({
                     />
                   ) : (
                     <span className="text-xs md:text-sm">
-                      {friendAvatar || "??"}
+                      {friendAvatar || "👤"}
                     </span>
                   )}
                 </motion.div>
@@ -713,8 +713,16 @@ export default function DirectMessages({
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
             >
-              <div className="w-8 h-8 rounded-xl bg-neutral-600 flex items-center justify-center">
-                <span className="text-sm">{friendAvatar || "??"}</span>
+              <div className="w-8 h-8 rounded-full bg-neutral-600 flex items-center justify-center overflow-hidden">
+                {friendAvatar && (friendAvatar.startsWith('http') || friendAvatar.startsWith('/')) ? (
+                  <img
+                    src={friendAvatar}
+                    alt={friendName}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <span className="text-sm">{friendAvatar || "👤"}</span>
+                )}
               </div>
               <div className="flex items-center gap-1">
                 <span>{friendName} is typing</span>
