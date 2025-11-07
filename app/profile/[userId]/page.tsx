@@ -28,6 +28,17 @@ interface UserProfile {
   created_at: string;
 }
 
+interface Post {
+  id: string;
+  user_id: string;
+  content: string | null;
+  image: string | null;
+  likes: number;
+  created_at: string;
+  username: string;
+  avatar: string;
+}
+
 export default function UserProfilePage() {
   const router = useRouter();
   const params = useParams();
@@ -40,6 +51,8 @@ export default function UserProfilePage() {
   const [friendRequestSent, setFriendRequestSent] = useState(false);
   const [sendingRequest, setSendingRequest] = useState(false);
   const [isFriend, setIsFriend] = useState(false);
+  const [posts, setPosts] = useState<Post[]>([]);
+  const [loadingPosts, setLoadingPosts] = useState(false);
 
   // Get online status from Socket.IO
   const { onlineUsers } = useSocket(currentUser?.id || "");
@@ -48,6 +61,7 @@ export default function UserProfilePage() {
   useEffect(() => {
     fetchProfile();
     checkFriendStatus();
+    fetchUserPosts();
   }, [userId]);
 
   const fetchProfile = async () => {
@@ -91,6 +105,26 @@ export default function UserProfilePage() {
       }
     } catch (error) {
       console.error("Error checking friend status:", error);
+    }
+  };
+
+  const fetchUserPosts = async () => {
+    try {
+      setLoadingPosts(true);
+      const token = localStorage.getItem("auth_token");
+
+      const res = await fetch(`/api/posts?userId=${userId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        setPosts(data.posts || []);
+      }
+    } catch (error) {
+      console.error("Error fetching posts:", error);
+    } finally {
+      setLoadingPosts(false);
     }
   };
 
@@ -198,7 +232,7 @@ export default function UserProfilePage() {
             {/* Avatar */}
             <div className="relative -mt-12 sm:-mt-16">
               <div className="w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 rounded-full border-4 border-neutral-900 overflow-hidden bg-blue-600 flex items-center justify-center">
-                {profile.avatar?.startsWith("/avatars/") ? (
+                {profile.avatar && (profile.avatar.startsWith('http') || profile.avatar.startsWith('/')) ? (
                   <img
                     src={profile.avatar}
                     alt={profile.username}
@@ -289,6 +323,100 @@ export default function UserProfilePage() {
             </Card>
           </motion.div>
         )}
+
+        {/* Posts Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          className="mt-6"
+        >
+          <Card>
+            <h2 className="text-xl font-bold text-white mb-4">Posts</h2>
+            {loadingPosts ? (
+              <p className="text-neutral-400 text-center py-8">Loading posts...</p>
+            ) : posts.length === 0 ? (
+              <p className="text-neutral-400 text-center py-8">No posts yet</p>
+            ) : (
+              <div className="space-y-4">
+                {posts.map((post) => {
+                  const getImageUrl = (url: string | null) => {
+                    if (!url) return null;
+                    if (url.startsWith("http")) return url;
+                    if (url.startsWith("/upload/") || url.startsWith("upload/")) {
+                      const cleanPath = url.startsWith("/") ? url.substring(1) : url;
+                      return `https://res.cloudinary.com/dhgsxwtwv/image/${cleanPath}`;
+                    }
+                    return url;
+                  };
+
+                  const imageUrl = getImageUrl(post.image);
+
+                  return (
+                    <div
+                      key={post.id}
+                      className="p-4 bg-neutral-800/50 rounded-lg border border-neutral-700"
+                    >
+                      {/* Post Header */}
+                      <div className="flex items-center gap-3 mb-3">
+                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center overflow-hidden shrink-0">
+                          {post.avatar && (post.avatar.startsWith('http') || post.avatar.startsWith('/')) ? (
+                            <img
+                              src={post.avatar}
+                              alt={post.username}
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            <span className="text-white text-lg">
+                              {post.avatar || '👤'}
+                            </span>
+                          )}
+                        </div>
+                        <div>
+                          <h4 className="font-semibold text-white text-sm">
+                            {post.username}
+                          </h4>
+                          <p className="text-xs text-neutral-400">
+                            {new Date(post.created_at).toLocaleDateString()} at{" "}
+                            {new Date(post.created_at).toLocaleTimeString([], {
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            })}
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Post Content */}
+                      {post.content && (
+                        <p className="text-white mb-3 whitespace-pre-wrap break-words text-sm">
+                          {post.content}
+                        </p>
+                      )}
+
+                      {/* Post Image */}
+                      {imageUrl && (
+                        <div className="rounded-lg overflow-hidden mb-3 bg-neutral-900">
+                          <img
+                            src={imageUrl}
+                            alt="Post"
+                            className="w-full h-auto max-h-96 object-contain"
+                          />
+                        </div>
+                      )}
+
+                      {/* Post Actions */}
+                      <div className="flex items-center gap-4 pt-3 border-t border-neutral-700">
+                        <span className="text-neutral-400 text-sm">
+                          ❤️ {post.likes || 0}
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </Card>
+        </motion.div>
       </div>
     </div>
   );

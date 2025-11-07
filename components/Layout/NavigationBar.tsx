@@ -151,12 +151,12 @@ export default function NavigationBar({ currentPage }: NavigationBarProps) {
                         className="w-full px-4 py-3 hover:bg-neutral-800 flex items-center gap-3 transition-colors"
                         whileHover={{ x: 4 }}
                       >
-                        <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gradient-to-br from-blue-600 to-blue-700 flex items-center justify-center flex-shrink-0 shadow-lg">
-                          {user.avatar?.startsWith("/avatars/") ? (
+                        <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gradient-to-br from-blue-600 to-blue-700 flex items-center justify-center flex-shrink-0 shadow-lg overflow-hidden">
+                          {user.avatar && (user.avatar.startsWith('http') || user.avatar.startsWith('/')) ? (
                             <img
                               src={user.avatar}
                               alt={user.username}
-                              className="w-full h-full rounded-full object-cover"
+                              className="w-full h-full object-cover"
                             />
                           ) : (
                             <span className="text-white font-bold text-sm sm:text-base">
