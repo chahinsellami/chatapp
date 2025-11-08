@@ -4,6 +4,16 @@ const nextConfig: NextConfig = {
   /* config options here */
   reactCompiler: true,
 
+  // Webpack config to handle client-only modules
+  webpack: (config, { isServer }) => {
+    if (isServer) {
+      // Exclude Agora SDK from server-side bundle
+      config.externals = config.externals || [];
+      config.externals.push("agora-rtc-sdk-ng");
+    }
+    return config;
+  },
+
   // Image optimization
   images: {
     remotePatterns: [

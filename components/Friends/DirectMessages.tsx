@@ -8,7 +8,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useSocket } from "@/lib/useSocket";
-import { useAgoraCall } from "@/lib/useAgoraCall";
+import { useAgoraCallWrapper as useAgoraCall } from "@/lib/useAgoraCallWrapper";
 import { VideoPlayer } from "@/components/Call/VideoPlayer";
 import { useAuth } from "@/context/AuthContext";
 import { motion, AnimatePresence } from "framer-motion";

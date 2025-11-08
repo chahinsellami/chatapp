@@ -7,6 +7,9 @@ import DirectMessages from "@/components/Friends/DirectMessages";
 import AddFriend from "@/components/Friends/AddFriend";
 import { verifyToken } from "@/lib/auth";
 
+// Force dynamic rendering - no static generation
+export const dynamic = "force-dynamic";
+
 interface User {
   userId: string;
   username: string;
