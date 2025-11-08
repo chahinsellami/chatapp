@@ -8,7 +8,8 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useSocket } from "@/lib/useSocket";
-import { useWebRTC } from "@/lib/useWebRTC";
+import { useAgoraCall } from "@/lib/useAgoraCall";
+import { VideoPlayer } from "@/components/Call/VideoPlayer";
 import { useAuth } from "@/context/AuthContext";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -88,10 +89,8 @@ export default function DirectMessages({
   // Auth context for user status
   const { user, updateUser } = useAuth();
 
-  // DOM references for scrolling and video elements
+  // DOM references for scrolling and other elements
   const messagesEndRef = useRef<HTMLDivElement>(null); // Reference for auto-scrolling
-  const localVideoRef = useRef<HTMLVideoElement>(null); // Local video stream element
-  const remoteVideoRef = useRef<HTMLVideoElement>(null); // Remote video stream element
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null); // Typing indicator timeout
   const statusDropdownRef = useRef<HTMLDivElement>(null); // Status dropdown reference
 
@@ -137,35 +136,30 @@ export default function DirectMessages({
     onlineUsers,
   } = useSocket(userId);
 
-  // Initialize WebRTC connection for voice/video calls
+  // Initialize Agora call for voice/video calls
   const {
     isCallActive,
-    isIncomingCall,
-    callType,
-    callerInfo,
-    localStream,
-    remoteStream,
-    startCall,
-    acceptCall,
-    rejectCall,
+    localAudioTrack,
+    localVideoTrack,
+    remoteUsers,
+    startCall: startAgoraCall,
     endCall,
     toggleAudio,
     toggleVideo,
-  } = useWebRTC({ socket, userId });
+    isAudioEnabled,
+    isVideoEnabled,
+    callType,
+    currentChannel,
+  } = useAgoraCall(userId || "");
 
-  // Set up local video stream when available
-  useEffect(() => {
-    if (localStream && localVideoRef.current) {
-      localVideoRef.current.srcObject = localStream;
-    }
-  }, [localStream]);
-
-  // Set up remote video stream when available
-  useEffect(() => {
-    if (remoteStream && remoteVideoRef.current) {
-      remoteVideoRef.current.srcObject = remoteStream;
-    }
-  }, [remoteStream]);
+  // State for incoming calls
+  const [isIncomingCall, setIsIncomingCall] = useState(false);
+  const [incomingCallData, setIncomingCallData] = useState<{
+    from: string;
+    channelName: string;
+    callType: "video" | "voice";
+    callerName: string;
+  } | null>(null);
 
   // Fetch messages when conversation changes
   useEffect(() => {
@@ -241,6 +235,38 @@ export default function DirectMessages({
       socket.off("receive-message", handleNewMessage);
     };
   }, [socket, userId, friendId, friendName, friendAvatar]);
+
+  // Socket.IO listeners for Agora call signaling
+  useEffect(() => {
+    if (!socket) return;
+
+    // Handle incoming call requests
+    const handleIncomingCall = (data: { 
+      from: string; 
+      channelName: string; 
+      callType: "video" | "voice";
+      callerName: string;
+    }) => {
+      console.log("📞 Incoming call from:", data.from);
+      setIsIncomingCall(true);
+      setIncomingCallData(data);
+    };
+
+    // Handle call rejection
+    const handleCallRejected = () => {
+      console.log("❌ Call was rejected");
+      alert("Call was declined");
+      endCall();
+    };
+
+    socket.on("incoming-call", handleIncomingCall);
+    socket.on("call-rejected", handleCallRejected);
+
+    return () => {
+      socket.off("incoming-call", handleIncomingCall);
+      socket.off("call-rejected", handleCallRejected);
+    };
+  }, [socket, endCall]);
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
@@ -475,7 +501,7 @@ export default function DirectMessages({
     }
 
     // Check if friend is online or if there's an incoming call
-    if (isIncomingCall && callerInfo?.id === friendId) {
+    if (isIncomingCall && incomingCallData?.from === friendId) {
       diagnosticMessage += "✅ Incoming call detected - friend is calling you\n";
     } else if (onlineUsers.has(friendId)) {
       diagnosticMessage += "✅ Friend is online\n";
@@ -496,7 +522,7 @@ export default function DirectMessages({
 
   /**
    * Initiate a voice or video call with mobile-specific warnings
-   * Checks permissions and provides user guidance for mobile devices
+   * Uses Agora.io for reliable connection
    */
   const handleStartCall = async (type: "voice" | "video") => {
     // Check if friend is online first
@@ -513,10 +539,14 @@ export default function DirectMessages({
       return;
     }
 
-    console.log("🎯 Starting call:", {
+    // Generate unique channel name
+    const channelName = `call_${userId}_${friendId}_${Date.now()}`;
+
+    console.log("📞 Initiating Agora call:", {
       type,
       to: friendId,
       from: userId,
+      channelName,
       socketConnected: isConnected,
       friendOnline: onlineUsers.has(friendId),
     });
@@ -545,7 +575,48 @@ export default function DirectMessages({
       // Permissions API not supported, continue anyway
     }
 
-    startCall(friendId, type);
+    // Send call request to friend via Socket.IO
+    socket.emit("call-request", {
+      to: friendId,
+      channelName,
+      callType: type,
+      callerName: user?.username || "Unknown",
+    });
+
+    // Join Agora channel
+    await startAgoraCall(channelName, type);
+  };
+
+  /**
+   * Accept an incoming call
+   */
+  const acceptCall = async () => {
+    if (!incomingCallData) return;
+
+    console.log("✅ Accepting call:", incomingCallData);
+
+    // Join the Agora channel
+    await startAgoraCall(incomingCallData.channelName, incomingCallData.callType);
+
+    // Clear incoming call state
+    setIsIncomingCall(false);
+    setIncomingCallData(null);
+  };
+
+  /**
+   * Reject an incoming call
+   */
+  const rejectCall = () => {
+    if (!incomingCallData || !socket) return;
+
+    console.log("❌ Rejecting call from:", incomingCallData.from);
+
+    // Notify caller that call was rejected
+    socket.emit("reject-call", { to: incomingCallData.from });
+
+    // Clear incoming call state
+    setIsIncomingCall(false);
+    setIncomingCallData(null);
   };
 
   // Show loading spinner while fetching initial messages
@@ -922,7 +993,7 @@ export default function DirectMessages({
 
       {/* Incoming Call Modal */}
       <AnimatePresence>
-        {isIncomingCall && callerInfo && (
+        {isIncomingCall && incomingCallData && (
           <motion.div
             className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4"
             initial={{ opacity: 0 }}
@@ -940,7 +1011,7 @@ export default function DirectMessages({
                 animate={{ rotate: [0, 10, -10, 0] }}
                 transition={{ duration: 2, repeat: Infinity }}
               >
-                {callType === "video" ? (
+                {incomingCallData.callType === "video" ? (
                   <Video className="w-10 h-10 text-white" />
                 ) : (
                   <Phone className="w-10 h-10 text-white" />
@@ -948,16 +1019,16 @@ export default function DirectMessages({
               </motion.div>
 
               <h2 className="text-2xl font-bold text-white mb-2">
-                Incoming {callType === "video" ? "Video" : "Voice"} Call
+                Incoming {incomingCallData.callType === "video" ? "Video" : "Voice"} Call
               </h2>
               <p className="text-neutral-300 mb-6">
-                {friendName} is calling...
+                {incomingCallData.callerName} is calling...
               </p>
 
               {isMobile && (
                 <p className="text-neutral-400 text-sm mb-4">
                   Make sure to allow microphone
-                  {callType === "video" ? " and camera" : ""} access when
+                  {incomingCallData.callType === "video" ? " and camera" : ""} access when
                   prompted
                 </p>
               )}
@@ -1014,13 +1085,21 @@ export default function DirectMessages({
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{ delay: 0.2 }}
               >
-                {/* Remote Video */}
-                <video
-                  ref={remoteVideoRef}
-                  autoPlay
-                  playsInline
-                  className="w-full h-full object-cover"
-                />
+                {/* Remote Video - Show first remote user */}
+                {remoteUsers.length > 0 && remoteUsers[0].videoTrack ? (
+                  <VideoPlayer
+                    videoTrack={remoteUsers[0].videoTrack}
+                    isLocal={false}
+                    className="w-full h-full"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center text-neutral-500">
+                    <div className="text-center">
+                      <div className="text-6xl mb-4">👤</div>
+                      <p>Waiting for {friendName}...</p>
+                    </div>
+                  </div>
+                )}
 
                 {/* Local Video */}
                 <motion.div
@@ -1029,13 +1108,17 @@ export default function DirectMessages({
                   animate={{ scale: 1 }}
                   transition={{ delay: 0.4 }}
                 >
-                  <video
-                    ref={localVideoRef}
-                    autoPlay
-                    playsInline
-                    muted
-                    className="w-full h-full object-cover"
-                  />
+                  {localVideoTrack ? (
+                    <VideoPlayer
+                      videoTrack={localVideoTrack}
+                      isLocal={true}
+                      className="w-full h-full"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center bg-neutral-900">
+                      <VideoOff className="w-8 h-8 text-neutral-600" />
+                    </div>
+                  )}
                 </motion.div>
               </motion.div>
             )}
@@ -1059,20 +1142,34 @@ export default function DirectMessages({
             >
               <motion.button
                 onClick={toggleAudio}
-                className="p-4 rounded-2xl glass-button hover:bg-neutral-700"
+                className={`p-4 rounded-2xl glass-button ${
+                  isAudioEnabled ? "hover:bg-neutral-700" : "bg-red-600 hover:bg-red-700"
+                }`}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
+                title={isAudioEnabled ? "Mute" : "Unmute"}
               >
-                <Mic className="w-6 h-6 text-white" />
+                {isAudioEnabled ? (
+                  <Mic className="w-6 h-6 text-white" />
+                ) : (
+                  <MicOff className="w-6 h-6 text-white" />
+                )}
               </motion.button>
               {callType === "video" && (
                 <motion.button
                   onClick={toggleVideo}
-                  className="p-4 rounded-2xl glass-button hover:bg-neutral-700"
+                  className={`p-4 rounded-2xl glass-button ${
+                    isVideoEnabled ? "hover:bg-neutral-700" : "bg-red-600 hover:bg-red-700"
+                  }`}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
+                  title={isVideoEnabled ? "Turn off camera" : "Turn on camera"}
                 >
-                  <Video className="w-6 h-6 text-white" />
+                  {isVideoEnabled ? (
+                    <Video className="w-6 h-6 text-white" />
+                  ) : (
+                    <VideoOff className="w-6 h-6 text-white" />
+                  )}
                 </motion.button>
               )}
               <motion.button
