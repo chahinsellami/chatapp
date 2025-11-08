@@ -1,3 +1,5 @@
+"use client";
+
 import { useState, useEffect, useCallback, useRef } from "react";
 import AgoraRTC, {
   IAgoraRTCClient,
@@ -9,11 +11,13 @@ import AgoraRTC, {
 
 const APP_ID = process.env.NEXT_PUBLIC_AGORA_APP_ID || "";
 
-// Enable Agora debug logging in development
-if (process.env.NODE_ENV === "development") {
-  AgoraRTC.setLogLevel(0);
-} else {
-  AgoraRTC.setLogLevel(3); // Only show warnings and errors in production
+// Enable Agora debug logging in development (only on client)
+if (typeof window !== "undefined") {
+  if (process.env.NODE_ENV === "development") {
+    AgoraRTC.setLogLevel(0);
+  } else {
+    AgoraRTC.setLogLevel(3); // Only show warnings and errors in production
+  }
 }
 
 export type CallType = "video" | "voice";
