@@ -539,8 +539,19 @@ export default function DirectMessages({
       return;
     }
 
-    // Generate unique channel name
-    const channelName = `call_${userId}_${friendId}_${Date.now()}`;
+    // Generate unique channel name (must be < 64 chars for Agora)
+    // Create a short hash from user IDs
+    const shortHash = (str: string) => {
+      let hash = 0;
+      for (let i = 0; i < str.length; i++) {
+        const char = str.charCodeAt(i);
+        hash = ((hash << 5) - hash) + char;
+        hash = hash & hash; // Convert to 32bit integer
+      }
+      return Math.abs(hash).toString(36);
+    };
+    const userHash = shortHash(userId + friendId);
+    const channelName = `call_${userHash}_${Date.now()}`;
 
     console.log("📞 Initiating Agora call:", {
       type,
