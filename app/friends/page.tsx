@@ -2,10 +2,19 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import dynamicImport from "next/dynamic";
 import FriendsList from "@/components/Friends/FriendsList";
-import DirectMessages from "@/components/Friends/DirectMessages";
 import AddFriend from "@/components/Friends/AddFriend";
 import { verifyToken } from "@/lib/auth";
+
+// Lazy-load DirectMessages to avoid SSR issues with Agora SDK
+const DirectMessages = dynamicImport(
+  () => import("@/components/Friends/DirectMessages"),
+  { 
+    ssr: false,
+    loading: () => <div className="flex-1 flex items-center justify-center">Loading...</div>
+  }
+);
 
 // Force dynamic rendering - no static generation
 export const dynamic = "force-dynamic";

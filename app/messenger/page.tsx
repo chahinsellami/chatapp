@@ -2,10 +2,22 @@
 
 import { useEffect, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import dynamicImport from "next/dynamic";
 import { useAuth } from "@/context/AuthContext";
 import FriendsList from "@/components/Friends/FriendsList";
-import DirectMessages from "@/components/Friends/DirectMessages";
 import { MessageCircle, LogOut, Menu, X, UserCircle2 } from "lucide-react";
+
+// Lazy-load DirectMessages to avoid SSR issues with Agora SDK
+const DirectMessages = dynamicImport(
+  () => import("@/components/Friends/DirectMessages"),
+  { 
+    ssr: false,
+    loading: () => <div className="flex-1 flex items-center justify-center">Loading...</div>
+  }
+);
+
+// Force dynamic rendering
+export const dynamic = "force-dynamic";
 
 interface Friend {
   id: string;

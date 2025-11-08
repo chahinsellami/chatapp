@@ -2,31 +2,39 @@
 
 import { useState, useEffect } from "react";
 
+// Lazy-loaded Agora hook
+let useAgoraCallModule: any = null;
+
 // Wrapper to lazy-load Agora only when needed
 export function useAgoraCallWrapper(userId: string) {
-  const [agoraHook, setAgoraHook] = useState<any>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [hook, setHook] = useState<any>(null);
+  const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
     // Only load Agora on client-side
-    if (typeof window !== "undefined") {
+    if (typeof window !== "undefined" && !useAgoraCallModule) {
       import("@/lib/useAgoraCall")
         .then((mod) => {
-          const hook = mod.useAgoraCall(userId);
-          setAgoraHook(hook);
-          setIsLoading(false);
+          useAgoraCallModule = mod.useAgoraCall;
+          setIsLoaded(true);
         })
         .catch((err) => {
           console.error("Failed to load Agora:", err);
-          setIsLoading(false);
         });
+    } else if (useAgoraCallModule) {
+      setIsLoaded(true);
     }
-  }, [userId]);
+  }, []);
 
-  // Return stub methods while loading
-  if (isLoading || !agoraHook) {
+  // Only call the actual hook after the module is loaded
+  const agoraHook = isLoaded && useAgoraCallModule ? useAgoraCallModule(userId) : null;
+
+  // Return the actual hook if loaded, otherwise return stub
+  if (!agoraHook) {
     return {
-      startCall: async () => {},
+      startCall: async () => {
+        console.warn("Agora not loaded yet");
+      },
       endCall: async () => {},
       toggleAudio: async () => false,
       toggleVideo: async () => false,
