@@ -13,7 +13,11 @@ interface VideoPlayerProps {
  * Component to render Agora video tracks
  * Automatically plays the video track when it's available
  */
-export function VideoPlayer({ videoTrack, isLocal = false, className = "" }: VideoPlayerProps) {
+export function VideoPlayer({
+  videoTrack,
+  isLocal = false,
+  className = "",
+}: VideoPlayerProps) {
   const videoRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {

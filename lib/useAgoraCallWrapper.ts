@@ -27,7 +27,8 @@ export function useAgoraCallWrapper(userId: string) {
   }, []);
 
   // Only call the actual hook after the module is loaded
-  const agoraHook = isLoaded && useAgoraCallModule ? useAgoraCallModule(userId) : null;
+  const agoraHook =
+    isLoaded && useAgoraCallModule ? useAgoraCallModule(userId) : null;
 
   // Return the actual hook if loaded, otherwise return stub
   if (!agoraHook) {

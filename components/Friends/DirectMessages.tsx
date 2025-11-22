@@ -241,9 +241,9 @@ export default function DirectMessages({
     if (!socket) return;
 
     // Handle incoming call requests
-    const handleIncomingCall = (data: { 
-      from: string; 
-      channelName: string; 
+    const handleIncomingCall = (data: {
+      from: string;
+      channelName: string;
       callType: "video" | "voice";
       callerName: string;
     }) => {
@@ -502,7 +502,8 @@ export default function DirectMessages({
 
     // Check if friend is online or if there's an incoming call
     if (isIncomingCall && incomingCallData?.from === friendId) {
-      diagnosticMessage += "✅ Incoming call detected - friend is calling you\n";
+      diagnosticMessage +=
+        "✅ Incoming call detected - friend is calling you\n";
     } else if (onlineUsers.has(friendId)) {
       diagnosticMessage += "✅ Friend is online\n";
     } else {
@@ -545,7 +546,7 @@ export default function DirectMessages({
       let hash = 0;
       for (let i = 0; i < str.length; i++) {
         const char = str.charCodeAt(i);
-        hash = ((hash << 5) - hash) + char;
+        hash = (hash << 5) - hash + char;
         hash = hash & hash; // Convert to 32bit integer
       }
       return Math.abs(hash).toString(36);
@@ -607,7 +608,10 @@ export default function DirectMessages({
     console.log("✅ Accepting call:", incomingCallData);
 
     // Join the Agora channel
-    await startAgoraCall(incomingCallData.channelName, incomingCallData.callType);
+    await startAgoraCall(
+      incomingCallData.channelName,
+      incomingCallData.callType
+    );
 
     // Clear incoming call state
     setIsIncomingCall(false);
@@ -1030,7 +1034,8 @@ export default function DirectMessages({
               </motion.div>
 
               <h2 className="text-2xl font-bold text-white mb-2">
-                Incoming {incomingCallData.callType === "video" ? "Video" : "Voice"} Call
+                Incoming{" "}
+                {incomingCallData.callType === "video" ? "Video" : "Voice"} Call
               </h2>
               <p className="text-neutral-300 mb-6">
                 {incomingCallData.callerName} is calling...
@@ -1039,8 +1044,10 @@ export default function DirectMessages({
               {isMobile && (
                 <p className="text-neutral-400 text-sm mb-4">
                   Make sure to allow microphone
-                  {incomingCallData.callType === "video" ? " and camera" : ""} access when
-                  prompted
+                  {incomingCallData.callType === "video"
+                    ? " and camera"
+                    : ""}{" "}
+                  access when prompted
                 </p>
               )}
 
@@ -1154,7 +1161,9 @@ export default function DirectMessages({
               <motion.button
                 onClick={toggleAudio}
                 className={`p-4 rounded-2xl glass-button ${
-                  isAudioEnabled ? "hover:bg-neutral-700" : "bg-red-600 hover:bg-red-700"
+                  isAudioEnabled
+                    ? "hover:bg-neutral-700"
+                    : "bg-red-600 hover:bg-red-700"
                 }`}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
@@ -1170,7 +1179,9 @@ export default function DirectMessages({
                 <motion.button
                   onClick={toggleVideo}
                   className={`p-4 rounded-2xl glass-button ${
-                    isVideoEnabled ? "hover:bg-neutral-700" : "bg-red-600 hover:bg-red-700"
+                    isVideoEnabled
+                      ? "hover:bg-neutral-700"
+                      : "bg-red-600 hover:bg-red-700"
                   }`}
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}

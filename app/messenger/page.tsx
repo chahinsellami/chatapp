@@ -10,9 +10,11 @@ import { MessageCircle, LogOut, Menu, X, UserCircle2 } from "lucide-react";
 // Lazy-load DirectMessages to avoid SSR issues with Agora SDK
 const DirectMessages = dynamicImport(
   () => import("@/components/Friends/DirectMessages"),
-  { 
+  {
     ssr: false,
-    loading: () => <div className="flex-1 flex items-center justify-center">Loading...</div>
+    loading: () => (
+      <div className="flex-1 flex items-center justify-center">Loading...</div>
+    ),
   }
 );
 
