@@ -1,5 +1,6 @@
-import Image from "next/image";
+
 "use client";
+import Image from "next/image";
 
 /**
  * ImageUpload Component - Reusable image upload with preview
