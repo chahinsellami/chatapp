@@ -40,6 +40,11 @@ const nextConfig: NextConfig = {
         source: "/:path*",
         headers: [
           {
+            key: "Content-Security-Policy",
+            value:
+              "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://www.googletagmanager.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net; img-src 'self' data: https://api.dicebear.com https://res.cloudinary.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://api.dicebear.com https://res.cloudinary.com wss:; frame-ancestors 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests;",
+          },
+          {
             key: "X-DNS-Prefetch-Control",
             value: "on",
           },
