@@ -13,7 +13,15 @@ const DirectMessages = dynamicImport(
   {
     ssr: false,
     loading: () => (
-      <div className="flex-1 flex items-center justify-center">Loading...</div>
+      <div className="flex flex-col items-center justify-center min-h-[400px] w-full">
+        <div className="w-16 h-16 rounded-2xl flex items-center justify-center bg-gradient-to-br from-blue-500 to-indigo-600 shadow-lg mb-4 animate-spin-slow">
+          <MessageCircle className="w-8 h-8 text-white" />
+        </div>
+        <div className="text-center">
+          <p className="text-lg font-semibold text-white mb-1">Loading conversation...</p>
+          <p className="text-neutral-400 text-sm">Please wait while we load your chat.</p>
+        </div>
+      </div>
     ),
   }
 );
