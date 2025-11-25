@@ -1,5 +1,6 @@
-import Image from "next/image";
+
 "use client";
+import Image from "next/image";
 
 /**
  * Add Friend Component - Search and send friend requests to other users

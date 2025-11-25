@@ -1,5 +1,6 @@
-import Image from "next/image";
+
 "use client";
+import Image from "next/image";
 
 /**
  * NavigationBar Component - Top navigation bar for authenticated pages

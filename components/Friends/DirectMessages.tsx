@@ -1,5 +1,6 @@
-import Image from "next/image";
+
 "use client";
+import Image from "next/image";
 
 /**
  * Direct Messages Component - Main messaging interface between two users

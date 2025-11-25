@@ -1,5 +1,6 @@
-﻿import Image from "next/image";
+﻿
 "use client";
+import Image from "next/image";
 
 /**
  * Friends List Component - Displays user's friends and pending friend requests
