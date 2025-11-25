@@ -1,6 +1,7 @@
+
 # WebChat
 
-A professional real-time messaging platform with direct messaging, friend management, post sharing, and WebRTC voice/video calling. Built with Next.js, TypeScript, and PostgreSQL.
+A professional real-time messaging platform with direct messaging, friend management, post sharing, and secure voice/video calling powered by Agora. Built with Next.js, TypeScript, and PostgreSQL.
 
 [![Next.js](https://img.shields.io/badge/Next.js-16-black?logo=next.js)](https://nextjs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?logo=typescript)](https://www.typescriptlang.org/)
@@ -12,7 +13,7 @@ A professional real-time messaging platform with direct messaging, friend manage
 ## Features
 
 - **Real-time Messaging** - Instant messaging with Socket.IO, typing indicators, and presence tracking
-- **Voice & Video Calls** - WebRTC peer-to-peer calling with in-call controls
+- **Voice & Video Calls** - Secure, production-grade voice/video calls powered by Agora
 - **Friend System** - Send/accept friend requests, search users, view online status
 - **Posts** - Create and share posts with image uploads via Cloudinary
 - **Authentication** - JWT-based auth with bcrypt password hashing
@@ -327,11 +328,12 @@ npm run dev      # Start with auto-reload
 - Check file size < 10MB
 - Ensure proper FormData format
 
-**WebRTC Calls Not Working**
+**Voice/Video Calls Not Working**
 
 - Grant browser camera/microphone permissions
 - Check if device is available
-- Verify network allows WebRTC (some corporate networks block it)
+- Ensure you have a stable internet connection
+- If issues persist, check Agora dashboard for service status
 
 ## Contributing
 

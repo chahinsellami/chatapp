@@ -11,13 +11,8 @@ import AgoraRTC, {
 
 const APP_ID = process.env.NEXT_PUBLIC_AGORA_APP_ID || "";
 
-// Enable Agora debug logging in development (only on client)
 if (typeof window !== "undefined") {
-  if (process.env.NODE_ENV === "development") {
-    AgoraRTC.setLogLevel(0);
-  } else {
-    AgoraRTC.setLogLevel(3); // Only show warnings and errors in production
-  }
+  AgoraRTC.setLogLevel(3);
 }
 
 export type CallType = "video" | "voice";
@@ -86,13 +81,8 @@ export function useAgoraCall(userId: string): UseAgoraCallReturn {
    */
   useEffect(() => {
     if (!APP_ID) {
-      console.warn(
-        "⚠️ Agora App ID not configured. Please add NEXT_PUBLIC_AGORA_APP_ID to .env.local"
-      );
       return;
     }
-
-    console.log("🎬 Initializing Agora RTC client");
 
     // Create Agora client with VP8 codec (better compatibility)
     const client = AgoraRTC.createClient({
@@ -107,11 +97,11 @@ export function useAgoraCall(userId: string): UseAgoraCallReturn {
      */
     client.on("user-published", async (user, mediaType) => {
       try {
-        console.log(`📡 Remote user published ${mediaType}:`, user.uid);
+        // ...existing code...
 
         // Subscribe to the remote user's media
         await client.subscribe(user, mediaType);
-        console.log(`✅ Subscribed to ${mediaType} from:`, user.uid);
+        // ...existing code...
 
         // Update remote users state
         setRemoteUsers((prev) => {
@@ -150,10 +140,10 @@ export function useAgoraCall(userId: string): UseAgoraCallReturn {
         // Auto-play audio
         if (mediaType === "audio") {
           user.audioTrack?.play();
-          console.log("🔊 Playing remote audio");
+          // ...existing code...
         }
       } catch (error) {
-        console.error(`❌ Error subscribing to ${mediaType}:`, error);
+        // ...existing code...
       }
     });
 
@@ -161,7 +151,7 @@ export function useAgoraCall(userId: string): UseAgoraCallReturn {
      * Handle when a remote user unpublishes their media
      */
     client.on("user-unpublished", (user, mediaType) => {
-      console.log(`📴 Remote user unpublished ${mediaType}:`, user.uid);
+      // ...existing code...
 
       setRemoteUsers((prev) =>
         prev.map((u) =>
@@ -182,7 +172,7 @@ export function useAgoraCall(userId: string): UseAgoraCallReturn {
      * Handle when a remote user leaves the channel
      */
     client.on("user-left", (user) => {
-      console.log("👋 Remote user left:", user.uid);
+      // ...existing code...
       setRemoteUsers((prev) => prev.filter((u) => u.uid !== user.uid));
     });
 
@@ -191,7 +181,7 @@ export function useAgoraCall(userId: string): UseAgoraCallReturn {
      */
     client.on("network-quality", (stats) => {
       if (stats.downlinkNetworkQuality > 3 || stats.uplinkNetworkQuality > 3) {
-        console.warn("⚠️ Poor network quality detected:", stats);
+        // ...existing code...
       }
     });
 
@@ -199,20 +189,17 @@ export function useAgoraCall(userId: string): UseAgoraCallReturn {
      * Handle connection state changes
      */
     client.on("connection-state-change", (curState, prevState, reason) => {
-      console.log(
-        `🔄 Connection state changed: ${prevState} → ${curState}`,
-        reason
-      );
+      // ...existing code...
 
       if (curState === "DISCONNECTED") {
-        console.log("📵 Disconnected from Agora");
+        // ...existing code...
         setIsCallActive(false);
       }
     });
 
     // Cleanup on unmount
     return () => {
-      console.log("🧹 Cleaning up Agora client");
+      // ...existing code...
       client.removeAllListeners();
     };
   }, []);
@@ -226,14 +213,11 @@ export function useAgoraCall(userId: string): UseAgoraCallReturn {
   const startCall = useCallback(
     async (channelName: string, type: CallType) => {
       if (!clientRef.current) {
-        console.error("❌ Agora client not initialized");
+        // ...existing code...
         return;
       }
 
       if (!APP_ID) {
-        alert(
-          "Agora App ID not configured. Please check your environment variables."
-        );
         return;
       }
 
@@ -245,11 +229,10 @@ export function useAgoraCall(userId: string): UseAgoraCallReturn {
           client.connectionState === "CONNECTED" ||
           client.connectionState === "CONNECTING"
         ) {
-          alert("Already in a call. Please end the current call first.");
           return;
         }
 
-        console.log(`📞 Starting ${type} call in channel:`, channelName);
+        // ...existing code...
 
         // Fetch token from backend
         let token = "";
@@ -267,13 +250,12 @@ export function useAgoraCall(userId: string): UseAgoraCallReturn {
           const data = await res.json();
           token = data.token;
         } catch (err) {
-          alert("Failed to get Agora token. Please try again.");
           return;
         }
 
         // Join the channel with token
         await client.join(APP_ID, channelName, token, userId);
-        console.log("✅ Joined Agora channel successfully");
+        // ...existing code...
 
         // Create audio track with optimized settings
         const audioTrack = await AgoraRTC.createMicrophoneAudioTrack({
@@ -283,7 +265,7 @@ export function useAgoraCall(userId: string): UseAgoraCallReturn {
           ANS: true, // Automatic Noise Suppression
         });
         setLocalAudioTrack(audioTrack);
-        console.log("🎤 Created audio track");
+        // ...existing code...
 
         // Create video track if it's a video call
         let videoTrack: ICameraVideoTrack | null = null;
@@ -298,7 +280,7 @@ export function useAgoraCall(userId: string): UseAgoraCallReturn {
             },
           });
           setLocalVideoTrack(videoTrack);
-          console.log("📹 Created video track");
+          // ...existing code...
         }
 
         // Publish tracks to the channel
@@ -306,7 +288,7 @@ export function useAgoraCall(userId: string): UseAgoraCallReturn {
           ? [audioTrack, videoTrack]
           : [audioTrack];
         await client.publish(tracksToPublish);
-        console.log("📤 Published local tracks to channel");
+        // ...existing code...
 
         setCurrentChannel(channelName);
         setCallType(type);
@@ -314,30 +296,8 @@ export function useAgoraCall(userId: string): UseAgoraCallReturn {
         setIsAudioEnabled(true);
         setIsVideoEnabled(type === "video");
 
-        console.log("✅ Call started successfully!");
+        // ...existing code...
       } catch (error: any) {
-        console.error("❌ Error starting call:", error);
-
-        // Handle specific errors
-        if (error.code === "INVALID_PARAMS") {
-          alert("Invalid call parameters. Please try again.");
-        } else if (error.code === "UNEXPECTED_ERROR") {
-          alert(
-            "Unexpected error occurred. Please check your internet connection."
-          );
-        } else if (
-          error.name === "NotAllowedError" ||
-          error.name === "PermissionDeniedError"
-        ) {
-          alert(
-            "Camera/microphone access denied. Please grant permissions and try again."
-          );
-        } else if (error.name === "NotFoundError") {
-          alert("No camera/microphone found. Please check your device.");
-        } else {
-          alert(`Failed to start call: ${error.message || "Unknown error"}`);
-        }
-
         // Cleanup on error
         await endCall();
       }
@@ -352,14 +312,11 @@ export function useAgoraCall(userId: string): UseAgoraCallReturn {
     if (!clientRef.current) return;
 
     try {
-      console.log("📵 Ending call...");
-
       // Stop and close local audio track
       if (localAudioTrack) {
         localAudioTrack.stop();
         localAudioTrack.close();
         setLocalAudioTrack(null);
-        console.log("🎤 Closed audio track");
       }
 
       // Stop and close local video track
@@ -367,12 +324,10 @@ export function useAgoraCall(userId: string): UseAgoraCallReturn {
         localVideoTrack.stop();
         localVideoTrack.close();
         setLocalVideoTrack(null);
-        console.log("📹 Closed video track");
       }
 
       // Leave the channel
       await clientRef.current.leave();
-      console.log("👋 Left Agora channel");
 
       // Reset state
       setCurrentChannel(null);
@@ -381,10 +336,8 @@ export function useAgoraCall(userId: string): UseAgoraCallReturn {
       setRemoteUsers([]);
       setIsAudioEnabled(true);
       setIsVideoEnabled(true);
-
-      console.log("✅ Call ended successfully");
     } catch (error) {
-      console.error("❌ Error ending call:", error);
+      // ...existing code...
     }
   }, [localAudioTrack, localVideoTrack]);
 
@@ -394,7 +347,6 @@ export function useAgoraCall(userId: string): UseAgoraCallReturn {
    */
   const toggleAudio = useCallback(async () => {
     if (!localAudioTrack) {
-      console.warn("⚠️ No audio track available");
       return false;
     }
 
@@ -402,10 +354,9 @@ export function useAgoraCall(userId: string): UseAgoraCallReturn {
       const newState = !isAudioEnabled;
       await localAudioTrack.setEnabled(newState);
       setIsAudioEnabled(newState);
-      console.log(`🎤 Audio ${newState ? "enabled" : "muted"}`);
+      // ...existing code...
       return newState;
     } catch (error) {
-      console.error("❌ Error toggling audio:", error);
       return isAudioEnabled;
     }
   }, [localAudioTrack, isAudioEnabled]);
@@ -416,7 +367,6 @@ export function useAgoraCall(userId: string): UseAgoraCallReturn {
    */
   const toggleVideo = useCallback(async () => {
     if (!localVideoTrack) {
-      console.warn("⚠️ No video track available");
       return false;
     }
 
@@ -424,10 +374,9 @@ export function useAgoraCall(userId: string): UseAgoraCallReturn {
       const newState = !isVideoEnabled;
       await localVideoTrack.setEnabled(newState);
       setIsVideoEnabled(newState);
-      console.log(`📹 Video ${newState ? "enabled" : "disabled"}`);
+      // ...existing code...
       return newState;
     } catch (error) {
-      console.error("❌ Error toggling video:", error);
       return isVideoEnabled;
     }
   }, [localVideoTrack, isVideoEnabled]);

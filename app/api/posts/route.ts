@@ -55,7 +55,6 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ posts: result.rows });
   } catch (error) {
-    console.error("Error fetching posts:", error);
     return NextResponse.json(
       { error: "Failed to fetch posts" },
       { status: 500 }
@@ -79,8 +78,6 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { content, imageUrl } = body;
 
-    console.log("📥 Received post data:", { content, imageUrl });
-
     if (!content && !imageUrl) {
       return NextResponse.json(
         { error: "Post must have content or an image" },
@@ -95,21 +92,12 @@ export async function POST(request: NextRequest) {
       RETURNING *
     `;
 
-    console.log("💾 Inserting into database:", {
-      postId,
-      userId: decoded.userId,
-      content: content || null,
-      image: imageUrl || null,
-    });
-
     const result = await pool.query(query, [
       postId,
       decoded.userId,
       content || null,
       imageUrl || null,
     ]);
-
-    console.log("✅ Database insert result:", result.rows[0]);
 
     // Get user info for the response
     const userQuery = `SELECT username, avatar FROM users WHERE id = $1`;
@@ -123,7 +111,6 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ post }, { status: 201 });
   } catch (error) {
-    console.error("Error creating post:", error);
     return NextResponse.json(
       { error: "Failed to create post" },
       { status: 500 }

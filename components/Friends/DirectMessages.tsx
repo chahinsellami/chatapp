@@ -190,7 +190,7 @@ export default function DirectMessages({
         }
       }
     } catch (error) {
-      console.error("Failed to fetch user avatar:", error);
+      // ...existing code...
     }
   };
 
@@ -247,14 +247,14 @@ export default function DirectMessages({
       callType: "video" | "voice";
       callerName: string;
     }) => {
-      console.log("📞 Incoming call from:", data.from);
+      // ...existing code...
       setIsIncomingCall(true);
       setIncomingCallData(data);
     };
 
     // Handle call rejection
     const handleCallRejected = () => {
-      console.log("❌ Call was rejected");
+      // ...existing code...
       alert("Call was declined");
       endCall();
     };
@@ -452,74 +452,10 @@ export default function DirectMessages({
         setShowStatusDropdown(false);
       }
     } catch (error) {
-      console.error("Failed to update status:", error);
+      // ...existing code...
     }
   };
 
-  /**
-   * Run WebRTC diagnostics
-   */
-  const runDiagnostics = async () => {
-    setShowDiagnostics(true);
-
-    let diagnosticMessage = "🔍 WebRTC Diagnostics:\n\n";
-
-    // Check browser support
-    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-      diagnosticMessage += "❌ Browser does not support WebRTC\n";
-      alert(diagnosticMessage);
-      return;
-    }
-    diagnosticMessage += "✅ Browser supports WebRTC\n";
-
-    // Check devices
-    try {
-      const devices = await navigator.mediaDevices.enumerateDevices();
-      const audioDevices = devices.filter((d) => d.kind === "audioinput");
-      const videoDevices = devices.filter((d) => d.kind === "videoinput");
-
-      diagnosticMessage += `✅ Found ${audioDevices.length} microphone(s)\n`;
-      diagnosticMessage += `✅ Found ${videoDevices.length} camera(s)\n`;
-    } catch (err: any) {
-      diagnosticMessage += `❌ Error checking devices: ${err.message}\n`;
-    }
-
-    // Check permissions
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      stream.getTracks().forEach((track) => track.stop());
-      diagnosticMessage += "✅ Microphone permission granted\n";
-    } catch (err: any) {
-      diagnosticMessage += `❌ Microphone permission: ${err.name}\n`;
-    }
-
-    // Check socket connection
-    if (socket && isConnected) {
-      diagnosticMessage += "✅ Socket.IO connected\n";
-    } else {
-      diagnosticMessage += "❌ Socket.IO not connected\n";
-    }
-
-    // Check if friend is online or if there's an incoming call
-    if (isIncomingCall && incomingCallData?.from === friendId) {
-      diagnosticMessage +=
-        "✅ Incoming call detected - friend is calling you\n";
-    } else if (onlineUsers.has(friendId)) {
-      diagnosticMessage += "✅ Friend is online\n";
-    } else {
-      diagnosticMessage += "⚠️ Friend is offline - calls won't work\n";
-    }
-
-    diagnosticMessage += "\n💡 Tips:\n";
-    diagnosticMessage += "• Both users must be online\n";
-    diagnosticMessage += "• Grant camera/microphone permissions\n";
-    diagnosticMessage += "• Check browser console (F12) for errors\n";
-    diagnosticMessage += "• Calls may fail between different networks\n";
-    diagnosticMessage += "• Use Chrome/Firefox for best compatibility\n";
-
-    alert(diagnosticMessage);
-    setShowDiagnostics(false);
-  };
 
   /**
    * Initiate a voice or video call with mobile-specific warnings
@@ -554,14 +490,7 @@ export default function DirectMessages({
     const userHash = shortHash(userId + friendId);
     const channelName = `call_${userHash}_${Date.now()}`;
 
-    console.log("📞 Initiating Agora call:", {
-      type,
-      to: friendId,
-      from: userId,
-      channelName,
-      socketConnected: isConnected,
-      friendOnline: onlineUsers.has(friendId),
-    });
+    // ...existing code...
 
     if (isMobile && type === "video") {
       const confirmed = confirm(
@@ -605,7 +534,7 @@ export default function DirectMessages({
   const acceptCall = async () => {
     if (!incomingCallData) return;
 
-    console.log("✅ Accepting call:", incomingCallData);
+    // ...existing code...
 
     // Join the Agora channel
     await startAgoraCall(
@@ -624,7 +553,7 @@ export default function DirectMessages({
   const rejectCall = () => {
     if (!incomingCallData || !socket) return;
 
-    console.log("❌ Rejecting call from:", incomingCallData.from);
+    // ...existing code...
 
     // Notify caller that call was rejected
     socket.emit("reject-call", { to: incomingCallData.from });
@@ -778,15 +707,6 @@ export default function DirectMessages({
           </div>
 
           {/* Call buttons */}
-          <motion.button
-            onClick={runDiagnostics}
-            className="p-2.5 md:p-3 rounded-xl bg-slate-800/60 hover:bg-slate-700/60 border border-slate-700/50 transition-all"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            title="Test Call Setup"
-          >
-            <Settings className="w-4 h-4 md:w-5 md:h-5 text-slate-400" />
-          </motion.button>
           <motion.button
             onClick={() => handleStartCall("voice")}
             disabled={isCallActive}

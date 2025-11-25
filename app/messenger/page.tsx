@@ -84,12 +84,12 @@ function MessengerContent() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-screen bg-black">
+      <div className="min-h-screen flex items-center justify-center bg-black">
         <div className="text-center">
-          <div className="w-12 h-12 mx-auto mb-3 rounded-xl flex items-center justify-center bg-blue-600">
+          <div className="w-12 h-12 mx-auto mb-4 rounded-xl flex items-center justify-center bg-blue-600">
             <MessageCircle className="w-6 h-6 text-white" />
           </div>
-          <p className="text-neutral-400 text-sm">Loading...</p>
+          <p className="text-neutral-400 text-base font-medium">Loading...</p>
         </div>
       </div>
     );
@@ -234,12 +234,12 @@ export default function MessengerPage() {
   return (
     <Suspense
       fallback={
-        <div className="flex items-center justify-center h-screen bg-black">
+        <div className="min-h-screen flex items-center justify-center bg-black">
           <div className="text-center">
-            <div className="w-12 h-12 mx-auto mb-3 rounded-xl flex items-center justify-center bg-blue-600">
+            <div className="w-12 h-12 mx-auto mb-4 rounded-xl flex items-center justify-center bg-blue-600">
               <MessageCircle className="w-6 h-6 text-white" />
             </div>
-            <p className="text-neutral-400 text-sm">Loading...</p>
+            <p className="text-neutral-400 text-base font-medium">Loading...</p>
           </div>
         </div>
       }

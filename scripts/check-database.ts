@@ -14,8 +14,6 @@ async function checkDatabase() {
 
   try {
     await client.connect();
-    
-
     // Check if direct_messages table exists
     const tableCheck = await client.query(`
       SELECT EXISTS (
@@ -23,48 +21,11 @@ async function checkDatabase() {
         WHERE table_name = 'direct_messages'
       );
     `);
-
-    
-
     if (tableCheck.rows[0].exists) {
-      // Get table structure
-      const columns = await client.query(`
-        SELECT column_name, data_type 
-        FROM information_schema.columns 
-        WHERE table_name = 'direct_messages'
-        ORDER BY ordinal_position;
-      `);
-
-      
-      columns.rows.forEach((col) => {
-        
-      });
-
-      // Count messages
-      const count = await client.query(`SELECT COUNT(*) FROM direct_messages`);
-      
-
-      // Show sample messages
-      if (parseInt(count.rows[0].count) > 0) {
-        const sample = await client.query(`
-          SELECT id, sender_id, receiver_id, text, created_at 
-          FROM direct_messages 
-          ORDER BY created_at DESC 
-          LIMIT 5
-        `);
-        
-        sample.rows.forEach((msg) => {
-          console.log(
-            `  [${msg.created_at}] ${msg.sender_id} → ${msg.receiver_id}: ${msg.text}`
-          );
-        });
-      }
-    } else {
-      
-      
+      // Table exists, optionally add more checks here if needed
     }
   } catch (error) {
-    
+    // Optionally handle error
   } finally {
     await client.end();
   }
