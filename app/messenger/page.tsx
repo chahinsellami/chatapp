@@ -15,7 +15,7 @@ const DirectMessages = dynamic(() => import("@/components/Friends/DirectMessages
 });
 
 // Force dynamic rendering
-export const dynamicPage = "force-dynamic";
+
 
 interface Friend {
   id: string;
