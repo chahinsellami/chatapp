@@ -64,7 +64,7 @@ export function useSocket(userId: string | null) {
 
     // Handle successful connection
     socket.on("connect", () => {
-      console.log("✅ Socket.IO connected");
+      // Socket.IO connected
       setIsConnected(true);
       // Join the user's personal room for direct messaging
       socket.emit("join", userId);
@@ -72,24 +72,24 @@ export function useSocket(userId: string | null) {
 
     // Handle disconnection
     socket.on("disconnect", (reason) => {
-      console.log("❌ Socket.IO disconnected:", reason);
+      // Socket.IO disconnected: (reason)
       setIsConnected(false);
     });
 
     // Handle connection errors
     socket.on("connect_error", (error) => {
-      console.warn("⚠️ Socket.IO connection error:", error.message);
+      // Socket.IO connection error: (error.message)
       setIsConnected(false);
     });
 
     // Handle reconnection attempts
     socket.on("reconnect_attempt", (attemptNumber) => {
-      console.log(`🔄 Reconnection attempt ${attemptNumber}/3`);
+      // Reconnection attempt
     });
 
     // Handle failed reconnection
     socket.on("reconnect_failed", () => {
-      console.error("❌ Socket.IO reconnection failed after 3 attempts");
+      // Socket.IO reconnection failed after 3 attempts
       setIsConnected(false);
     });
 

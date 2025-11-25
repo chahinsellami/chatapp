@@ -35,7 +35,7 @@ export async function DELETE(request: NextRequest) {
       deletedCount: result.rowCount,
     });
   } catch (error) {
-    console.error("Error clearing posts:", error);
+    // Error clearing posts: (error)
     return NextResponse.json(
       { error: "Failed to clear posts" },
       { status: 500 }

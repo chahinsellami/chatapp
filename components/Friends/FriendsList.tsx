@@ -1,4 +1,5 @@
-﻿"use client";
+﻿import Image from "next/image";
+"use client";
 
 /**
  * Friends List Component - Displays user's friends and pending friend requests
@@ -374,10 +375,12 @@ export default function FriendsList({
                         {request.avatar &&
                         (request.avatar.startsWith("http") ||
                           request.avatar.startsWith("/")) ? (
-                          <img
+                          <Image
                             src={request.avatar}
                             alt={request.username}
                             className="w-full h-full object-cover"
+                            width={40}
+                            height={40}
                           />
                         ) : (
                           <span className="text-white text-sm font-bold">
@@ -516,10 +519,12 @@ export default function FriendsList({
                       {friend.avatar &&
                       (friend.avatar.startsWith("http") ||
                         friend.avatar.startsWith("/")) ? (
-                        <img
+                        <Image
                           src={friend.avatar}
                           alt={friend.username}
                           className="w-full h-full object-cover"
+                          width={48}
+                          height={48}
                         />
                       ) : (
                         <span className="text-white text-lg font-bold">

@@ -2,9 +2,11 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
+import dynamic from "next/dynamic";
+import { Suspense } from "react";
+const Link = dynamic(() => import("next/link"), { ssr: false });
+const motion = dynamic(() => import("framer-motion").then(mod => mod.motion), { ssr: false });
 import { useAuth } from "@/context/AuthContext";
-import { motion } from "framer-motion";
 import { Eye, EyeOff, UserPlus, AlertCircle, CheckCircle } from "lucide-react";
 
 export default function SignupPage() {
@@ -31,7 +33,8 @@ export default function SignupPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading...</div>}>
+      <div className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
       {/* Animated background elements */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <motion.div
@@ -332,5 +335,7 @@ export default function SignupPage() {
         </div>
       </motion.div>
     </div>
+      </div>
+    </Suspense>
   );
 }

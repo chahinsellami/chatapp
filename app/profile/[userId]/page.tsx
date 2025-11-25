@@ -9,11 +9,13 @@ import { useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { motion } from "framer-motion";
 import { UserPlus, Check, MessageCircle, ArrowLeft } from "lucide-react";
-import NavigationBar from "@/components/Layout/NavigationBar";
-import Avatar from "@/components/Common/Avatar";
-import Badge from "@/components/Common/Badge";
-import Button from "@/components/Common/Button";
-import Card from "@/components/Common/Card";
+import dynamic from "next/dynamic";
+import Image from "next/image";
+const NavigationBar = dynamic(() => import("@/components/Layout/NavigationBar"), { ssr: false });
+const Avatar = dynamic(() => import("@/components/Common/Avatar"), { ssr: false });
+const Badge = dynamic(() => import("@/components/Common/Badge"), { ssr: false });
+const Button = dynamic(() => import("@/components/Common/Button"), { ssr: false });
+const Card = dynamic(() => import("@/components/Common/Card"), { ssr: false });
 import { useAuth } from "@/context/AuthContext";
 import { useSocket } from "@/lib/useSocket";
 
@@ -104,7 +106,7 @@ export default function UserProfilePage() {
         setIsFriend(friends.some((f: any) => f.id === userId));
       }
     } catch (error) {
-      console.error("Error checking friend status:", error);
+      // Error checking friend status: (error)
     }
   };
 
@@ -122,7 +124,7 @@ export default function UserProfilePage() {
         setPosts(data.posts || []);
       }
     } catch (error) {
-      console.error("Error fetching posts:", error);
+      // Error fetching posts: (error)
     } finally {
       setLoadingPosts(false);
     }
@@ -218,10 +220,13 @@ export default function UserProfilePage() {
           className="relative h-32 sm:h-40 md:h-48 bg-gradient-to-br from-blue-600 to-blue-800 rounded-t-2xl overflow-hidden"
         >
           {profile.cover_image && (
-            <img
+            <Image
               src={profile.cover_image}
               alt="Cover"
               className="w-full h-full object-cover"
+              fill
+              sizes="100vw"
+              priority
             />
           )}
         </motion.div>
@@ -235,10 +240,12 @@ export default function UserProfilePage() {
                 {profile.avatar &&
                 (profile.avatar.startsWith("http") ||
                   profile.avatar.startsWith("/")) ? (
-                  <img
+                  <Image
                     src={profile.avatar}
                     alt={profile.username}
                     className="w-full h-full object-cover"
+                    fill
+                    sizes="96px"
                   />
                 ) : (
                   <span className="text-white text-4xl sm:text-5xl font-bold">
@@ -372,10 +379,12 @@ export default function UserProfilePage() {
                           {post.avatar &&
                           (post.avatar.startsWith("http") ||
                             post.avatar.startsWith("/")) ? (
-                            <img
+                            <Image
                               src={post.avatar}
                               alt={post.username}
                               className="w-full h-full object-cover"
+                              width={40}
+                              height={40}
                             />
                           ) : (
                             <span className="text-white text-lg">
@@ -407,10 +416,12 @@ export default function UserProfilePage() {
                       {/* Post Image */}
                       {imageUrl && (
                         <div className="rounded-lg overflow-hidden mb-3 bg-neutral-900">
-                          <img
+                          <Image
                             src={imageUrl}
                             alt="Post"
                             className="w-full h-auto max-h-96 object-contain"
+                            width={600}
+                            height={400}
                           />
                         </div>
                       )}

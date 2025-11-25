@@ -1,3 +1,4 @@
+import Image from "next/image";
 "use client";
 
 /**
@@ -286,10 +287,12 @@ export default function AddFriend({ userId, onFriendAdded }: AddFriendProps) {
                       whileHover={{ scale: 1.05 }}
                     >
                       {user.avatar?.startsWith("/avatars/") ? (
-                        <img
+                        <Image
                           src={user.avatar}
                           alt={user.username}
                           className="w-full h-full object-cover"
+                          width={48}
+                          height={48}
                         />
                       ) : (
                         <span className="text-white text-lg font-bold">

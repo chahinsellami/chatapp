@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
       user: result.rows[0],
     });
   } catch (error) {
-    console.error("Error fixing avatar:", error);
+    // Error fixing avatar: (error)
     return NextResponse.json(
       { error: "Failed to fix avatar" },
       { status: 500 }

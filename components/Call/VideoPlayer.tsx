@@ -25,12 +25,12 @@ export function VideoPlayer({
 
     // Play the video track in the div element
     videoTrack.play(videoRef.current);
-    console.log(`📺 Playing ${isLocal ? "local" : "remote"} video`);
+    // Playing video
 
     return () => {
       // Stop playing when component unmounts
       videoTrack.stop();
-      console.log(`⏹️ Stopped ${isLocal ? "local" : "remote"} video`);
+      // Stopped video
     };
   }, [videoTrack, isLocal]);
 

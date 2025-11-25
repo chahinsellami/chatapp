@@ -98,7 +98,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
       } catch (error) {
         // Network or other error, clear any stored auth data
-        console.error("Auth check failed:", error);
+        // Auth check failed: (error)
       } finally {
         setIsLoading(false); // Auth check complete
       }

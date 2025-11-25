@@ -2,24 +2,16 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import dynamicImport from "next/dynamic";
-import FriendsList from "@/components/Friends/FriendsList";
-import AddFriend from "@/components/Friends/AddFriend";
+import dynamic from "next/dynamic";
+const FriendsList = dynamic(() => import("@/components/Friends/FriendsList"), { ssr: false });
+const AddFriend = dynamic(() => import("@/components/Friends/AddFriend"), { ssr: false });
+const DirectMessages = dynamic(() => import("@/components/Friends/DirectMessages"), { ssr: false, loading: () => <div className="flex-1 flex items-center justify-center">Loading...</div> });
 import { verifyToken } from "@/lib/auth";
 
-// Lazy-load DirectMessages to avoid SSR issues with Agora SDK
-const DirectMessages = dynamicImport(
-  () => import("@/components/Friends/DirectMessages"),
-  {
-    ssr: false,
-    loading: () => (
-      <div className="flex-1 flex items-center justify-center">Loading...</div>
-    ),
-  }
-);
+
 
 // Force dynamic rendering - no static generation
-export const dynamic = "force-dynamic";
+export const dynamicPage = "force-dynamic";
 
 interface User {
   userId: string;
@@ -50,17 +42,14 @@ export default function FriendsPage() {
           return;
         }
 
-        // Verify token is valid
         const res = await fetch("/api/auth/me", {
           headers: { Authorization: `Bearer ${token}` },
         });
-
         if (!res.ok) {
           localStorage.removeItem("token");
           router.push("/login");
           return;
         }
-
         const userData = await res.json();
         setUser(userData.user);
       } catch (error) {
@@ -110,12 +99,10 @@ export default function FriendsPage() {
         <div className="h-16 bg-neutral-950 border-b border-neutral-800 flex items-center px-4">
           <h1 className="text-white font-bold">Friends</h1>
         </div>
-
         {/* Add Friend Section */}
         <div className="p-4 border-b border-neutral-800">
           <AddFriend userId={user.userId} onFriendAdded={handleFriendAdded} />
         </div>
-
         {/* Friends List */}
         <FriendsList
           userId={user.userId}
@@ -123,7 +110,6 @@ export default function FriendsPage() {
           onRefresh={handleFriendAdded}
         />
       </div>
-
       {/* Right Main Area - Direct Messages */}
       <div className="flex-1 flex flex-col">
         {selectedFriend ? (

@@ -13,19 +13,19 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
-import NavigationBar from "@/components/Layout/NavigationBar";
-import {
-  LoadingSpinner,
-  AlertMessage,
-  Card,
-  Button,
-  TextArea,
-  ImageUpload,
-  EmojiPicker,
-  StatusSelector,
-  type StatusOption,
-} from "@/components/Common";
-import { AnimatePresence } from "framer-motion";
+import dynamic from "next/dynamic";
+import { Suspense } from "react";
+const NavigationBar = dynamic(() => import("@/components/Layout/NavigationBar"), { ssr: false });
+const Card = dynamic(() => import("@/components/Common/Card"), { ssr: false });
+const Button = dynamic(() => import("@/components/Common/Button"), { ssr: false });
+const TextArea = dynamic(() => import("@/components/Common/TextArea"), { ssr: false });
+const ImageUpload = dynamic(() => import("@/components/Common/ImageUpload"), { ssr: false });
+const EmojiPicker = dynamic(() => import("@/components/Common/EmojiPicker"), { ssr: false });
+const StatusSelector = dynamic(() => import("@/components/Common/StatusSelector"), { ssr: false });
+const AlertMessage = dynamic(() => import("@/components/Common/AlertMessage"), { ssr: false });
+const AnimatePresence = dynamic(() => import("framer-motion").then(mod => mod.AnimatePresence), { ssr: false });
+import { LoadingSpinner } from "@/components/Common";
+import type { StatusOption } from "@/components/Common";
 import { User, Save, ArrowLeft } from "lucide-react";
 
 // Available emoji avatars for user selection
@@ -305,7 +305,8 @@ export default function SettingsPage() {
   if (!user) return null;
 
   return (
-    <div className="min-h-screen bg-black">
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading...</div>}>
+      <div className="min-h-screen bg-black">
       {/* Header */}
       <NavigationBar currentPage="settings" />
 
@@ -409,5 +410,7 @@ export default function SettingsPage() {
         </Card>
       </div>
     </div>
+      </div>
+    </Suspense>
   );
 }

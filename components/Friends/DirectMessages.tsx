@@ -1,3 +1,4 @@
+import Image from "next/image";
 "use client";
 
 /**
@@ -202,14 +203,14 @@ export default function DirectMessages({
      * Handle incoming messages from Socket.IO
      * Only processes messages for the current conversation
      */
-    const handleNewMessage = (message: any) => {
+    const handleNewMessage = (message: DirectMessage) => {
       // Check if message belongs to this conversation
       if (
         (message.senderId === friendId && message.receiverId === userId) ||
         (message.senderId === userId && message.receiverId === friendId)
       ) {
         const formattedMessage: DirectMessage = {
-          id: message.messageId,
+          id: message.id,
           senderId: message.senderId,
           receiverId: message.receiverId,
           text: message.text,
@@ -297,16 +298,16 @@ export default function DirectMessages({
       const data = await res.json();
 
       // Format messages for display
-      const formattedMessages = (data.messages || []).map((msg: any) => ({
+      const formattedMessages = (data.messages || []).map((msg: DirectMessage) => ({
         id: msg.id,
-        senderId: msg.sender_id,
-        receiverId: msg.receiver_id,
+        senderId: msg.senderId,
+        receiverId: msg.receiverId,
         text: msg.text,
-        createdAt: msg.created_at,
-        editedAt: msg.edited_at,
-        username: msg.sender_id === userId ? "You" : msg.username || friendName,
+        createdAt: msg.createdAt,
+        editedAt: msg.editedAt,
+        username: msg.senderId === userId ? "You" : msg.username || friendName,
         avatar:
-          msg.sender_id === userId ? undefined : msg.avatar || friendAvatar,
+          msg.senderId === userId ? undefined : msg.avatar || friendAvatar,
       }));
 
       setMessages(formattedMessages);
@@ -359,7 +360,7 @@ export default function DirectMessages({
         senderId: userId,
         receiverId: friendId,
         text: text,
-        createdAt: newMessage.created_at || new Date().toISOString(),
+        createdAt: newMessage.createdAt || new Date().toISOString(),
         username: "You",
       };
 
@@ -612,10 +613,12 @@ export default function DirectMessages({
               {friendAvatar &&
               (friendAvatar.startsWith("http") ||
                 friendAvatar.startsWith("/")) ? (
-                <img
+                <Image
                   src={friendAvatar}
                   alt={friendName}
                   className="w-full h-full object-cover"
+                  width={48}
+                  height={48}
                 />
               ) : (
                 <span className="text-xl md:text-2xl">
@@ -759,10 +762,12 @@ export default function DirectMessages({
                     userAvatar &&
                     (userAvatar.startsWith("http") ||
                       userAvatar.startsWith("/")) ? (
-                      <img
+                      <Image
                         src={userAvatar}
                         alt="You"
                         className="w-full h-full object-cover"
+                        width={32}
+                        height={32}
                       />
                     ) : (
                       <span className="text-xs md:text-sm">
@@ -772,10 +777,12 @@ export default function DirectMessages({
                   ) : friendAvatar &&
                     (friendAvatar.startsWith("http") ||
                       friendAvatar.startsWith("/")) ? (
-                    <img
+                    <Image
                       src={friendAvatar}
                       alt={friendName}
                       className="w-full h-full object-cover"
+                      width={32}
+                      height={32}
                     />
                   ) : (
                     <span className="text-xs md:text-sm">
@@ -829,10 +836,12 @@ export default function DirectMessages({
                 {friendAvatar &&
                 (friendAvatar.startsWith("http") ||
                   friendAvatar.startsWith("/")) ? (
-                  <img
+                  <Image
                     src={friendAvatar}
                     alt={friendName}
                     className="w-full h-full object-cover"
+                    width={32}
+                    height={32}
                   />
                 ) : (
                   <span className="text-sm">{friendAvatar || "👤"}</span>

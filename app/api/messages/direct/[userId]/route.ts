@@ -95,7 +95,7 @@ export async function POST(
       throw dbError;
     }
   } catch (error) {
-    console.error("Send direct message error:", error);
+    // Send direct message error: (error)
     return createErrorResponse("Failed to send message", 500);
   }
 }

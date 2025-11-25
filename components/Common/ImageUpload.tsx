@@ -1,3 +1,4 @@
+import Image from "next/image";
 "use client";
 
 /**
@@ -43,10 +44,12 @@ export default function ImageUpload({
       <div className="relative h-48 rounded-xl overflow-hidden bg-slate-800/50 flex items-center justify-center border border-slate-700/50">
         {preview ? (
           <>
-            <img
+            <Image
               src={preview}
               alt="Preview"
               className="w-full h-full object-cover"
+              width={192}
+              height={192}
             />
             {onRemove && (
               <motion.button

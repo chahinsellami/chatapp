@@ -1,3 +1,4 @@
+import Image from "next/image";
 "use client";
 
 /**
@@ -78,7 +79,7 @@ export default function NavigationBar({ currentPage }: NavigationBarProps) {
         setShowResults(true);
       }
     } catch (error) {
-      console.error("Search error:", error);
+      // Search error: (error)
     } finally {
       setSearching(false);
     }
@@ -155,10 +156,12 @@ export default function NavigationBar({ currentPage }: NavigationBarProps) {
                           {user.avatar &&
                           (user.avatar.startsWith("http") ||
                             user.avatar.startsWith("/")) ? (
-                            <img
+                            <Image
                               src={user.avatar}
                               alt={user.username}
                               className="w-full h-full object-cover"
+                              width={48}
+                              height={48}
                             />
                           ) : (
                             <span className="text-white font-bold text-sm sm:text-base">

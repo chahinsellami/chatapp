@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
+import isEqual from "react-fast-compare";
+import * as Sentry from "@sentry/browser";
 import AgoraRTC, {
   IAgoraRTCClient,
   ICameraVideoTrack,
@@ -106,10 +108,9 @@ export function useAgoraCall(userId: string): UseAgoraCallReturn {
         // Update remote users state
         setRemoteUsers((prev) => {
           const existingUser = prev.find((u) => u.uid === user.uid);
-
+          let next: RemoteUser[];
           if (existingUser) {
-            // Update existing user
-            return prev.map((u) =>
+            next = prev.map((u) =>
               u.uid === user.uid
                 ? {
                     ...u,
@@ -123,8 +124,7 @@ export function useAgoraCall(userId: string): UseAgoraCallReturn {
                 : u
             );
           } else {
-            // Add new user
-            return [
+            next = [
               ...prev,
               {
                 uid: user.uid,
@@ -135,6 +135,7 @@ export function useAgoraCall(userId: string): UseAgoraCallReturn {
               },
             ];
           }
+          return isEqual(prev, next) ? prev : next;
         });
 
         // Auto-play audio
@@ -143,7 +144,7 @@ export function useAgoraCall(userId: string): UseAgoraCallReturn {
           // ...existing code...
         }
       } catch (error) {
-        // ...existing code...
+        Sentry.captureException(error);
       }
     });
 
@@ -151,10 +152,8 @@ export function useAgoraCall(userId: string): UseAgoraCallReturn {
      * Handle when a remote user unpublishes their media
      */
     client.on("user-unpublished", (user, mediaType) => {
-      // ...existing code...
-
-      setRemoteUsers((prev) =>
-        prev.map((u) =>
+      setRemoteUsers((prev) => {
+        const next = prev.map((u) =>
           u.uid === user.uid
             ? {
                 ...u,
@@ -164,16 +163,19 @@ export function useAgoraCall(userId: string): UseAgoraCallReturn {
                 hasVideo: mediaType === "video" ? false : u.hasVideo,
               }
             : u
-        )
-      );
+        );
+        return isEqual(prev, next) ? prev : next;
+      });
     });
 
     /**
      * Handle when a remote user leaves the channel
      */
     client.on("user-left", (user) => {
-      // ...existing code...
-      setRemoteUsers((prev) => prev.filter((u) => u.uid !== user.uid));
+      setRemoteUsers((prev) => {
+        const next = prev.filter((u) => u.uid !== user.uid);
+        return isEqual(prev, next) ? prev : next;
+      });
     });
 
     /**
@@ -297,8 +299,8 @@ export function useAgoraCall(userId: string): UseAgoraCallReturn {
         setIsVideoEnabled(type === "video");
 
         // ...existing code...
-      } catch (error: any) {
-        // Cleanup on error
+      } catch (error: unknown) {
+        Sentry.captureException(error);
         await endCall();
       }
     },
@@ -337,7 +339,7 @@ export function useAgoraCall(userId: string): UseAgoraCallReturn {
       setIsAudioEnabled(true);
       setIsVideoEnabled(true);
     } catch (error) {
-      // ...existing code...
+      Sentry.captureException(error);
     }
   }, [localAudioTrack, localVideoTrack]);
 
@@ -357,6 +359,7 @@ export function useAgoraCall(userId: string): UseAgoraCallReturn {
       // ...existing code...
       return newState;
     } catch (error) {
+      Sentry.captureException(error);
       return isAudioEnabled;
     }
   }, [localAudioTrack, isAudioEnabled]);
@@ -377,6 +380,7 @@ export function useAgoraCall(userId: string): UseAgoraCallReturn {
       // ...existing code...
       return newState;
     } catch (error) {
+      Sentry.captureException(error);
       return isVideoEnabled;
     }
   }, [localVideoTrack, isVideoEnabled]);

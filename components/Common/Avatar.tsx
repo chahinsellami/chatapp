@@ -12,6 +12,7 @@
  */
 
 import { User } from "lucide-react";
+import Image from "next/image";
 
 interface AvatarProps {
   src?: string | null;
@@ -65,7 +66,7 @@ export default function Avatar({
         className={`${sizeStyles[size]} rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 overflow-hidden shadow-lg flex items-center justify-center`}
       >
         {src ? (
-          <img src={src} alt="Avatar" className="w-full h-full object-cover" />
+          <Image src={src} alt="Avatar" className="w-full h-full object-cover" fill sizes="100vw" />
         ) : emoji ? (
           <span>{emoji}</span>
         ) : (

@@ -79,7 +79,7 @@ export async function PUT(request: NextRequest) {
     );
   } catch (error) {
     // Log the actual error for debugging
-    console.error("❌ Profile update error:", error);
+    // Profile update error: (error)
     return NextResponse.json(
       {
         error: "Internal server error",

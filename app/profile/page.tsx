@@ -13,13 +13,17 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
-import FriendsList from "@/components/Friends/FriendsList";
-import NavigationBar from "@/components/Layout/NavigationBar";
-import ProfileHeader from "@/components/Profile/ProfileHeader";
-import LoadingSpinner from "@/components/Common/LoadingSpinner";
-import TabNavigation, { Tab } from "@/components/Common/TabNavigation";
-import AlertMessage from "@/components/Common/AlertMessage";
+import dynamic from "next/dynamic";
+import Image from "next/image";
+import { Suspense } from "react";
+import type { Tab } from "@/components/Common/TabNavigation";
 import { motion, AnimatePresence } from "framer-motion";
+const FriendsList = dynamic(() => import("@/components/Friends/FriendsList"), { ssr: false, loading: () => null });
+const NavigationBar = dynamic(() => import("@/components/Layout/NavigationBar"), { ssr: false, loading: () => null });
+const ProfileHeader = dynamic(() => import("@/components/Profile/ProfileHeader"), { ssr: false, loading: () => null });
+const LoadingSpinner = dynamic(() => import("@/components/Common/LoadingSpinner"), { ssr: false, loading: () => null });
+const TabNavigation = dynamic(() => import("@/components/Common/TabNavigation"), { ssr: false, loading: () => null });
+const AlertMessage = dynamic(() => import("@/components/Common/AlertMessage"), { ssr: false, loading: () => null });
 import {
   User,
   Save,
@@ -118,7 +122,16 @@ export default function ProfilePage() {
   const [postImage, setPostImage] = useState<File | null>(null);
   const [postImagePreview, setPostImagePreview] = useState<string | null>(null);
   const [posting, setPosting] = useState(false);
-  const [posts, setPosts] = useState<any[]>([]);
+  interface Post {
+    id: string;
+    username: string;
+    avatar?: string;
+    created_at: string;
+    content?: string;
+    image?: string;
+    likes?: number;
+  }
+  const [posts, setPosts] = useState<Post[]>([]);
   const [loadingPosts, setLoadingPosts] = useState(false);
 
   /**
@@ -169,7 +182,7 @@ export default function ProfilePage() {
         setPosts(data.posts || []);
       }
     } catch (error) {
-      console.error("❌ Error fetching posts:", error);
+      // Error fetching posts: (error)
     } finally {
       setLoadingPosts(false);
     }
@@ -405,7 +418,7 @@ export default function ProfilePage() {
 
       setTimeout(() => setSuccess(false), 3000);
     } catch (err) {
-      console.error("❌ Error creating post:", err);
+      // Error creating post: (err)
       setError(err instanceof Error ? err.message : "Error creating post");
     } finally {
       setPosting(false);
@@ -415,8 +428,13 @@ export default function ProfilePage() {
   /**
    * Loading state UI
    */
+
   if (isLoading) {
-    return <LoadingSpinner icon={User} message="Loading Profile..." />;
+    return (
+      <Suspense fallback={null}>
+        <LoadingSpinner icon={User} message="Loading Profile..." />
+      </Suspense>
+    );
   }
 
   if (!user) return null;
@@ -493,10 +511,12 @@ export default function ProfilePage() {
                     {/* Image Preview */}
                     {postImagePreview && (
                       <div className="relative">
-                        <img
+                        <Image
                           src={postImagePreview}
                           alt="Post preview"
                           className="w-full max-h-48 sm:max-h-64 object-cover rounded-lg"
+                          width={400}
+                          height={256}
                         />
                         <motion.button
                           onClick={() => {
@@ -568,7 +588,7 @@ export default function ProfilePage() {
                     {posts.map((post) => {
                       // Ensure image URL is complete
                       const getImageUrl = (url: string | null) => {
-                        if (!url) return null;
+                        if (!url || typeof url !== "string") return null;
                         // If URL starts with http/https, it's already complete
                         if (url.startsWith("http")) {
                           return url;
@@ -586,7 +606,7 @@ export default function ProfilePage() {
                         return url;
                       };
 
-                      const imageUrl = getImageUrl(post.image);
+                      const imageUrl = getImageUrl(post.image ?? null);
 
                       return (
                         <motion.div
@@ -601,10 +621,12 @@ export default function ProfilePage() {
                               {post.avatar &&
                               (post.avatar.startsWith("http") ||
                                 post.avatar.startsWith("/")) ? (
-                                <img
+                                <Image
                                   src={post.avatar}
                                   alt={post.username}
                                   className="w-full h-full object-cover"
+                                  width={48}
+                                  height={48}
                                 />
                               ) : (
                                 <span>{post.avatar || "👤"}</span>
@@ -638,10 +660,12 @@ export default function ProfilePage() {
                           {/* Post Image */}
                           {imageUrl && (
                             <div className="w-full rounded-lg overflow-hidden mb-4 bg-slate-800">
-                              <img
+                              <Image
                                 src={imageUrl}
                                 alt="Post image"
                                 className="w-full h-auto max-h-[500px] object-contain"
+                                width={800}
+                                height={500}
                               />
                             </div>
                           )}
@@ -698,10 +722,12 @@ export default function ProfilePage() {
                       <div className="relative h-48 rounded-xl overflow-hidden bg-slate-800 flex items-center justify-center">
                         {customImage ? (
                           <>
-                            <img
+                            <Image
                               src={customImage}
                               alt="Profile preview"
                               className="w-full h-full object-cover"
+                              width={192}
+                              height={192}
                             />
                             <motion.button
                               onClick={handleRemoveImage}
@@ -727,10 +753,12 @@ export default function ProfilePage() {
                       <div className="relative h-48 rounded-xl overflow-hidden bg-slate-800 flex items-center justify-center">
                         {coverImage ? (
                           <>
-                            <img
+                            <Image
                               src={coverImage}
                               alt="Cover preview"
                               className="w-full h-full object-cover"
+                              width={192}
+                              height={192}
                             />
                             <motion.button
                               onClick={handleRemoveCoverImage}

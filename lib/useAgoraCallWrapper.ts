@@ -19,7 +19,7 @@ export function useAgoraCallWrapper(userId: string) {
           setIsLoaded(true);
         })
         .catch((err) => {
-          console.error("Failed to load Agora:", err);
+          // Failed to load Agora: (err)
         });
     } else if (useAgoraCallModule) {
       setIsLoaded(true);
@@ -34,7 +34,7 @@ export function useAgoraCallWrapper(userId: string) {
   if (!agoraHook) {
     return {
       startCall: async () => {
-        console.warn("Agora not loaded yet");
+        // Agora not loaded yet
       },
       endCall: async () => {},
       toggleAudio: async () => false,

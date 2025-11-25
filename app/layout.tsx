@@ -1,4 +1,6 @@
 import "./globals.css";
+import "../sentry.client";
+import "./_console-silence";
 import { AuthProvider } from "@/context/AuthContext";
 
 export const metadata = {

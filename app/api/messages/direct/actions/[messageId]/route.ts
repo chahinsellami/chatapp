@@ -39,7 +39,7 @@ export async function PUT(
 
     return NextResponse.json(result);
   } catch (error) {
-    console.error("Update direct message error:", error);
+    // Update direct message error: (error)
     return createErrorResponse("Failed to update message", 500);
   }
 }
@@ -70,7 +70,7 @@ export async function DELETE(
 
     return NextResponse.json(result);
   } catch (error) {
-    console.error("Delete direct message error:", error);
+    // Delete direct message error: (error)
     return createErrorResponse("Failed to delete message", 500);
   }
 }

@@ -1,3 +1,4 @@
+import Image from "next/image";
 "use client";
 
 /**
@@ -44,10 +45,12 @@ export default function ProfileHeader({
           className="relative w-full h-48 sm:h-64 md:h-80 lg:h-[350px] bg-gradient-to-br from-slate-700 via-slate-600 to-slate-700 overflow-hidden"
         >
           {coverImage ? (
-            <img
+            <Image
               src={coverImage}
               alt="Cover"
               className="w-full h-full object-cover"
+              width={1200}
+              height={350}
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center">
@@ -71,10 +74,12 @@ export default function ProfileHeader({
               >
                 <div className="w-32 h-32 sm:w-36 sm:h-36 md:w-44 md:h-44 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 overflow-hidden shadow-2xl border-4 border-black">
                   {customImage ? (
-                    <img
+                    <Image
                       src={customImage}
                       alt="Profile"
                       className="w-full h-full object-cover"
+                      width={176}
+                      height={176}
                     />
                   ) : avatar && !avatar.startsWith("http") ? (
                     <div className="w-full h-full flex items-center justify-center text-5xl sm:text-6xl md:text-7xl">
