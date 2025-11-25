@@ -335,7 +335,6 @@ export default function SignupPage() {
         </div>
       </motion.div>
     </div>
-      </div>
     </Suspense>
   );
 }
