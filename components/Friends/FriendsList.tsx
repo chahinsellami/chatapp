@@ -227,30 +227,7 @@ export default function FriendsList({
    * Loading State UI
    * Displays animated spinner while fetching initial data
    */
-  if (loading) {
-    return (
-      <motion.div
-        className="absolute inset-0 flex items-center justify-center"
-        initial={{ opacity: 0, scale: 0.9 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.5 }}
-      >
-        <motion.div className="text-center">
-          {/* Rotating icon spinner */}
-          <motion.div
-            className="w-16 h-16 mx-auto mb-4 rounded-2xl flex items-center justify-center bg-blue-600"
-            animate={{ rotate: 360 }}
-            transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-          >
-            <Users className="w-8 h-8 text-white" />
-          </motion.div>
-          <p className="text-neutral-400 text-lg font-medium">
-            Loading friends...
-          </p>
-        </motion.div>
-      </motion.div>
-    );
-  }
+
 
   /**
    * Main Component Render
@@ -472,7 +449,7 @@ export default function FriendsList({
 
       {/* Friends List Section */}
       <div
-        className="flex-1 overflow-y-auto p-6 pb-8 space-y-3 min-h-0 relative z-10 hide-scrollbar"
+        className="flex-1 overflow-y-auto p-6 pb-24 space-y-3 min-h-0 relative z-10 hide-scrollbar"
         style={{ scrollBehavior: "smooth", maxHeight: "calc(100vh - 180px)" }}
       >
         <AnimatePresence>
@@ -608,6 +585,8 @@ export default function FriendsList({
                 </div>
               </motion.div>
             ))
+            // Spacer to ensure last item is always visible
+            <div className="h-8" />
           )}
         </AnimatePresence>
       </div>
