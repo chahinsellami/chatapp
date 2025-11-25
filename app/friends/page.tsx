@@ -11,7 +11,7 @@ import { verifyToken } from "@/lib/auth";
 
 
 // Force dynamic rendering - no static generation
-export const dynamicPage = "force-dynamic";
+
 
 interface User {
   userId: string;
