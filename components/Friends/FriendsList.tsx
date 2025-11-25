@@ -468,7 +468,7 @@ export default function FriendsList({
       )}
 
       {/* Friends List Section */}
-      <div className="flex-1 overflow-y-auto p-6 space-y-3 min-h-0 relative z-10 hide-scrollbar" style={{scrollBehavior: 'smooth', maxHeight: 'calc(100vh - 180px)'}}>
+      <div className="flex-1 overflow-y-auto p-6 pb-8 space-y-3 min-h-0 relative z-10 hide-scrollbar" style={{scrollBehavior: 'smooth', maxHeight: 'calc(100vh - 180px)'}}>
         <AnimatePresence>
           {/* Empty state - no friends */}
           {friends.length === 0 ? (
