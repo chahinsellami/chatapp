@@ -1,4 +1,3 @@
-
 # WebChat
 
 A professional real-time messaging platform with direct messaging, friend management, post sharing, and secure voice/video calling powered by Agora. Built with Next.js, TypeScript, and PostgreSQL.

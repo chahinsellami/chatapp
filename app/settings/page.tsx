@@ -15,15 +15,34 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import dynamic from "next/dynamic";
 import { Suspense } from "react";
-const NavigationBar = dynamic(() => import("@/components/Layout/NavigationBar"), { ssr: false });
+const NavigationBar = dynamic(
+  () => import("@/components/Layout/NavigationBar"),
+  { ssr: false }
+);
 const Card = dynamic(() => import("@/components/Common/Card"), { ssr: false });
-const Button = dynamic(() => import("@/components/Common/Button"), { ssr: false });
-const TextArea = dynamic(() => import("@/components/Common/TextArea"), { ssr: false });
-const ImageUpload = dynamic(() => import("@/components/Common/ImageUpload"), { ssr: false });
-const EmojiPicker = dynamic(() => import("@/components/Common/EmojiPicker"), { ssr: false });
-const StatusSelector = dynamic(() => import("@/components/Common/StatusSelector"), { ssr: false });
-const AlertMessage = dynamic(() => import("@/components/Common/AlertMessage"), { ssr: false });
-const AnimatePresence = dynamic(() => import("framer-motion").then(mod => mod.AnimatePresence), { ssr: false });
+const Button = dynamic(() => import("@/components/Common/Button"), {
+  ssr: false,
+});
+const TextArea = dynamic(() => import("@/components/Common/TextArea"), {
+  ssr: false,
+});
+const ImageUpload = dynamic(() => import("@/components/Common/ImageUpload"), {
+  ssr: false,
+});
+const EmojiPicker = dynamic(() => import("@/components/Common/EmojiPicker"), {
+  ssr: false,
+});
+const StatusSelector = dynamic(
+  () => import("@/components/Common/StatusSelector"),
+  { ssr: false }
+);
+const AlertMessage = dynamic(() => import("@/components/Common/AlertMessage"), {
+  ssr: false,
+});
+const AnimatePresence = dynamic(
+  () => import("framer-motion").then((mod) => mod.AnimatePresence),
+  { ssr: false }
+);
 import { LoadingSpinner } from "@/components/Common";
 import type { StatusOption } from "@/components/Common";
 import { User, Save, ArrowLeft } from "lucide-react";
@@ -305,111 +324,117 @@ export default function SettingsPage() {
   if (!user) return null;
 
   return (
-    <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading...</div>}>
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center">
+          Loading...
+        </div>
+      }
+    >
       <div className="min-h-screen bg-black">
-      {/* Header */}
-      <NavigationBar currentPage="settings" />
+        {/* Header */}
+        <NavigationBar currentPage="settings" />
 
-      <div className="max-w-4xl mx-auto px-6 py-4 flex items-center gap-4 mt-4">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => router.push("/profile")}
-          icon={ArrowLeft}
-        />
-        <h1 className="text-2xl font-bold text-white">Profile Settings</h1>
-      </div>
+        <div className="max-w-4xl mx-auto px-6 py-4 flex items-center gap-4 mt-4">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => router.push("/profile")}
+            icon={ArrowLeft}
+          />
+          <h1 className="text-2xl font-bold text-white">Profile Settings</h1>
+        </div>
 
-      {/* Content */}
-      <div className="max-w-4xl mx-auto px-6 py-8">
-        <Card padding="lg">
-          <h2 className="text-2xl font-bold text-white mb-6">
-            Customize Your Profile
-          </h2>
+        {/* Content */}
+        <div className="max-w-4xl mx-auto px-6 py-8">
+          <Card padding="lg">
+            <h2 className="text-2xl font-bold text-white mb-6">
+              Customize Your Profile
+            </h2>
 
-          {/* Success/Error Messages */}
-          <AnimatePresence>
-            {success && (
-              <AlertMessage
-                type="success"
-                message="Profile updated successfully!"
+            {/* Success/Error Messages */}
+            <AnimatePresence>
+              {success && (
+                <AlertMessage
+                  type="success"
+                  message="Profile updated successfully!"
+                />
+              )}
+              {error && <AlertMessage type="error" message={error} />}
+            </AnimatePresence>
+
+            <div className="space-y-8">
+              {/* Current Images Preview */}
+              <div className="grid md:grid-cols-2 gap-6">
+                <ImageUpload
+                  label="Profile Picture"
+                  preview={
+                    customImage ||
+                    (avatar && !avatar.startsWith("http") ? null : customImage)
+                  }
+                  onUpload={handleImageChange}
+                  onRemove={handleRemoveImage}
+                  id="avatar-upload-settings"
+                  placeholder="No profile picture"
+                />
+
+                <ImageUpload
+                  label="Cover Photo"
+                  preview={coverImage}
+                  onUpload={handleCoverImageChange}
+                  onRemove={handleRemoveCoverImage}
+                  id="cover-upload-settings"
+                  placeholder="No cover photo"
+                />
+              </div>
+
+              {/* Emoji Avatar Selection */}
+              {!customImage && (
+                <EmojiPicker
+                  label="Or Choose an Emoji Avatar"
+                  emojis={AVATARS}
+                  value={avatar}
+                  onChange={(emoji) => {
+                    setAvatar(emoji);
+                    setCustomImage(null);
+                  }}
+                />
+              )}
+
+              {/* Status Selection */}
+              <StatusSelector
+                label="Your Status"
+                options={STATUS_OPTIONS}
+                value={status}
+                onChange={setStatus}
               />
-            )}
-            {error && <AlertMessage type="error" message={error} />}
-          </AnimatePresence>
 
-          <div className="space-y-8">
-            {/* Current Images Preview */}
-            <div className="grid md:grid-cols-2 gap-6">
-              <ImageUpload
-                label="Profile Picture"
-                preview={
-                  customImage ||
-                  (avatar && !avatar.startsWith("http") ? null : customImage)
-                }
-                onUpload={handleImageChange}
-                onRemove={handleRemoveImage}
-                id="avatar-upload-settings"
-                placeholder="No profile picture"
+              {/* Bio */}
+              <TextArea
+                label="About You"
+                value={bio}
+                onChange={(e) => setBio(e.target.value)}
+                maxLength={150}
+                placeholder="Tell everyone about yourself..."
+                rows={4}
+                showCount
               />
 
-              <ImageUpload
-                label="Cover Photo"
-                preview={coverImage}
-                onUpload={handleCoverImageChange}
-                onRemove={handleRemoveCoverImage}
-                id="cover-upload-settings"
-                placeholder="No cover photo"
-              />
+              {/* Save Button */}
+              <Button
+                variant="primary"
+                size="lg"
+                fullWidth
+                loading={saving}
+                icon={Save}
+                onClick={handleSave}
+              >
+                Save Profile
+              </Button>
             </div>
-
-            {/* Emoji Avatar Selection */}
-            {!customImage && (
-              <EmojiPicker
-                label="Or Choose an Emoji Avatar"
-                emojis={AVATARS}
-                value={avatar}
-                onChange={(emoji) => {
-                  setAvatar(emoji);
-                  setCustomImage(null);
-                }}
-              />
-            )}
-
-            {/* Status Selection */}
-            <StatusSelector
-              label="Your Status"
-              options={STATUS_OPTIONS}
-              value={status}
-              onChange={setStatus}
-            />
-
-            {/* Bio */}
-            <TextArea
-              label="About You"
-              value={bio}
-              onChange={(e) => setBio(e.target.value)}
-              maxLength={150}
-              placeholder="Tell everyone about yourself..."
-              rows={4}
-              showCount
-            />
-
-            {/* Save Button */}
-            <Button
-              variant="primary"
-              size="lg"
-              fullWidth
-              loading={saving}
-              icon={Save}
-              onClick={handleSave}
-            >
-              Save Profile
-            </Button>
-          </div>
-        </Card>
+          </Card>
+        </div>
       </div>
-    </div>
     </Suspense>
   );
 }

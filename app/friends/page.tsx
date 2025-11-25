@@ -3,15 +3,24 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
-const FriendsList = dynamic(() => import("@/components/Friends/FriendsList"), { ssr: false });
-const AddFriend = dynamic(() => import("@/components/Friends/AddFriend"), { ssr: false });
-const DirectMessages = dynamic(() => import("@/components/Friends/DirectMessages"), { ssr: false, loading: () => <div className="flex-1 flex items-center justify-center">Loading...</div> });
+const FriendsList = dynamic(() => import("@/components/Friends/FriendsList"), {
+  ssr: false,
+});
+const AddFriend = dynamic(() => import("@/components/Friends/AddFriend"), {
+  ssr: false,
+});
+const DirectMessages = dynamic(
+  () => import("@/components/Friends/DirectMessages"),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="flex-1 flex items-center justify-center">Loading...</div>
+    ),
+  }
+);
 import { verifyToken } from "@/lib/auth";
 
-
-
 // Force dynamic rendering - no static generation
-
 
 interface User {
   userId: string;

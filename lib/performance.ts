@@ -174,6 +174,7 @@ export function useRenderPerformance(name: string) {
 
     if (process.env.NODE_ENV === "development") {
       // Performance log
+      console.log(
         `[Performance] ${name} render #${
           renderCount.current
         }: ${renderTime.toFixed(2)}ms`

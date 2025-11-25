@@ -66,7 +66,13 @@ export default function Avatar({
         className={`${sizeStyles[size]} rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 overflow-hidden shadow-lg flex items-center justify-center`}
       >
         {src ? (
-          <Image src={src} alt="Avatar" className="w-full h-full object-cover" fill sizes="100vw" />
+          <Image
+            src={src}
+            alt="Avatar"
+            className="w-full h-full object-cover"
+            fill
+            sizes="100vw"
+          />
         ) : emoji ? (
           <span>{emoji}</span>
         ) : (

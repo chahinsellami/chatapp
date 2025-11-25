@@ -1,4 +1,3 @@
-
 "use client";
 import Image from "next/image";
 
@@ -299,17 +298,20 @@ export default function DirectMessages({
       const data = await res.json();
 
       // Format messages for display
-      const formattedMessages = (data.messages || []).map((msg: DirectMessage) => ({
-        id: msg.id,
-        senderId: msg.senderId,
-        receiverId: msg.receiverId,
-        text: msg.text,
-        createdAt: msg.createdAt,
-        editedAt: msg.editedAt,
-        username: msg.senderId === userId ? "You" : msg.username || friendName,
-        avatar:
-          msg.senderId === userId ? undefined : msg.avatar || friendAvatar,
-      }));
+      const formattedMessages = (data.messages || []).map(
+        (msg: DirectMessage) => ({
+          id: msg.id,
+          senderId: msg.senderId,
+          receiverId: msg.receiverId,
+          text: msg.text,
+          createdAt: msg.createdAt,
+          editedAt: msg.editedAt,
+          username:
+            msg.senderId === userId ? "You" : msg.username || friendName,
+          avatar:
+            msg.senderId === userId ? undefined : msg.avatar || friendAvatar,
+        })
+      );
 
       setMessages(formattedMessages);
       setError(null);
@@ -458,7 +460,6 @@ export default function DirectMessages({
     }
   };
 
-
   /**
    * Initiate a voice or video call with mobile-specific warnings
    * Uses Agora.io for reliable connection
@@ -578,13 +579,17 @@ export default function DirectMessages({
           <motion.div
             className="w-16 h-16 rounded-2xl flex items-center justify-center bg-gradient-to-br from-blue-500 to-indigo-600 shadow-lg"
             animate={{ rotate: 360 }}
-            transition={{ duration: 1.2, repeat: Infinity, ease: 'linear' }}
+            transition={{ duration: 1.2, repeat: Infinity, ease: "linear" }}
           >
             <MessageCircle className="w-8 h-8 text-white" />
           </motion.div>
           <div className="text-center">
-            <p className="text-lg font-semibold text-white mb-1">Loading messages...</p>
-            <p className="text-neutral-400 text-sm">Please wait while we fetch your conversation.</p>
+            <p className="text-lg font-semibold text-white mb-1">
+              Loading messages...
+            </p>
+            <p className="text-neutral-400 text-sm">
+              Please wait while we fetch your conversation.
+            </p>
           </div>
         </motion.div>
       </div>
@@ -738,7 +743,10 @@ export default function DirectMessages({
       </motion.div>
 
       {/* Messages area with scrolling */}
-      <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-3 min-h-0 relative z-10 hide-scrollbar" style={{scrollBehavior: 'smooth'}}>
+      <div
+        className="flex-1 overflow-y-auto p-4 md:p-6 space-y-3 min-h-0 relative z-10 hide-scrollbar"
+        style={{ scrollBehavior: "smooth" }}
+      >
         <AnimatePresence>
           {messages.map((message, index) => {
             const isOwnMessage = message.senderId === userId;

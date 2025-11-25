@@ -11,10 +11,19 @@ import { motion } from "framer-motion";
 import { UserPlus, Check, MessageCircle, ArrowLeft } from "lucide-react";
 import dynamic from "next/dynamic";
 import Image from "next/image";
-const NavigationBar = dynamic(() => import("@/components/Layout/NavigationBar"), { ssr: false });
-const Avatar = dynamic(() => import("@/components/Common/Avatar"), { ssr: false });
-const Badge = dynamic(() => import("@/components/Common/Badge"), { ssr: false });
-const Button = dynamic(() => import("@/components/Common/Button"), { ssr: false });
+const NavigationBar = dynamic(
+  () => import("@/components/Layout/NavigationBar"),
+  { ssr: false }
+);
+const Avatar = dynamic(() => import("@/components/Common/Avatar"), {
+  ssr: false,
+});
+const Badge = dynamic(() => import("@/components/Common/Badge"), {
+  ssr: false,
+});
+const Button = dynamic(() => import("@/components/Common/Button"), {
+  ssr: false,
+});
 const Card = dynamic(() => import("@/components/Common/Card"), { ssr: false });
 import { useAuth } from "@/context/AuthContext";
 import { useSocket } from "@/lib/useSocket";

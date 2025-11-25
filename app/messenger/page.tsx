@@ -2,20 +2,24 @@
 
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Suspense } from "react";
+
 import dynamic from "next/dynamic";
 import { useAuth } from "@/context/AuthContext";
-const FriendsList = dynamic(() => import("@/components/Friends/FriendsList"), { ssr: false });
+const FriendsList = dynamic(() => import("@/components/Friends/FriendsList"), {
+  ssr: false,
+});
 import { MessageCircle, LogOut, Menu, X, UserCircle2 } from "lucide-react";
 
 // Lazy-load DirectMessages to avoid SSR issues with Agora SDK
-const DirectMessages = dynamic(() => import("@/components/Friends/DirectMessages"), {
-  ssr: false,
-  loading: () => null,
-});
+const DirectMessages = dynamic(
+  () => import("@/components/Friends/DirectMessages"),
+  {
+    ssr: false,
+    loading: () => null,
+  }
+);
 
 // Force dynamic rendering
-
 
 interface Friend {
   id: string;
@@ -62,7 +66,9 @@ function MessengerContent() {
             });
           }
         })
-        .catch(() => {/* Error fetching friend */});
+        .catch(() => {
+          /* Error fetching friend */
+        });
     }
   }, [searchParams, user]);
 
@@ -226,6 +232,12 @@ function MessengerContent() {
   );
 }
 
+import { Suspense } from "react";
+
 export default function MessengerPage() {
-  return <MessengerContent />;
+  return (
+    <Suspense>
+      <MessengerContent />
+    </Suspense>
+  );
 }
