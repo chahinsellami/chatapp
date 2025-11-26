@@ -921,7 +921,7 @@ export default function ProfilePage() {
                 <div className="glass-card p-6 rounded-2xl">
                   <FriendsList
                     userId={user.id}
-                    onSelectFriend={(friendId) => {
+                    onSelectFriend={(friendId: string) => {
                       router.push(`/messenger?friend=${friendId}`);
                     }}
                   />

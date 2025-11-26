@@ -113,6 +113,7 @@ export default function SettingsPage() {
 
   // Profile state
   const [avatar, setAvatar] = useState("");
+  const [username, setUsername] = useState("");
   const [status, setStatus] = useState("online");
   const [bio, setBio] = useState("");
   const [customImage, setCustomImage] = useState<string | null>(null);
@@ -129,18 +130,21 @@ export default function SettingsPage() {
    * Initialize profile data from user context
    */
   useEffect(() => {
-    if (user?.avatar) {
-      setAvatar(user.avatar);
-      setStatus(user.status || "online");
-      setBio(user.bio || "");
-      if (
-        user.avatar.startsWith("/avatars/") ||
-        user.avatar.startsWith("http")
-      ) {
-        setCustomImage(user.avatar);
-      }
-      if (user.coverImage) {
-        setCoverImage(user.coverImage);
+    if (user) {
+      setUsername(user.username || "");
+      if (user.avatar) {
+        setAvatar(user.avatar);
+        setStatus(user.status || "online");
+        setBio(user.bio || "");
+        if (
+          user.avatar.startsWith("/avatars/") ||
+          user.avatar.startsWith("http")
+        ) {
+          setCustomImage(user.avatar);
+        }
+        if (user.coverImage) {
+          setCoverImage(user.coverImage);
+        }
       }
     }
   }, [user]);
@@ -226,6 +230,10 @@ export default function SettingsPage() {
       setError("Please select an avatar or upload an image");
       return;
     }
+    if (!username || username.length < 3) {
+      setError("Username must be at least 3 characters");
+      return;
+    }
 
     try {
       setSaving(true);
@@ -236,6 +244,27 @@ export default function SettingsPage() {
       if (!token) {
         router.push("/login");
         return;
+      }
+
+      // Check if username is taken (unless unchanged)
+      if (username !== user?.username) {
+        const checkRes = await fetch(
+          `/api/users/search?q=${encodeURIComponent(username)}`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+        const checkData = await checkRes.json();
+        if (
+          checkData.users &&
+          checkData.users.some(
+            (u: any) => u.username.toLowerCase() === username.toLowerCase()
+          )
+        ) {
+          setError("Username already exists. Please choose another.");
+          setSaving(false);
+          return;
+        }
       }
 
       let profileImageUrl = customImage || avatar;
@@ -293,6 +322,7 @@ export default function SettingsPage() {
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({
+          username,
           avatar: profileImageUrl,
           coverImage: coverImageUrl,
           status,
@@ -400,6 +430,35 @@ export default function SettingsPage() {
                   }}
                 />
               )}
+
+              {/* Username Change */}
+              <div>
+                <label
+                  className="block text-white font-medium mb-2"
+                  htmlFor="username-settings"
+                >
+                  Username
+                </label>
+                <input
+                  id="username-settings"
+                  type="text"
+                  className="w-full px-4 py-2 rounded-lg bg-neutral-900 text-white border border-neutral-700 focus:outline-none focus:ring-2 focus:ring-blue-600"
+                  value={username}
+                  onChange={(e) =>
+                    setUsername(
+                      e.target.value.replace(/\s+/g, "").toLowerCase()
+                    )
+                  }
+                  minLength={3}
+                  maxLength={32}
+                  autoComplete="off"
+                  spellCheck={false}
+                  required
+                />
+                <p className="text-neutral-400 text-xs mt-1">
+                  Username must be unique and 3-32 characters, no spaces.
+                </p>
+              </div>
 
               {/* Status Selection */}
               <StatusSelector

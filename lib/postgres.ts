@@ -280,6 +280,7 @@ export async function createUser(
  */
 export async function updateUserProfileComplete(
   userId: string,
+  username: string,
   avatar: string,
   status: string,
   bio: string,
@@ -287,10 +288,10 @@ export async function updateUserProfileComplete(
 ) {
   const result = await pool.query(
     `UPDATE users
-     SET avatar = $1, status = $2, bio = $3, cover_image = $4
-     WHERE id = $5
+     SET username = $1, avatar = $2, status = $3, bio = $4, cover_image = $5
+     WHERE id = $6
      RETURNING id, username, email, avatar, status, bio, cover_image, created_at`,
-    [avatar, status, bio, coverImage, userId]
+    [username, avatar, status, bio, coverImage, userId]
   );
   return result.rows[0];
 }
