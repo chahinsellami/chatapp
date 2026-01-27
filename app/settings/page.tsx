@@ -1,115 +1,31 @@
 "use client";
 
-/**
- * Settings Page - User profile customization
- *
- * Features:
- * - Avatar selection from emoji gallery or custom upload
- * - Cover photo upload
- * - Status management (online, idle, dnd, invisible)
- * - Bio editing
- */
-
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import dynamic from "next/dynamic";
+import Image from "next/image";
 import { Suspense } from "react";
-const NavigationBar = dynamic(
-  () => import("@/components/Layout/NavigationBar"),
-  { ssr: false }
-);
-const Card = dynamic(() => import("@/components/Common/Card"), { ssr: false });
-const Button = dynamic(() => import("@/components/Common/Button"), {
-  ssr: false,
-});
-const TextArea = dynamic(() => import("@/components/Common/TextArea"), {
-  ssr: false,
-});
-const ImageUpload = dynamic(() => import("@/components/Common/ImageUpload"), {
-  ssr: false,
-});
-const EmojiPicker = dynamic(() => import("@/components/Common/EmojiPicker"), {
-  ssr: false,
-});
-const StatusSelector = dynamic(
-  () => import("@/components/Common/StatusSelector"),
-  { ssr: false }
-);
-const AlertMessage = dynamic(() => import("@/components/Common/AlertMessage"), {
-  ssr: false,
-});
-const AnimatePresence = dynamic(
-  () => import("framer-motion").then((mod) => mod.AnimatePresence),
-  { ssr: false }
-);
 import { LoadingSpinner } from "@/components/Common";
-import type { StatusOption } from "@/components/Common";
-import { User, Save, ArrowLeft } from "lucide-react";
-
-// Available emoji avatars for user selection
-const AVATARS = [
-  "🎭",
-  "🎨",
-  "🎪",
-  "🎬",
-  "🎮",
-  "🎯",
-  "🎲",
-  "🎳",
-  "🎸",
-  "🎹",
-  "🎺",
-  "🎻",
-  "🥁",
-  "🎤",
-  "🎧",
-  "📱",
-  "💻",
-  "⌨️",
-  "🖱️",
-  "🖥️",
-  "📷",
-  "📹",
-  "🎥",
-  "🎞️",
-  "📚",
-  "📖",
-  "✏️",
-  "📝",
-  "🖊️",
-  "🖍️",
-  "🎓",
-  "🏆",
-  "🌟",
-  "⭐",
-  "✨",
-  "💫",
-  "🌠",
-  "🌌",
-  "🌃",
-  "🌆",
-  "🚀",
-  "🛸",
-  "🛰️",
-  "🌍",
-  "🌎",
-  "🌏",
-  "🗺️",
-  "🧭",
-];
-
-// Status options with colors and labels
-const STATUS_OPTIONS: StatusOption[] = [
-  { value: "online", label: "Online", icon: "🟢", color: "#10b981" },
-  { value: "idle", label: "Idle", icon: "🟡", color: "#f59e0b" },
-  { value: "dnd", label: "Do Not Disturb", icon: "🔴", color: "#ef4444" },
-  { value: "invisible", label: "Invisible", icon: "⚫", color: "#6b7280" },
-];
+import { motion } from "framer-motion";
+import {
+  ArrowLeft,
+  Save,
+  LogOut,
+  Bell,
+  Lock,
+  Palette,
+  User as UserIcon,
+  Camera,
+  Check,
+  AlertCircle,
+  Mail,
+  Clock,
+} from "lucide-react";
 
 export default function SettingsPage() {
   const router = useRouter();
-  const { user, isLoading, updateUser } = useAuth();
+  const { user, isLoading, updateUser, logout } = useAuth();
 
   // Profile state
   const [avatar, setAvatar] = useState("");
@@ -125,40 +41,33 @@ export default function SettingsPage() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
+  const [activeTab, setActiveTab] = useState<"profile" | "preferences" | "account">("profile");
 
-  /**
-   * Initialize profile data from user context
-   */
+  const AVATARS = [
+    "🎭", "🎨", "🎪", "🎬", "🎮", "🎯", "🎲", "🎳", "🎸", "🎹",
+    "🎺", "🎻", "🥁", "🎤", "🎧", "📱", "💻", "⌨️", "🖱️", "🖥️",
+  ];
+
+  const STATUS_OPTIONS = [
+    { value: "online", label: "Online", color: "bg-green-500" },
+    { value: "idle", label: "Idle", color: "bg-yellow-500" },
+    { value: "dnd", label: "Do Not Disturb", color: "bg-red-500" },
+    { value: "invisible", label: "Offline", color: "bg-gray-500" },
+  ];
+
   useEffect(() => {
     if (user) {
       setUsername(user.username || "");
-      if (user.avatar) {
-        setAvatar(user.avatar);
-        setStatus(user.status || "online");
-        setBio(user.bio || "");
-        if (
-          user.avatar.startsWith("/avatars/") ||
-          user.avatar.startsWith("http")
-        ) {
-          setCustomImage(user.avatar);
-        }
-        if (user.coverImage) {
-          setCoverImage(user.coverImage);
-        }
-      }
+      setAvatar(user.avatar || "");
+      setStatus(user.status || "online");
+      setBio(user.bio || "");
     }
   }, [user]);
 
-  /**
-   * Redirect to login if not authenticated
-   */
   useEffect(() => {
     if (!isLoading && !user) router.push("/login");
   }, [isLoading, user, router]);
 
-  /**
-   * Handle image file selection
-   */
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -181,53 +90,15 @@ export default function SettingsPage() {
     }
   };
 
-  /**
-   * Handle cover image file selection
-   */
-  const handleCoverImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      if (!file.type.startsWith("image/")) {
-        setError("Please select an image file");
-        return;
-      }
-      if (file.size > 5 * 1024 * 1024) {
-        setError("Image size must be less than 5MB");
-        return;
-      }
-
-      setCoverFile(file);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setCoverImage(reader.result as string);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-
-  /**
-   * Remove custom image
-   */
   const handleRemoveImage = () => {
     setCustomImage(null);
     setImageFile(null);
     setAvatar("");
   };
 
-  /**
-   * Remove cover image
-   */
-  const handleRemoveCoverImage = () => {
-    setCoverImage(null);
-    setCoverFile(null);
-  };
-
-  /**
-   * Save profile changes to server
-   */
   const handleSave = async () => {
     if (!avatar && !customImage) {
-      setError("Please select an avatar or upload an image");
+      setError("Please select an avatar");
       return;
     }
     if (!username || username.length < 3) {
@@ -246,31 +117,8 @@ export default function SettingsPage() {
         return;
       }
 
-      // Check if username is taken (unless unchanged)
-      if (username !== user?.username) {
-        const checkRes = await fetch(
-          `/api/users/search?q=${encodeURIComponent(username)}`,
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
-        const checkData = await checkRes.json();
-        if (
-          checkData.users &&
-          checkData.users.some(
-            (u: any) => u.username.toLowerCase() === username.toLowerCase()
-          )
-        ) {
-          setError("Username already exists. Please choose another.");
-          setSaving(false);
-          return;
-        }
-      }
-
       let profileImageUrl = customImage || avatar;
-      let coverImageUrl = coverImage || "";
 
-      // Upload profile image if a new file was selected
       if (imageFile) {
         const formData = new FormData();
         formData.append("file", imageFile);
@@ -285,36 +133,13 @@ export default function SettingsPage() {
 
         if (!uploadRes.ok) {
           const data = await uploadRes.json();
-          throw new Error(data.error || "Failed to upload profile image");
+          throw new Error(data.error || "Failed to upload image");
         }
 
         const uploadData = await uploadRes.json();
         profileImageUrl = uploadData.imageUrl;
       }
 
-      // Upload cover image if a new file was selected
-      if (coverFile) {
-        const formData = new FormData();
-        formData.append("file", coverFile);
-
-        const uploadRes = await fetch("/api/upload/cover-image", {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-          body: formData,
-        });
-
-        if (!uploadRes.ok) {
-          const data = await uploadRes.json();
-          throw new Error(data.error || "Failed to upload cover image");
-        }
-
-        const uploadData = await uploadRes.json();
-        coverImageUrl = uploadData.imageUrl;
-      }
-
-      // Save profile with the uploaded image URLs
       const res = await fetch("/api/auth/profile", {
         method: "PUT",
         headers: {
@@ -324,7 +149,6 @@ export default function SettingsPage() {
         body: JSON.stringify({
           username,
           avatar: profileImageUrl,
-          coverImage: coverImageUrl,
           status,
           bio,
         }),
@@ -347,153 +171,361 @@ export default function SettingsPage() {
     }
   };
 
+  const handleLogout = async () => {
+    await logout();
+    router.push("/login");
+  };
+
   if (isLoading) {
-    return <LoadingSpinner icon={User} message="Loading Settings..." />;
+    return <LoadingSpinner icon={UserIcon} message="Loading Settings..." />;
   }
 
   if (!user) return null;
 
   return (
-    <Suspense
-      fallback={
-        <div className="min-h-screen flex items-center justify-center">
-          Loading...
-        </div>
-      }
-    >
-      <div className="min-h-screen bg-black">
-        {/* Header */}
-        <NavigationBar currentPage="settings" />
-
-        <div className="max-w-4xl mx-auto px-6 py-4 flex items-center gap-4 mt-4">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => router.push("/profile")}
-            icon={ArrowLeft}
-          />
-          <h1 className="text-2xl font-bold text-white">Profile Settings</h1>
-        </div>
-
-        {/* Content */}
-        <div className="max-w-4xl mx-auto px-6 py-8">
-          <Card padding="lg">
-            <h2 className="text-2xl font-bold text-white mb-6">
-              Customize Your Profile
-            </h2>
-
-            {/* Success/Error Messages */}
-            <AnimatePresence>
-              {success && (
-                <AlertMessage
-                  type="success"
-                  message="Profile updated successfully!"
-                />
-              )}
-              {error && <AlertMessage type="error" message={error} />}
-            </AnimatePresence>
-
-            <div className="space-y-8">
-              {/* Current Images Preview */}
-              <div className="grid md:grid-cols-2 gap-6">
-                <ImageUpload
-                  label="Profile Picture"
-                  preview={
-                    customImage ||
-                    (avatar && !avatar.startsWith("http") ? null : customImage)
-                  }
-                  onUpload={handleImageChange}
-                  onRemove={handleRemoveImage}
-                  id="avatar-upload-settings"
-                  placeholder="No profile picture"
-                />
-
-                <ImageUpload
-                  label="Cover Photo"
-                  preview={coverImage}
-                  onUpload={handleCoverImageChange}
-                  onRemove={handleRemoveCoverImage}
-                  id="cover-upload-settings"
-                  placeholder="No cover photo"
-                />
-              </div>
-
-              {/* Emoji Avatar Selection */}
-              {!customImage && (
-                <EmojiPicker
-                  label="Or Choose an Emoji Avatar"
-                  emojis={AVATARS}
-                  value={avatar}
-                  onChange={(emoji) => {
-                    setAvatar(emoji);
-                    setCustomImage(null);
-                  }}
-                />
-              )}
-
-              {/* Username Change */}
-              <div>
-                <label
-                  className="block text-white font-medium mb-2"
-                  htmlFor="username-settings"
-                >
-                  Username
-                </label>
-                <input
-                  id="username-settings"
-                  type="text"
-                  className="w-full px-4 py-2 rounded-lg bg-neutral-900 text-white border border-neutral-700 focus:outline-none focus:ring-2 focus:ring-blue-600"
-                  value={username}
-                  onChange={(e) =>
-                    setUsername(
-                      e.target.value.replace(/\s+/g, "").toLowerCase()
-                    )
-                  }
-                  minLength={3}
-                  maxLength={32}
-                  autoComplete="off"
-                  spellCheck={false}
-                  required
-                />
-                <p className="text-neutral-400 text-xs mt-1">
-                  Username must be unique and 3-32 characters, no spaces.
-                </p>
-              </div>
-
-              {/* Status Selection */}
-              <StatusSelector
-                label="Your Status"
-                options={STATUS_OPTIONS}
-                value={status}
-                onChange={setStatus}
-              />
-
-              {/* Bio */}
-              <TextArea
-                label="About You"
-                value={bio}
-                onChange={(e) => setBio(e.target.value)}
-                maxLength={150}
-                placeholder="Tell everyone about yourself..."
-                rows={4}
-                showCount
-              />
-
-              {/* Save Button */}
-              <Button
-                variant="primary"
-                size="lg"
-                fullWidth
-                loading={saving}
-                icon={Save}
-                onClick={handleSave}
-              >
-                Save Profile
-              </Button>
-            </div>
-          </Card>
+    <div className="min-h-screen bg-neutral-950">
+      {/* Header */}
+      <div className="bg-neutral-900 border-b border-neutral-800">
+        <div className="max-w-6xl mx-auto px-4 md:px-8 py-4 flex items-center gap-4">
+          <button
+            onClick={() => router.back()}
+            className="p-2 hover:bg-neutral-800 rounded-lg transition-colors"
+          >
+            <ArrowLeft className="w-5 h-5 text-neutral-400" />
+          </button>
+          <h1 className="text-2xl font-bold text-white">Settings</h1>
         </div>
       </div>
-    </Suspense>
+
+      <div className="max-w-6xl mx-auto px-4 md:px-8 py-8">
+        <div className="grid md:grid-cols-4 gap-6">
+          {/* Sidebar Navigation */}
+          <div className="md:col-span-1">
+            <nav className="space-y-2">
+              {[
+                { id: "profile", label: "Profile", icon: UserIcon },
+                { id: "preferences", label: "Preferences", icon: Palette },
+                { id: "account", label: "Account", icon: Lock },
+              ].map((item) => (
+                <motion.button
+                  key={item.id}
+                  onClick={() => setActiveTab(item.id as any)}
+                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
+                    activeTab === item.id
+                      ? "bg-blue-600 text-white"
+                      : "text-neutral-400 hover:bg-neutral-800"
+                  }`}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                >
+                  <item.icon className="w-5 h-5" />
+                  <span className="font-medium">{item.label}</span>
+                </motion.button>
+              ))}
+            </nav>
+          </div>
+
+          {/* Main Content */}
+          <div className="md:col-span-3">
+            <motion.div
+              key={activeTab}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.2 }}
+            >
+              {/* Profile Tab */}
+              {activeTab === "profile" && (
+                <div className="space-y-6">
+                  {/* Success/Error Messages */}
+                  {success && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="p-4 bg-green-500/20 border border-green-500/50 rounded-lg flex items-center gap-3 text-green-400"
+                    >
+                      <Check className="w-5 h-5" />
+                      <span>Profile updated successfully!</span>
+                    </motion.div>
+                  )}
+                  {error && (
+                    <motion.div
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="p-4 bg-red-500/20 border border-red-500/50 rounded-lg flex items-center gap-3 text-red-400"
+                    >
+                      <AlertCircle className="w-5 h-5" />
+                      <span>{error}</span>
+                    </motion.div>
+                  )}
+
+                  {/* Profile Card */}
+                  <div className="bg-neutral-900 rounded-lg p-6 border border-neutral-800">
+                    <h2 className="text-xl font-bold text-white mb-6">
+                      Profile Information
+                    </h2>
+
+                    {/* Avatar Section */}
+                    <div className="mb-8">
+                      <label className="block text-neutral-300 font-semibold mb-4">
+                        Profile Picture
+                      </label>
+                      <div className="flex items-center gap-6">
+                        <div className="w-24 h-24 rounded-full bg-blue-600 flex items-center justify-center text-4xl overflow-hidden border-2 border-neutral-700">
+                          {customImage ? (
+                            <Image
+                              src={customImage}
+                              alt="Avatar"
+                              width={96}
+                              height={96}
+                              className="w-full h-full object-cover"
+                            />
+                          ) : avatar && !avatar.startsWith("http") ? (
+                            avatar
+                          ) : avatar && avatar.startsWith("http") ? (
+                            <Image
+                              src={avatar}
+                              alt="Avatar"
+                              width={96}
+                              height={96}
+                              className="w-full h-full object-cover"
+                            />
+                          ) : (
+                            user.username[0]?.toUpperCase()
+                          )}
+                        </div>
+                        <div className="space-y-2">
+                          <label className="block">
+                            <input
+                              type="file"
+                              accept="image/*"
+                              onChange={handleImageChange}
+                              className="hidden"
+                            />
+                            <span className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg cursor-pointer flex items-center gap-2 w-fit transition-colors">
+                              <Camera className="w-4 h-4" />
+                              Upload Photo
+                            </span>
+                          </label>
+                          {customImage && (
+                            <button
+                              onClick={handleRemoveImage}
+                              className="px-4 py-2 bg-neutral-800 hover:bg-neutral-700 text-neutral-300 rounded-lg flex items-center gap-2 transition-colors"
+                            >
+                              Remove
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Emoji Avatars */}
+                    {!customImage && (
+                      <div className="mb-8">
+                        <label className="block text-neutral-300 font-semibold mb-4">
+                          Or Choose an Emoji Avatar
+                        </label>
+                        <div className="grid grid-cols-5 sm:grid-cols-10 gap-2">
+                          {AVATARS.map((emoji) => (
+                            <motion.button
+                              key={emoji}
+                              onClick={() => {
+                                setAvatar(emoji);
+                                setCustomImage(null);
+                              }}
+                              className={`text-3xl p-3 rounded-lg transition-all ${
+                                avatar === emoji
+                                  ? "bg-blue-600 scale-110"
+                                  : "bg-neutral-800 hover:bg-neutral-700"
+                              }`}
+                              whileHover={{ scale: 1.1 }}
+                              whileTap={{ scale: 0.95 }}
+                            >
+                              {emoji}
+                            </motion.button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Username */}
+                    <div className="mb-8">
+                      <label className="block text-neutral-300 font-semibold mb-2">
+                        Username
+                      </label>
+                      <input
+                        type="text"
+                        value={username}
+                        onChange={(e) => setUsername(e.target.value)}
+                        className="w-full px-4 py-2 rounded-lg bg-neutral-800 text-white border border-neutral-700 focus:outline-none focus:ring-2 focus:ring-blue-600 transition-all"
+                        minLength={3}
+                        maxLength={32}
+                      />
+                      <p className="text-neutral-500 text-sm mt-1">
+                        3-32 characters, no spaces
+                      </p>
+                    </div>
+
+                    {/* Bio */}
+                    <div className="mb-8">
+                      <label className="block text-neutral-300 font-semibold mb-2">
+                        About You
+                      </label>
+                      <textarea
+                        value={bio}
+                        onChange={(e) => setBio(e.target.value)}
+                        maxLength={150}
+                        className="w-full px-4 py-2 rounded-lg bg-neutral-800 text-white border border-neutral-700 focus:outline-none focus:ring-2 focus:ring-blue-600 transition-all resize-none"
+                        rows={4}
+                        placeholder="Tell everyone about yourself..."
+                      />
+                      <p className="text-neutral-500 text-sm mt-1">
+                        {bio.length}/150 characters
+                      </p>
+                    </div>
+
+                    {/* Status */}
+                    <div className="mb-8">
+                      <label className="block text-neutral-300 font-semibold mb-3">
+                        Status
+                      </label>
+                      <div className="grid grid-cols-2 gap-3">
+                        {STATUS_OPTIONS.map((option) => (
+                          <motion.button
+                            key={option.value}
+                            onClick={() => setStatus(option.value)}
+                            className={`p-3 rounded-lg flex items-center gap-2 transition-all ${
+                              status === option.value
+                                ? "bg-blue-600 text-white border-2 border-blue-400"
+                                : "bg-neutral-800 text-neutral-300 border-2 border-transparent hover:bg-neutral-700"
+                            }`}
+                            whileHover={{ scale: 1.02 }}
+                            whileTap={{ scale: 0.98 }}
+                          >
+                            <div className={`w-3 h-3 rounded-full ${option.color}`} />
+                            {option.label}
+                          </motion.button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Save Button */}
+                    <motion.button
+                      onClick={handleSave}
+                      disabled={saving}
+                      className="w-full px-4 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-neutral-700 text-white font-semibold rounded-lg flex items-center justify-center gap-2 transition-all"
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                    >
+                      {saving ? (
+                        <>
+                          <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                          Saving...
+                        </>
+                      ) : (
+                        <>
+                          <Save className="w-5 h-5" />
+                          Save Changes
+                        </>
+                      )}
+                    </motion.button>
+                  </div>
+                </div>
+              )}
+
+              {/* Preferences Tab */}
+              {activeTab === "preferences" && (
+                <div className="bg-neutral-900 rounded-lg p-6 border border-neutral-800 space-y-6">
+                  <h2 className="text-xl font-bold text-white">Preferences</h2>
+
+                  <div className="space-y-4">
+                    {[
+                      { icon: Bell, label: "Message Notifications" },
+                      { icon: Bell, label: "Call Notifications" },
+                      { icon: Bell, label: "Friend Request Notifications" },
+                      { icon: Palette, label: "Theme Customization" },
+                      { icon: Palette, label: "Dark Mode" },
+                      { icon: Palette, label: "Color Scheme" },
+                      { icon: Clock, label: "Online Status" },
+                      { icon: Clock, label: "Status Visibility" },
+                      { icon: Lock, label: "Privacy Settings" },
+                      { icon: Lock, label: "Who Can Message You" },
+                      { icon: Lock, label: "Who Can Call You" },
+                      { icon: Lock, label: "Who Can See Your Profile" },
+                      { icon: Bell, label: "Email Notifications" },
+                      { icon: Palette, label: "Font Size" },
+                      { icon: Clock, label: "Time Zone" },
+                      { icon: Lock, label: "Two Factor Authentication" },
+                      { icon: Bell, label: "Activity Status" },
+                      { icon: Palette, label: "Interface Language" },
+                      { icon: Clock, label: "Auto Lock Timeout" },
+                      { icon: Lock, label: "Session Management" },
+                    ].map((item) => (
+                      <div
+                        key={item.label}
+                        className="p-4 bg-neutral-800/50 rounded-lg border border-neutral-700 opacity-60 cursor-not-allowed"
+                      >
+                        <div className="flex items-center gap-3">
+                          <item.icon className="w-5 h-5 text-neutral-500" />
+                          <div className="flex-1">
+                            <h3 className="text-neutral-400 font-semibold">{item.label}</h3>
+                            <p className="text-neutral-500 text-xs mt-1">Coming Soon</p>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Account Tab */}
+              {activeTab === "account" && (
+                <div className="space-y-6">
+                  <div className="bg-neutral-900 rounded-lg p-6 border border-neutral-800">
+                    <h2 className="text-xl font-bold text-white mb-6">Account Settings</h2>
+
+                    <div className="space-y-4">
+                      <div className="p-4 bg-neutral-800/50 rounded-lg border border-neutral-700">
+                        <div className="flex items-center gap-3 mb-2">
+                          <Mail className="w-5 h-5 text-neutral-400" />
+                          <span className="text-neutral-300 font-semibold">Email</span>
+                        </div>
+                        <p className="text-neutral-400 text-sm ml-8">{user.email}</p>
+                      </div>
+
+                      <div className="p-4 bg-neutral-800/50 rounded-lg border border-neutral-700">
+                        <div className="flex items-center gap-3 mb-2">
+                          <Clock className="w-5 h-5 text-neutral-400" />
+                          <span className="text-neutral-300 font-semibold">Member Since</span>
+                        </div>
+                        <p className="text-neutral-400 text-sm ml-8">
+                          {user.createdAt
+                            ? new Date(user.createdAt).toLocaleDateString()
+                            : "N/A"}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Danger Zone */}
+                  <div className="bg-red-500/10 rounded-lg p-6 border border-red-500/20">
+                    <h3 className="text-lg font-bold text-red-400 mb-4">Danger Zone</h3>
+                    <div className="opacity-60 cursor-not-allowed">
+                      <button
+                        disabled
+                        className="w-full px-4 py-3 bg-red-600/50 text-red-300 font-semibold rounded-lg flex items-center justify-center gap-2 transition-all"
+                      >
+                        Delete Account
+                      </button>
+                      <p className="text-red-400 text-xs mt-2">Coming Soon</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </motion.div>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }

@@ -2,13 +2,14 @@
 
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import Image from "next/image";
 
 import dynamic from "next/dynamic";
 import { useAuth } from "@/context/AuthContext";
 const FriendsList = dynamic(() => import("@/components/Friends/FriendsList"), {
   ssr: false,
 });
-import { MessageCircle, LogOut, Menu, X, UserCircle2 } from "lucide-react";
+import { MessageCircle, Menu, X } from "lucide-react";
 
 // Lazy-load DirectMessages to avoid SSR issues with Agora SDK
 const DirectMessages = dynamic(
@@ -101,45 +102,46 @@ function MessengerContent() {
 
   return (
     <div className="flex h-screen overflow-hidden bg-black">
-      {/* Desktop Sidebar */}
-      <div className="hidden lg:flex lg:w-80 bg-neutral-950 border-r border-neutral-800 flex-col">
-        {/* Header */}
-        <div className="h-14 border-b border-neutral-800 flex items-center justify-between px-4">
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-blue-600">
-              <MessageCircle className="w-4 h-4 text-white" />
-            </div>
-            <div className="min-w-0">
-              <h1 className="text-white font-semibold text-sm">WebChat</h1>
-              <p className="text-xs text-neutral-500 truncate">
-                {user.username}
-              </p>
-            </div>
-          </div>
-
+      {/* Desktop Sidebar - Facebook Messenger Style */}
+      <div className="hidden lg:flex lg:w-96 bg-neutral-950 border-r border-neutral-800 flex-col">
+        {/* Header with Title */}
+        <div className="p-4 border-b border-neutral-800 relative">
+          <h1 className="text-2xl font-bold text-white">Chats</h1>
+          
+          {/* Profile Button - Top Right */}
           <button
             onClick={() => router.push("/profile")}
-            className="p-1.5 rounded-lg hover:bg-neutral-800 transition-colors"
+            className="absolute top-4 right-4 w-8 h-8 rounded-full overflow-hidden flex items-center justify-center bg-blue-600 hover:ring-2 hover:ring-blue-400 transition-all hover:scale-110"
             title="Profile"
           >
-            <UserCircle2 className="w-4.5 h-4.5 text-neutral-400" />
+            {user.avatar && (user.avatar.startsWith("http") || user.avatar.startsWith("/")) ? (
+              <Image
+                src={user.avatar}
+                alt={user.username}
+                width={32}
+                height={32}
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <span className="text-sm font-bold text-white">
+                {user.username[0]?.toUpperCase()}
+              </span>
+            )}
           </button>
+          
+          {/* Search Bar */}
+          <div className="relative mt-4">
+            <input
+              type="text"
+              placeholder="Search Messenger"
+              className="w-full px-4 py-2.5 rounded-full bg-neutral-800 text-white placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all text-sm"
+            />
+          </div>
         </div>
 
-        {/* Friends List */}
-        <div className="flex-1 overflow-hidden">
+        {/* Friends/Chat List */}
+        <div className="flex-1 overflow-y-auto">
           <FriendsList userId={user.id} onSelectFriend={handleSelectFriend} />
-        </div>
-
-        {/* Footer */}
-        <div className="p-3 border-t border-neutral-800">
-          <button
-            onClick={handleLogout}
-            className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-neutral-800 transition-colors text-neutral-400 hover:text-red-400"
-          >
-            <LogOut className="w-4 h-4" />
-            <span className="text-sm font-medium">Logout</span>
-          </button>
         </div>
       </div>
 
@@ -176,16 +178,6 @@ function MessengerContent() {
                 userId={user.id}
                 onSelectFriend={handleSelectFriend}
               />
-            </div>
-
-            <div className="p-3 border-t border-neutral-800">
-              <button
-                onClick={handleLogout}
-                className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg hover:bg-neutral-800 transition-colors text-neutral-400 hover:text-red-400"
-              >
-                <LogOut className="w-4 h-4" />
-                <span className="text-sm font-medium">Logout</span>
-              </button>
             </div>
           </div>
         </>

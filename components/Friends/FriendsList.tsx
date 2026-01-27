@@ -59,18 +59,19 @@ export default function FriendsList({
 }: Props) {
   return (
     <motion.div
-      className="flex-1 flex flex-col glass-card m-2 relative overflow-hidden"
+      className="flex-1 flex flex-col bg-neutral-950 relative overflow-hidden"
       initial={{ opacity: 0, x: -12 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.35 }}
     >
-      <motion.div className="flex items-center gap-3 p-5 border-b border-neutral-800 bg-neutral-950/50">
-        <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-blue-600">
+      {/* Header with Friends title */}
+      <motion.div className="flex items-center gap-3 p-4 border-b border-neutral-800">
+        <div className="w-10 h-10 rounded-full flex items-center justify-center bg-blue-600">
           <Users className="w-5 h-5 text-white" />
         </div>
-        <div>
-          <h3 className="text-white font-semibold">Friends</h3>
-          <p className="text-neutral-400 text-sm">
+        <div className="flex-1">
+          <h3 className="text-white font-bold text-lg">Friends</h3>
+          <p className="text-neutral-500 text-xs">
             {friends.length} friend{friends.length !== 1 ? "s" : ""}
           </p>
         </div>
@@ -169,11 +170,11 @@ export default function FriendsList({
         </div>
       )}
 
-      {/* Friends list */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-3 hide-scrollbar">
+      {/* Friends list - Facebook Messenger Style */}
+      <div className="flex-1 overflow-y-auto space-y-1 hide-scrollbar">
         {friends.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-12 text-center">
-            <div className="w-16 h-16 rounded-2xl flex items-center justify-center mb-4 bg-neutral-800">
+          <div className="flex flex-col items-center justify-center py-12 text-center px-4">
+            <div className="w-16 h-16 rounded-full flex items-center justify-center mb-4 bg-neutral-800">
               <Users className="w-8 h-8 text-neutral-400" />
             </div>
             <div className="text-white font-medium mb-1">No friends yet</div>
@@ -185,44 +186,57 @@ export default function FriendsList({
           friends.map((f: Friend, idx: number) => (
             <motion.div
               key={f.id}
-              className="p-3 rounded-lg bg-neutral-900/30 flex items-center gap-3 cursor-pointer"
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
+              className="mx-2 p-2.5 rounded-lg flex items-center gap-3 cursor-pointer hover:bg-neutral-800 transition-colors group relative"
+              initial={{ opacity: 0, x: -8 }}
+              animate={{ opacity: 1, x: 0 }}
               transition={{ delay: idx * 0.04 }}
               onClick={() => onSelectFriend?.(f.id, f)}
             >
-              <div className="w-12 h-12 rounded-md overflow-hidden bg-blue-600 flex items-center justify-center text-white font-bold">
-                {f.avatar &&
-                (f.avatar.startsWith("http") || f.avatar.startsWith("/")) ? (
-                  <Image
-                    src={f.avatar}
-                    alt={f.username}
-                    width={48}
-                    height={48}
-                    className="object-cover w-full h-full"
-                  />
-                ) : (
-                  f.username[0]?.toUpperCase()
+              {/* Avatar with online status */}
+              <div className="relative flex-shrink-0">
+                <div className="w-14 h-14 rounded-full overflow-hidden bg-blue-600 flex items-center justify-center text-white font-bold flex-shrink-0">
+                  {f.avatar &&
+                  (f.avatar.startsWith("http") || f.avatar.startsWith("/")) ? (
+                    <Image
+                      src={f.avatar}
+                      alt={f.username}
+                      width={56}
+                      height={56}
+                      className="object-cover w-full h-full"
+                    />
+                  ) : (
+                    f.username[0]?.toUpperCase()
+                  )}
+                </div>
+                {/* Online indicator */}
+                {f.status === "online" && (
+                  <div className="absolute bottom-0 right-0 w-3.5 h-3.5 bg-green-500 rounded-full border-2 border-neutral-950" />
                 )}
               </div>
+
+              {/* Chat info */}
               <div className="flex-1 min-w-0">
-                <div className="text-white font-medium truncate">
+                <div className="text-white font-medium text-sm truncate">
                   {f.username}
                 </div>
-                <div className="text-neutral-400 text-sm">
-                  {f.status ?? "Offline"}
+                <div className="text-neutral-500 text-xs truncate">
+                  {f.status === "online" ? "Active now" : "Offline"}
                 </div>
               </div>
-              <button
+
+              {/* Remove button (show on hover) */}
+              <motion.button
                 onClick={(e) => {
                   e.stopPropagation();
                   handleRemoveFriend?.(f.id);
                 }}
                 disabled={actionLoading === f.id}
-                className="p-2 rounded hover:bg-red-500/20"
+                className="p-2 rounded-full hover:bg-red-500/20 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0"
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.95 }}
               >
                 <UserMinus className="w-4 h-4 text-red-400" />
-              </button>
+              </motion.button>
             </motion.div>
           ))
         )}
