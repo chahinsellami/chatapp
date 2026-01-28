@@ -37,7 +37,21 @@ export default function FriendRequests({ userId }: Props) {
       setLoading(true);
       setError(null);
 
-      const response = await fetch("/api/friends");
+      const token = typeof window !== "undefined" 
+        ? localStorage.getItem("auth_token")
+        : null;
+
+      if (!token) {
+        setError("Not authenticated");
+        setLoading(false);
+        return;
+      }
+
+      const response = await fetch("/api/friends", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       const data = await response.json();
 
       console.log("Friend requests API response:", data);
@@ -76,10 +90,22 @@ export default function FriendRequests({ userId }: Props) {
   const handleAccept = async (requestId: string) => {
     try {
       setProcessing(requestId);
+      const token = typeof window !== "undefined" 
+        ? localStorage.getItem("auth_token")
+        : null;
+
+      if (!token) {
+        setError("Not authenticated");
+        return;
+      }
+
       const response = await fetch(
         `/api/friends/requests/${requestId}?action=accept`,
         {
           method: "PUT",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         }
       );
 
@@ -102,10 +128,22 @@ export default function FriendRequests({ userId }: Props) {
   const handleReject = async (requestId: string) => {
     try {
       setProcessing(requestId);
+      const token = typeof window !== "undefined" 
+        ? localStorage.getItem("auth_token")
+        : null;
+
+      if (!token) {
+        setError("Not authenticated");
+        return;
+      }
+
       const response = await fetch(
         `/api/friends/requests/${requestId}?action=reject`,
         {
           method: "PUT",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         }
       );
 
