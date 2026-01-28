@@ -40,12 +40,17 @@ export default function FriendRequests({ userId }: Props) {
       const response = await fetch("/api/friends");
       const data = await response.json();
 
+      console.log("Friend requests API response:", data);
+
       if (!response.ok) {
         throw new Error(data.error || "Failed to fetch friend requests");
       }
 
-      setRequests(data.pendingRequests || []);
+      const requests = data.pendingRequests || [];
+      console.log("Pending requests:", requests);
+      setRequests(requests);
     } catch (err) {
+      console.error("Error fetching requests:", err);
       setError(err instanceof Error ? err.message : "Failed to load requests");
     } finally {
       setLoading(false);
