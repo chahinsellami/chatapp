@@ -22,7 +22,6 @@ import {
   VideoOff,
   Mic,
   MicOff,
-  MoreVertical,
   Smile,
   MessageCircle,
   ChevronDown,
@@ -161,6 +160,15 @@ export default function DirectMessages({
     callType: "video" | "voice";
     callerName: string;
   } | null>(null);
+
+  // Debug: Log online users status changes
+  useEffect(() => {
+    console.log(`🟢 Online users:`, Array.from(onlineUsers));
+    console.log(
+      `👤 ${friendName} status:`,
+      onlineUsers.has(friendId) ? "Online" : "Offline"
+    );
+  }, [onlineUsers, friendId, friendName]);
 
   // Fetch messages when conversation changes
   useEffect(() => {
@@ -682,14 +690,6 @@ export default function DirectMessages({
             title="Video Call"
           >
             <Video className="w-5 h-5 text-neutral-400 hover:text-blue-400" />
-          </motion.button>
-          <motion.button
-            className="p-2 rounded-full hover:bg-neutral-800 transition-all"
-            whileHover={{ scale: 1.1 }}
-            whileTap={{ scale: 0.95 }}
-            title="More options"
-          >
-            <MoreVertical className="w-5 h-5 text-neutral-400 hover:text-white" />
           </motion.button>
         </div>
       </motion.div>
