@@ -41,6 +41,7 @@ function MessengerContent() {
   const [selectedFriend, setSelectedFriend] = useState<Friend | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [conversations, setConversations] = useState<Friend[]>([]);
+  const [friends, setFriends] = useState<Friend[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [loadingConversations, setLoadingConversations] = useState(true);
 
@@ -75,11 +76,35 @@ function MessengerContent() {
     }
   };
 
+  // Fetch friends list (for messaging fallback if no conversations yet)
+  const fetchFriends = async () => {
+    if (!user) return;
+    try {
+      const token = localStorage.getItem("auth_token");
+      const res = await fetch("/api/friends", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (res.ok) {
+        const data = await res.json();
+        console.log("Friends loaded:", data.friends);
+        setFriends(data.friends || []);
+      }
+    } catch (error) {
+      console.error("Error fetching friends:", error);
+    }
+  };
+
   useEffect(() => {
     if (user) {
       fetchConversations();
+      fetchFriends();
       // Refresh conversations every 3 seconds
-      const interval = setInterval(fetchConversations, 3000);
+      const interval = setInterval(() => {
+        fetchConversations();
+        fetchFriends();
+      }, 3000);
       return () => clearInterval(interval);
     }
   }, [user]);
@@ -188,7 +213,7 @@ function MessengerContent() {
             <div className="flex items-center justify-center py-8">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
             </div>
-          ) : conversations.length === 0 ? (
+          ) : conversations.length === 0 && friends.length === 0 ? (
             <div className="flex-1 flex flex-col items-center justify-center px-4">
               <MessageCircle className="w-12 h-12 text-neutral-600 mb-3" />
               <p className="text-neutral-400 text-sm text-center">No conversations yet</p>
@@ -197,7 +222,12 @@ function MessengerContent() {
           ) : (
             <FriendsList 
               userId={user.id} 
-              friends={searchQuery ? conversations.filter(c => c.username.toLowerCase().includes(searchQuery.toLowerCase())) : conversations}
+              friends={searchQuery 
+                ? [...conversations, ...friends]
+                    .filter(c => c.username.toLowerCase().includes(searchQuery.toLowerCase()))
+                    .filter((value, index, array) => array.findIndex(v => v.id === value.id) === index)
+                : conversations.length > 0 ? conversations : friends
+              }
               onSelectFriend={handleSelectFriend} 
             />
           )}
