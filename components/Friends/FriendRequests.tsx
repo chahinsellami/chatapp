@@ -9,7 +9,6 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Check, X, User } from "lucide-react";
-import type { User as UserType } from "@/lib/types";
 
 interface FriendRequest {
   id: string;
