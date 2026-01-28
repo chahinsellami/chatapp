@@ -55,9 +55,16 @@ export default function FriendRequests({ userId }: Props) {
   // Fetch requests on mount
   useEffect(() => {
     fetchRequests();
-    // Refresh every 10 seconds
-    const interval = setInterval(fetchRequests, 10000);
-    return () => clearInterval(interval);
+    // Only refresh when user comes back to window (not constantly)
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible") {
+        fetchRequests();
+      }
+    };
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
   }, []);
 
   // Handle accepting a friend request
