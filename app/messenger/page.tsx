@@ -9,7 +9,10 @@ import { useAuth } from "@/context/AuthContext";
 const FriendsList = dynamic(() => import("@/components/Friends/FriendsList"), {
   ssr: false,
 });
-import { MessageCircle, Menu, X } from "lucide-react";
+const AddFriend = dynamic(() => import("@/components/Friends/AddFriend"), {
+  ssr: false,
+});
+import { MessageCircle, Menu, X, Search } from "lucide-react";
 
 // Lazy-load DirectMessages to avoid SSR issues with Agora SDK
 const DirectMessages = dynamic(
@@ -38,6 +41,8 @@ function MessengerContent() {
   const [selectedFriend, setSelectedFriend] = useState<Friend | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [conversations, setConversations] = useState<Friend[]>([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [loadingConversations, setLoadingConversations] = useState(true);
 
   useEffect(() => {
     if (!isLoading && !user) {
@@ -49,6 +54,7 @@ function MessengerContent() {
   const fetchConversations = async () => {
     if (!user) return;
     try {
+      setLoadingConversations(true);
       const token = localStorage.getItem("auth_token");
       const res = await fetch("/api/conversations", {
         headers: {
@@ -57,18 +63,23 @@ function MessengerContent() {
       });
       if (res.ok) {
         const data = await res.json();
+        console.log("Conversations loaded:", data.conversations);
         setConversations(data.conversations || []);
+      } else {
+        console.error("Failed to fetch conversations:", res.status);
       }
     } catch (error) {
       console.error("Error fetching conversations:", error);
+    } finally {
+      setLoadingConversations(false);
     }
   };
 
   useEffect(() => {
     if (user) {
       fetchConversations();
-      // Refresh conversations every 5 seconds
-      const interval = setInterval(fetchConversations, 5000);
+      // Refresh conversations every 3 seconds
+      const interval = setInterval(fetchConversations, 3000);
       return () => clearInterval(interval);
     }
   }, [user]);
@@ -160,21 +171,41 @@ function MessengerContent() {
           
           {/* Search Bar */}
           <div className="relative mt-4">
+            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 text-neutral-400" />
             <input
               type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search Messenger"
-              className="w-full px-4 py-2.5 rounded-full bg-neutral-800 text-white placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all text-sm"
+              className="w-full pl-10 pr-4 py-2.5 rounded-full bg-neutral-800 text-white placeholder-neutral-500 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all text-sm"
             />
           </div>
         </div>
 
         {/* Friends/Chat List */}
-        <div className="flex-1 overflow-y-auto">
-          <FriendsList 
-            userId={user.id} 
-            friends={conversations}
-            onSelectFriend={handleSelectFriend} 
-          />
+        <div className="flex-1 overflow-y-auto flex flex-col">
+          {loadingConversations ? (
+            <div className="flex items-center justify-center py-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+            </div>
+          ) : conversations.length === 0 ? (
+            <div className="flex-1 flex flex-col items-center justify-center px-4">
+              <MessageCircle className="w-12 h-12 text-neutral-600 mb-3" />
+              <p className="text-neutral-400 text-sm text-center">No conversations yet</p>
+              <p className="text-neutral-500 text-xs text-center mt-1">Send a message to start chatting</p>
+            </div>
+          ) : (
+            <FriendsList 
+              userId={user.id} 
+              friends={searchQuery ? conversations.filter(c => c.username.toLowerCase().includes(searchQuery.toLowerCase())) : conversations}
+              onSelectFriend={handleSelectFriend} 
+            />
+          )}
+        </div>
+
+        {/* Add Friend Section */}
+        <div className="border-t border-neutral-800 p-4">
+          <AddFriend userId={user.id} onFriendAdded={fetchConversations} />
         </div>
       </div>
 
