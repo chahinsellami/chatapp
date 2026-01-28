@@ -37,12 +37,41 @@ function MessengerContent() {
   const [selectedFriendId, setSelectedFriendId] = useState<string | null>(null);
   const [selectedFriend, setSelectedFriend] = useState<Friend | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [conversations, setConversations] = useState<Friend[]>([]);
 
   useEffect(() => {
     if (!isLoading && !user) {
       router.push("/login");
     }
   }, [isLoading, user, router]);
+
+  // Fetch conversations
+  const fetchConversations = async () => {
+    if (!user) return;
+    try {
+      const token = localStorage.getItem("auth_token");
+      const res = await fetch("/api/conversations", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setConversations(data.conversations || []);
+      }
+    } catch (error) {
+      console.error("Error fetching conversations:", error);
+    }
+  };
+
+  useEffect(() => {
+    if (user) {
+      fetchConversations();
+      // Refresh conversations every 5 seconds
+      const interval = setInterval(fetchConversations, 5000);
+      return () => clearInterval(interval);
+    }
+  }, [user]);
 
   useEffect(() => {
     const friendId = searchParams.get("friend");
@@ -141,7 +170,11 @@ function MessengerContent() {
 
         {/* Friends/Chat List */}
         <div className="flex-1 overflow-y-auto">
-          <FriendsList userId={user.id} onSelectFriend={handleSelectFriend} />
+          <FriendsList 
+            userId={user.id} 
+            friends={conversations}
+            onSelectFriend={handleSelectFriend} 
+          />
         </div>
       </div>
 
@@ -176,6 +209,7 @@ function MessengerContent() {
             <div className="flex-1 overflow-hidden">
               <FriendsList
                 userId={user.id}
+                friends={conversations}
                 onSelectFriend={handleSelectFriend}
               />
             </div>

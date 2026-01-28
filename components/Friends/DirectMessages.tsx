@@ -299,17 +299,17 @@ export default function DirectMessages({
 
       // Format messages for display
       const formattedMessages = (data.messages || []).map(
-        (msg: DirectMessage) => ({
+        (msg: any) => ({
           id: msg.id,
-          senderId: msg.senderId,
-          receiverId: msg.receiverId,
+          senderId: msg.sender_id,
+          receiverId: msg.receiver_id,
           text: msg.text,
-          createdAt: msg.createdAt,
-          editedAt: msg.editedAt,
+          createdAt: msg.created_at,
+          editedAt: msg.edited_at,
           username:
-            msg.senderId === userId ? "You" : msg.username || friendName,
+            msg.sender_id === userId ? "You" : msg.username || friendName,
           avatar:
-            msg.senderId === userId ? undefined : msg.avatar || friendAvatar,
+            msg.sender_id === userId ? undefined : msg.avatar || friendAvatar,
         })
       );
 

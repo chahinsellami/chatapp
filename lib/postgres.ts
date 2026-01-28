@@ -581,6 +581,85 @@ export async function deleteDirectMessage(messageId: string) {
   return { deleted: true };
 }
 
+/**
+ * Get or create a conversation between two users
+ * @param userId1 - First user ID
+ * @param userId2 - Second user ID
+ * @returns Conversation ID
+ */
+export async function getOrCreateConversation(userId1: string, userId2: string) {
+  // Try to find existing conversation
+  const existing = await pool.query(
+    `SELECT id FROM conversations 
+     WHERE (user_id = $1 AND participant_id = $2) OR (user_id = $2 AND participant_id = $1)
+     LIMIT 1`,
+    [userId1, userId2]
+  );
+
+  if (existing.rows.length > 0) {
+    return existing.rows[0].id;
+  }
+
+  // Create new conversation
+  const id = crypto.randomUUID();
+  await pool.query(
+    `INSERT INTO conversations (id, user_id, participant_id)
+     VALUES ($1, $2, $3)
+     ON CONFLICT (user_id, participant_id) DO UPDATE
+     SET updated_at = CURRENT_TIMESTAMP`,
+    [id, userId1, userId2]
+  );
+
+  return id;
+}
+
+/**
+ * Get all conversations for a user with their latest message
+ * @param userId - User ID to get conversations for
+ * @returns Array of conversations with participant info and latest message
+ */
+export async function getConversations(userId: string) {
+  const result = await pool.query(
+    `SELECT 
+       c.id as conversation_id,
+       CASE 
+         WHEN c.user_id = $1 THEN c.participant_id
+         ELSE c.user_id
+       END as other_user_id,
+       u.username,
+       u.avatar,
+       u.status,
+       (SELECT text FROM direct_messages 
+        WHERE (sender_id = $1 AND receiver_id = u.id) 
+           OR (sender_id = u.id AND receiver_id = $1)
+        ORDER BY created_at DESC LIMIT 1) as last_message,
+       (SELECT created_at FROM direct_messages 
+        WHERE (sender_id = $1 AND receiver_id = u.id) 
+           OR (sender_id = u.id AND receiver_id = $1)
+        ORDER BY created_at DESC LIMIT 1) as last_message_at,
+       c.updated_at
+     FROM conversations c
+     JOIN users u ON (
+       CASE 
+         WHEN c.user_id = $1 THEN c.participant_id = u.id
+         ELSE c.user_id = u.id
+       END
+     )
+     WHERE c.user_id = $1 OR c.participant_id = $1
+     ORDER BY c.updated_at DESC`,
+    [userId]
+  );
+
+  return result.rows.map(row => ({
+    id: row.other_user_id,
+    username: row.username,
+    avatar: row.avatar,
+    status: row.status,
+    lastMessage: row.last_message,
+    lastMessageAt: row.last_message_at,
+  }));
+}
+
 // ============================================================================
 // USER SEARCH FUNCTIONS - Finding users for messaging/friending
 // ============================================================================

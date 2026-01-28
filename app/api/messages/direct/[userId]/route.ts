@@ -3,6 +3,7 @@ import { authenticateRequest, createErrorResponse } from "@/lib/auth";
 import {
   getDirectMessages,
   insertDirectMessage,
+  getOrCreateConversation,
   initializeDatabase,
 } from "@/lib/postgres";
 
@@ -79,6 +80,9 @@ export async function POST(
 
     const id = crypto.randomUUID();
     try {
+      // Create or update conversation record
+      await getOrCreateConversation(user.userId, receiverId);
+      
       const message = await insertDirectMessage(
         id,
         user.userId,

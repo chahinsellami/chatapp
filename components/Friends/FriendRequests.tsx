@@ -8,7 +8,7 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Check, X, User } from "lucide-react";
+import { Check, X, User, RefreshCw } from "lucide-react";
 
 interface FriendRequest {
   id: string;
@@ -74,15 +74,25 @@ export default function FriendRequests({ userId }: Props) {
   // Fetch requests on mount
   useEffect(() => {
     fetchRequests();
-    // Only refresh when user comes back to window (not constantly)
+    
+    // Refresh when user comes back to window
     const handleVisibilityChange = () => {
       if (document.visibilityState === "visible") {
         fetchRequests();
       }
     };
+    
+    // Also poll every 5 seconds to catch updates
+    const pollInterval = setInterval(() => {
+      if (document.visibilityState === "visible") {
+        fetchRequests();
+      }
+    }, 5000);
+    
     document.addEventListener("visibilitychange", handleVisibilityChange);
     return () => {
       document.removeEventListener("visibilitychange", handleVisibilityChange);
+      clearInterval(pollInterval);
     };
   }, []);
 
@@ -191,9 +201,21 @@ export default function FriendRequests({ userId }: Props) {
       exit={{ opacity: 0, y: -20 }}
       className="glass-card p-6 rounded-2xl"
     >
-      <h3 className="text-lg font-bold text-white mb-4">
-        Friend Requests ({requests.length})
-      </h3>
+      <div className="flex justify-between items-center mb-4">
+        <h3 className="text-lg font-bold text-white">
+          Friend Requests ({requests.length})
+        </h3>
+        <motion.button
+          onClick={fetchRequests}
+          disabled={loading}
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          className="p-2 hover:bg-slate-700 rounded-lg transition-colors disabled:opacity-50"
+          title="Refresh"
+        >
+          <RefreshCw className={`w-4 h-4 ${loading ? "animate-spin" : ""}`} />
+        </motion.button>
+      </div>
 
       {error && (
         <motion.div
