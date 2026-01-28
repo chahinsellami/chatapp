@@ -8,10 +8,13 @@ import { Pool } from "pg";
 
 // PostgreSQL connection pool for efficient database connections
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL, // Database URL from environment variables
+  connectionString:
+    process.env.NODE_ENV === "production"
+      ? process.env.DATABASE_URL_UNPOOLED // Use unpooled for Neon serverless
+      : process.env.DATABASE_URL, // Database URL from environment variables
   ssl:
     process.env.NODE_ENV === "production"
-      ? { rejectUnauthorized: false } // Required for Railway PostgreSQL
+      ? { rejectUnauthorized: false } // Required for Neon PostgreSQL
       : false, // No SSL for local development
 });
 
