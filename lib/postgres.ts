@@ -389,14 +389,27 @@ export async function getFriendsByUserId(userId: string) {
 export async function getPendingFriendRequests(userId: string) {
   const result = await pool.query(
     `SELECT fr.id, fr.sender_id, fr.receiver_id, fr.status, fr.created_at,
-            u.username, u.avatar
+            u.id as sender_user_id, u.username, u.avatar
      FROM friend_requests fr
      JOIN users u ON fr.sender_id = u.id
      WHERE fr.receiver_id = $1 AND fr.status = 'pending'
      ORDER BY fr.created_at DESC`,
     [userId]
   );
-  return result.rows;
+  
+  // Format the response to match component expectations
+  return result.rows.map((row) => ({
+    id: row.id,
+    sender_id: row.sender_id,
+    receiver_id: row.receiver_id,
+    status: row.status,
+    created_at: row.created_at,
+    sender: {
+      id: row.sender_user_id,
+      username: row.username,
+      avatar: row.avatar,
+    },
+  }));
 }
 
 /**

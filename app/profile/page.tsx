@@ -22,6 +22,10 @@ const FriendsList = dynamic(() => import("@/components/Friends/FriendsList"), {
   ssr: false,
   loading: () => null,
 });
+const FriendRequests = dynamic(
+  () => import("@/components/Friends/FriendRequests"),
+  { ssr: false, loading: () => null }
+);
 const NavigationBar = dynamic(
   () => import("@/components/Layout/NavigationBar"),
   { ssr: false, loading: () => null }
@@ -916,7 +920,11 @@ export default function ProfilePage() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
+                className="space-y-6"
               >
+                {/* Friend Requests Section */}
+                <FriendRequests userId={user.id} />
+
                 {/* Friends List */}
                 <div className="glass-card p-6 rounded-2xl">
                   <FriendsList
