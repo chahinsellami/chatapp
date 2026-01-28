@@ -9,9 +9,6 @@ import { useAuth } from "@/context/AuthContext";
 const FriendsList = dynamic(() => import("@/components/Friends/FriendsList"), {
   ssr: false,
 });
-const AddFriend = dynamic(() => import("@/components/Friends/AddFriend"), {
-  ssr: false,
-});
 import { MessageCircle, Menu, X, Search } from "lucide-react";
 
 // Lazy-load DirectMessages to avoid SSR issues with Agora SDK
@@ -100,12 +97,7 @@ function MessengerContent() {
     if (user) {
       fetchConversations();
       fetchFriends();
-      // Refresh conversations every 3 seconds
-      const interval = setInterval(() => {
-        fetchConversations();
-        fetchFriends();
-      }, 3000);
-      return () => clearInterval(interval);
+      // Only refresh on mount, don't poll constantly
     }
   }, [user]);
 
@@ -217,7 +209,7 @@ function MessengerContent() {
             <div className="flex-1 flex flex-col items-center justify-center px-4">
               <MessageCircle className="w-12 h-12 text-neutral-600 mb-3" />
               <p className="text-neutral-400 text-sm text-center">No conversations yet</p>
-              <p className="text-neutral-500 text-xs text-center mt-1">Send a message to start chatting</p>
+              <p className="text-neutral-500 text-xs text-center mt-1">Go to Friends to connect with people</p>
             </div>
           ) : (
             <FriendsList 
@@ -231,11 +223,6 @@ function MessengerContent() {
               onSelectFriend={handleSelectFriend} 
             />
           )}
-        </div>
-
-        {/* Add Friend Section */}
-        <div className="border-t border-neutral-800 p-4">
-          <AddFriend userId={user.id} onFriendAdded={fetchConversations} />
         </div>
       </div>
 
