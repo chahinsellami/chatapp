@@ -257,7 +257,7 @@ function MessengerContent() {
             <div className="flex-1 overflow-hidden">
               <FriendsList
                 userId={user.id}
-                friends={conversations}
+                friends={conversations.length > 0 ? conversations : friends}
                 onSelectFriend={handleSelectFriend}
               />
             </div>
