@@ -99,7 +99,7 @@ export default function DirectMessages({
     const checkMobile = () => {
       const mobile =
         /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
-          navigator.userAgent
+          navigator.userAgent,
         );
       setIsMobile(mobile);
     };
@@ -166,7 +166,7 @@ export default function DirectMessages({
     console.log(`🟢 Online users:`, Array.from(onlineUsers));
     console.log(
       `👤 ${friendName} status:`,
-      onlineUsers.has(friendId) ? "Online" : "Offline"
+      onlineUsers.has(friendId) ? "Online" : "Offline",
     );
   }, [onlineUsers, friendId, friendName]);
 
@@ -306,20 +306,17 @@ export default function DirectMessages({
       const data = await res.json();
 
       // Format messages for display
-      const formattedMessages = (data.messages || []).map(
-        (msg: any) => ({
-          id: msg.id,
-          senderId: msg.sender_id,
-          receiverId: msg.receiver_id,
-          text: msg.text,
-          createdAt: msg.created_at,
-          editedAt: msg.edited_at,
-          username:
-            msg.sender_id === userId ? "You" : msg.username || friendName,
-          avatar:
-            msg.sender_id === userId ? undefined : msg.avatar || friendAvatar,
-        })
-      );
+      const formattedMessages = (data.messages || []).map((msg: any) => ({
+        id: msg.id,
+        senderId: msg.sender_id,
+        receiverId: msg.receiver_id,
+        text: msg.text,
+        createdAt: msg.created_at,
+        editedAt: msg.edited_at,
+        username: msg.sender_id === userId ? "You" : msg.username || friendName,
+        avatar:
+          msg.sender_id === userId ? undefined : msg.avatar || friendAvatar,
+      }));
 
       setMessages(formattedMessages);
       setError(null);
@@ -476,7 +473,7 @@ export default function DirectMessages({
     // Check if friend is online first
     if (!onlineUsers.has(friendId)) {
       alert(
-        `${friendName} is offline. Calls only work when both users are online.`
+        `${friendName} is offline. Calls only work when both users are online.`,
       );
       return;
     }
@@ -505,7 +502,7 @@ export default function DirectMessages({
 
     if (isMobile && type === "video") {
       const confirmed = confirm(
-        "Video calls on mobile devices may use more data and battery. Make sure you have a stable connection. Continue?"
+        "Video calls on mobile devices may use more data and battery. Make sure you have a stable connection. Continue?",
       );
       if (!confirmed) return;
     }
@@ -519,7 +516,7 @@ export default function DirectMessages({
         alert(
           "Microphone access is blocked. Please enable it in your browser settings:\n\n" +
             "Chrome: Settings → Privacy and security → Site settings → Microphone\n" +
-            "Safari: Settings → Safari → Camera/Microphone"
+            "Safari: Settings → Safari → Camera/Microphone",
         );
         return;
       }
@@ -550,7 +547,7 @@ export default function DirectMessages({
     // Join the Agora channel
     await startAgoraCall(
       incomingCallData.channelName,
-      incomingCallData.callType
+      incomingCallData.callType,
     );
 
     // Clear incoming call state
@@ -622,7 +619,10 @@ export default function DirectMessages({
         transition={{ delay: 0.2 }}
       >
         <div className="flex items-center gap-3 flex-1 min-w-0">
-          <motion.div className="relative flex-shrink-0" whileHover={{ scale: 1.05 }}>
+          <motion.div
+            className="relative flex-shrink-0"
+            whileHover={{ scale: 1.05 }}
+          >
             <div className="w-10 h-10 rounded-full overflow-hidden flex items-center justify-center bg-gradient-to-br from-blue-500 to-indigo-600 flex-shrink-0">
               {friendAvatar &&
               (friendAvatar.startsWith("http") ||
@@ -635,9 +635,7 @@ export default function DirectMessages({
                   height={40}
                 />
               ) : (
-                <span className="text-lg">
-                  {friendAvatar || "👤"}
-                </span>
+                <span className="text-lg">{friendAvatar || "👤"}</span>
               )}
             </div>
             {/* Online indicator */}
@@ -853,8 +851,12 @@ export default function DirectMessages({
             whileTap={{ scale: 0.95 }}
             title="Add attachment"
           >
-            <svg className="w-5 h-5 text-blue-500" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 11h-4v4h-2v-4H7v-2h4V7h2v4h4v2z"/>
+            <svg
+              className="w-5 h-5 text-blue-500"
+              fill="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm5 11h-4v4h-2v-4H7v-2h4V7h2v4h4v2z" />
             </svg>
           </motion.button>
           <div className="flex-1 relative">

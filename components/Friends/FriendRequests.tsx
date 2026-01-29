@@ -37,9 +37,10 @@ export default function FriendRequests({ userId }: Props) {
       setLoading(true);
       setError(null);
 
-      const token = typeof window !== "undefined" 
-        ? localStorage.getItem("auth_token")
-        : null;
+      const token =
+        typeof window !== "undefined"
+          ? localStorage.getItem("auth_token")
+          : null;
 
       if (!token) {
         setError("Not authenticated");
@@ -74,21 +75,21 @@ export default function FriendRequests({ userId }: Props) {
   // Fetch requests on mount
   useEffect(() => {
     fetchRequests();
-    
+
     // Refresh when user comes back to window
     const handleVisibilityChange = () => {
       if (document.visibilityState === "visible") {
         fetchRequests();
       }
     };
-    
+
     // Also poll every 5 seconds to catch updates
     const pollInterval = setInterval(() => {
       if (document.visibilityState === "visible") {
         fetchRequests();
       }
     }, 5000);
-    
+
     document.addEventListener("visibilitychange", handleVisibilityChange);
     return () => {
       document.removeEventListener("visibilitychange", handleVisibilityChange);
@@ -100,9 +101,10 @@ export default function FriendRequests({ userId }: Props) {
   const handleAccept = async (requestId: string) => {
     try {
       setProcessing(requestId);
-      const token = typeof window !== "undefined" 
-        ? localStorage.getItem("auth_token")
-        : null;
+      const token =
+        typeof window !== "undefined"
+          ? localStorage.getItem("auth_token")
+          : null;
 
       if (!token) {
         setError("Not authenticated");
@@ -116,7 +118,7 @@ export default function FriendRequests({ userId }: Props) {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        }
+        },
       );
 
       if (!response.ok) {
@@ -126,9 +128,7 @@ export default function FriendRequests({ userId }: Props) {
       // Remove the request from the list
       setRequests((prev) => prev.filter((req) => req.id !== requestId));
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Failed to accept request"
-      );
+      setError(err instanceof Error ? err.message : "Failed to accept request");
     } finally {
       setProcessing(null);
     }
@@ -138,9 +138,10 @@ export default function FriendRequests({ userId }: Props) {
   const handleReject = async (requestId: string) => {
     try {
       setProcessing(requestId);
-      const token = typeof window !== "undefined" 
-        ? localStorage.getItem("auth_token")
-        : null;
+      const token =
+        typeof window !== "undefined"
+          ? localStorage.getItem("auth_token")
+          : null;
 
       if (!token) {
         setError("Not authenticated");
@@ -154,7 +155,7 @@ export default function FriendRequests({ userId }: Props) {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        }
+        },
       );
 
       if (!response.ok) {
@@ -164,9 +165,7 @@ export default function FriendRequests({ userId }: Props) {
       // Remove the request from the list
       setRequests((prev) => prev.filter((req) => req.id !== requestId));
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Failed to reject request"
-      );
+      setError(err instanceof Error ? err.message : "Failed to reject request");
     } finally {
       setProcessing(null);
     }

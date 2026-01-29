@@ -17,7 +17,7 @@ const DirectMessages = dynamic(
   {
     ssr: false,
     loading: () => null,
-  }
+  },
 );
 
 // Force dynamic rendering
@@ -164,14 +164,15 @@ function MessengerContent() {
         {/* Header with Title */}
         <div className="p-4 border-b border-neutral-800 relative">
           <h1 className="text-2xl font-bold text-white">Chats</h1>
-          
+
           {/* Profile Button - Top Right */}
           <button
             onClick={() => router.push("/profile")}
             className="absolute top-4 right-4 w-8 h-8 rounded-full overflow-hidden flex items-center justify-center bg-blue-600 hover:ring-2 hover:ring-blue-400 transition-all hover:scale-110"
             title="Profile"
           >
-            {user.avatar && (user.avatar.startsWith("http") || user.avatar.startsWith("/")) ? (
+            {user.avatar &&
+            (user.avatar.startsWith("http") || user.avatar.startsWith("/")) ? (
               <Image
                 src={user.avatar}
                 alt={user.username}
@@ -185,7 +186,7 @@ function MessengerContent() {
               </span>
             )}
           </button>
-          
+
           {/* Search Bar */}
           <div className="relative mt-4">
             <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-4 h-4 text-neutral-400" />
@@ -208,19 +209,33 @@ function MessengerContent() {
           ) : conversations.length === 0 && friends.length === 0 ? (
             <div className="flex-1 flex flex-col items-center justify-center px-4">
               <MessageCircle className="w-12 h-12 text-neutral-600 mb-3" />
-              <p className="text-neutral-400 text-sm text-center">No conversations yet</p>
-              <p className="text-neutral-500 text-xs text-center mt-1">Go to Friends to connect with people</p>
+              <p className="text-neutral-400 text-sm text-center">
+                No conversations yet
+              </p>
+              <p className="text-neutral-500 text-xs text-center mt-1">
+                Go to Friends to connect with people
+              </p>
             </div>
           ) : (
-            <FriendsList 
-              userId={user.id} 
-              friends={searchQuery 
-                ? [...conversations, ...friends]
-                    .filter(c => c.username.toLowerCase().includes(searchQuery.toLowerCase()))
-                    .filter((value, index, array) => array.findIndex(v => v.id === value.id) === index)
-                : conversations.length > 0 ? conversations : friends
+            <FriendsList
+              userId={user.id}
+              friends={
+                searchQuery
+                  ? [...conversations, ...friends]
+                      .filter((c) =>
+                        c.username
+                          .toLowerCase()
+                          .includes(searchQuery.toLowerCase()),
+                      )
+                      .filter(
+                        (value, index, array) =>
+                          array.findIndex((v) => v.id === value.id) === index,
+                      )
+                  : conversations.length > 0
+                    ? conversations
+                    : friends
               }
-              onSelectFriend={handleSelectFriend} 
+              onSelectFriend={handleSelectFriend}
             />
           )}
         </div>

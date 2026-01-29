@@ -41,11 +41,31 @@ export default function SettingsPage() {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
-  const [activeTab, setActiveTab] = useState<"profile" | "preferences" | "account">("profile");
+  const [activeTab, setActiveTab] = useState<
+    "profile" | "preferences" | "account"
+  >("profile");
 
   const AVATARS = [
-    "🎭", "🎨", "🎪", "🎬", "🎮", "🎯", "🎲", "🎳", "🎸", "🎹",
-    "🎺", "🎻", "🥁", "🎤", "🎧", "📱", "💻", "⌨️", "🖱️", "🖥️",
+    "🎭",
+    "🎨",
+    "🎪",
+    "🎬",
+    "🎮",
+    "🎯",
+    "🎲",
+    "🎳",
+    "🎸",
+    "🎹",
+    "🎺",
+    "🎻",
+    "🥁",
+    "🎤",
+    "🎧",
+    "📱",
+    "💻",
+    "⌨️",
+    "🖱️",
+    "🖥️",
   ];
 
   const STATUS_OPTIONS = [
@@ -402,7 +422,9 @@ export default function SettingsPage() {
                             whileHover={{ scale: 1.02 }}
                             whileTap={{ scale: 0.98 }}
                           >
-                            <div className={`w-3 h-3 rounded-full ${option.color}`} />
+                            <div
+                              className={`w-3 h-3 rounded-full ${option.color}`}
+                            />
                             {option.label}
                           </motion.button>
                         ))}
@@ -468,8 +490,12 @@ export default function SettingsPage() {
                         <div className="flex items-center gap-3">
                           <item.icon className="w-5 h-5 text-neutral-500" />
                           <div className="flex-1">
-                            <h3 className="text-neutral-400 font-semibold">{item.label}</h3>
-                            <p className="text-neutral-500 text-xs mt-1">Coming Soon</p>
+                            <h3 className="text-neutral-400 font-semibold">
+                              {item.label}
+                            </h3>
+                            <p className="text-neutral-500 text-xs mt-1">
+                              Coming Soon
+                            </p>
                           </div>
                         </div>
                       </div>
@@ -482,21 +508,29 @@ export default function SettingsPage() {
               {activeTab === "account" && (
                 <div className="space-y-6">
                   <div className="bg-neutral-900 rounded-lg p-6 border border-neutral-800">
-                    <h2 className="text-xl font-bold text-white mb-6">Account Settings</h2>
+                    <h2 className="text-xl font-bold text-white mb-6">
+                      Account Settings
+                    </h2>
 
                     <div className="space-y-4">
                       <div className="p-4 bg-neutral-800/50 rounded-lg border border-neutral-700">
                         <div className="flex items-center gap-3 mb-2">
                           <Mail className="w-5 h-5 text-neutral-400" />
-                          <span className="text-neutral-300 font-semibold">Email</span>
+                          <span className="text-neutral-300 font-semibold">
+                            Email
+                          </span>
                         </div>
-                        <p className="text-neutral-400 text-sm ml-8">{user.email}</p>
+                        <p className="text-neutral-400 text-sm ml-8">
+                          {user.email}
+                        </p>
                       </div>
 
                       <div className="p-4 bg-neutral-800/50 rounded-lg border border-neutral-700">
                         <div className="flex items-center gap-3 mb-2">
                           <Clock className="w-5 h-5 text-neutral-400" />
-                          <span className="text-neutral-300 font-semibold">Member Since</span>
+                          <span className="text-neutral-300 font-semibold">
+                            Member Since
+                          </span>
                         </div>
                         <p className="text-neutral-400 text-sm ml-8">
                           {user.createdAt
@@ -509,7 +543,9 @@ export default function SettingsPage() {
 
                   {/* Danger Zone */}
                   <div className="bg-red-500/10 rounded-lg p-6 border border-red-500/20">
-                    <h3 className="text-lg font-bold text-red-400 mb-4">Danger Zone</h3>
+                    <h3 className="text-lg font-bold text-red-400 mb-4">
+                      Danger Zone
+                    </h3>
                     <div className="opacity-60 cursor-not-allowed">
                       <button
                         disabled

@@ -24,23 +24,23 @@ const FriendsList = dynamic(() => import("@/components/Friends/FriendsList"), {
 });
 const FriendRequests = dynamic(
   () => import("@/components/Friends/FriendRequests"),
-  { ssr: false, loading: () => null }
+  { ssr: false, loading: () => null },
 );
 const NavigationBar = dynamic(
   () => import("@/components/Layout/NavigationBar"),
-  { ssr: false, loading: () => null }
+  { ssr: false, loading: () => null },
 );
 const ProfileHeader = dynamic(
   () => import("@/components/Profile/ProfileHeader"),
-  { ssr: false, loading: () => null }
+  { ssr: false, loading: () => null },
 );
 const LoadingSpinner = dynamic(
   () => import("@/components/Common/LoadingSpinner"),
-  { ssr: false, loading: () => null }
+  { ssr: false, loading: () => null },
 );
 const TabNavigation = dynamic(
   () => import("@/components/Common/TabNavigation"),
-  { ssr: false, loading: () => null }
+  { ssr: false, loading: () => null },
 );
 const AlertMessage = dynamic(() => import("@/components/Common/AlertMessage"), {
   ssr: false,
@@ -666,7 +666,7 @@ export default function ProfilePage() {
                                   {
                                     hour: "2-digit",
                                     minute: "2-digit",
-                                  }
+                                  },
                                 )}
                               </p>
                             </div>

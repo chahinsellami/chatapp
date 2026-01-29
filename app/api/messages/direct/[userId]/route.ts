@@ -13,7 +13,7 @@ import {
  */
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ userId: string }> }
+  { params }: { params: Promise<{ userId: string }> },
 ) {
   try {
     await initializeDatabase();
@@ -47,7 +47,7 @@ export async function GET(
  */
 export async function POST(
   request: NextRequest,
-  { params }: { params: Promise<{ userId: string }> }
+  { params }: { params: Promise<{ userId: string }> },
 ) {
   try {
     await initializeDatabase();
@@ -82,12 +82,12 @@ export async function POST(
     try {
       // Create or update conversation record
       await getOrCreateConversation(user.userId, receiverId);
-      
+
       const message = await insertDirectMessage(
         id,
         user.userId,
         receiverId,
-        text
+        text,
       );
 
       return NextResponse.json(message, { status: 201 });

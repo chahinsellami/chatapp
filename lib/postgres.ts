@@ -243,7 +243,7 @@ export async function getUserByUsername(username: string) {
 export async function getUserById(id: string) {
   const result = await pool.query(
     "SELECT id, username, email, avatar, status, bio, cover_image, created_at FROM users WHERE id = $1",
-    [id]
+    [id],
   );
   return result.rows[0];
 }
@@ -261,13 +261,13 @@ export async function createUser(
   id: string,
   username: string,
   email: string,
-  passwordHash: string
+  passwordHash: string,
 ) {
   const result = await pool.query(
     `INSERT INTO users (id, username, email, password_hash)
      VALUES ($1, $2, $3, $4)
      RETURNING id, username, email, avatar, status, bio, created_at`,
-    [id, username, email, passwordHash]
+    [id, username, email, passwordHash],
   );
   return result.rows[0];
 }
@@ -287,14 +287,14 @@ export async function updateUserProfileComplete(
   avatar: string,
   status: string,
   bio: string,
-  coverImage: string = ""
+  coverImage: string = "",
 ) {
   const result = await pool.query(
     `UPDATE users
      SET username = $1, avatar = $2, status = $3, bio = $4, cover_image = $5
      WHERE id = $6
      RETURNING id, username, email, avatar, status, bio, cover_image, created_at`,
-    [username, avatar, status, bio, coverImage, userId]
+    [username, avatar, status, bio, coverImage, userId],
   );
   return result.rows[0];
 }
@@ -330,7 +330,7 @@ export async function getMessagesByChannelId(channelId: string) {
      JOIN users u ON m.user_id = u.id
      WHERE m.channel_id = $1
      ORDER BY m.created_at ASC`,
-    [channelId]
+    [channelId],
   );
   return result.rows;
 }
@@ -347,13 +347,13 @@ export async function insertMessage(
   id: string,
   text: string,
   userId: string,
-  channelId: string
+  channelId: string,
 ) {
   const result = await pool.query(
     `INSERT INTO messages (id, text, user_id, channel_id)
      VALUES ($1, $2, $3, $4)
      RETURNING *`,
-    [id, text, userId, channelId]
+    [id, text, userId, channelId],
   );
   return result.rows[0];
 }
@@ -376,7 +376,7 @@ export async function getFriendsByUserId(userId: string) {
      INNER JOIN users u ON f.friend_id = u.id
      WHERE f.user_id = $1 AND f.status = 'accepted' AND u.id IS NOT NULL
      ORDER BY u.username ASC`,
-    [userId]
+    [userId],
   );
   return result.rows;
 }
@@ -394,9 +394,9 @@ export async function getPendingFriendRequests(userId: string) {
      JOIN users u ON fr.sender_id = u.id
      WHERE fr.receiver_id = $1 AND fr.status = 'pending'
      ORDER BY fr.created_at DESC`,
-    [userId]
+    [userId],
   );
-  
+
   // Format the response to match component expectations
   return result.rows.map((row) => ({
     id: row.id,
@@ -422,13 +422,13 @@ export async function getPendingFriendRequests(userId: string) {
 export async function insertFriendRequest(
   id: string,
   senderId: string,
-  receiverId: string
+  receiverId: string,
 ) {
   const result = await pool.query(
     `INSERT INTO friend_requests (id, sender_id, receiver_id)
      VALUES ($1, $2, $3)
      RETURNING *`,
-    [id, senderId, receiverId]
+    [id, senderId, receiverId],
   );
   return result.rows[0];
 }
@@ -441,7 +441,7 @@ export async function insertFriendRequest(
 export async function getFriendRequest(requestId: string) {
   const result = await pool.query(
     `SELECT * FROM friend_requests WHERE id = $1`,
-    [requestId]
+    [requestId],
   );
   return result.rows[0];
 }
@@ -457,7 +457,7 @@ export async function getFriendRequest(requestId: string) {
 export async function acceptFriendRequest(
   requestId: string,
   userId: string,
-  friendId: string
+  friendId: string,
 ) {
   const client = await pool.connect();
   try {
@@ -476,13 +476,13 @@ export async function acceptFriendRequest(
     await client.query(
       `INSERT INTO friends (id, user_id, friend_id, status)
        VALUES ($1, $2, $3, 'accepted')`,
-      [friendId1, userId, friendId]
+      [friendId1, userId, friendId],
     );
 
     await client.query(
       `INSERT INTO friends (id, user_id, friend_id, status)
        VALUES ($1, $2, $3, 'accepted')`,
-      [friendId2, friendId, userId]
+      [friendId2, friendId, userId],
     );
 
     await client.query("COMMIT");
@@ -527,7 +527,7 @@ export async function getDirectMessages(userId1: string, userId2: string) {
      LEFT JOIN users u ON d.sender_id = u.id
      WHERE (d.sender_id = $1 AND d.receiver_id = $2) OR (d.sender_id = $2 AND d.receiver_id = $1)
      ORDER BY d.created_at ASC`,
-    [userId1, userId2]
+    [userId1, userId2],
   );
   return result.rows;
 }
@@ -544,13 +544,13 @@ export async function insertDirectMessage(
   id: string,
   senderId: string,
   receiverId: string,
-  text: string
+  text: string,
 ) {
   const result = await pool.query(
     `INSERT INTO direct_messages (id, sender_id, receiver_id, text)
      VALUES ($1, $2, $3, $4)
      RETURNING *`,
-    [id, senderId, receiverId, text]
+    [id, senderId, receiverId, text],
   );
   return result.rows[0];
 }
@@ -566,7 +566,7 @@ export async function updateDirectMessage(messageId: string, text: string) {
   const now = new Date().toISOString();
   await pool.query(
     `UPDATE direct_messages SET text = $1, edited_at = $2 WHERE id = $3`,
-    [text, now, messageId]
+    [text, now, messageId],
   );
   return { updated: true };
 }
@@ -587,13 +587,16 @@ export async function deleteDirectMessage(messageId: string) {
  * @param userId2 - Second user ID
  * @returns Conversation ID
  */
-export async function getOrCreateConversation(userId1: string, userId2: string) {
+export async function getOrCreateConversation(
+  userId1: string,
+  userId2: string,
+) {
   // Try to find existing conversation
   const existing = await pool.query(
     `SELECT id FROM conversations 
      WHERE (user_id = $1 AND participant_id = $2) OR (user_id = $2 AND participant_id = $1)
      LIMIT 1`,
-    [userId1, userId2]
+    [userId1, userId2],
   );
 
   if (existing.rows.length > 0) {
@@ -607,7 +610,7 @@ export async function getOrCreateConversation(userId1: string, userId2: string) 
      VALUES ($1, $2, $3)
      ON CONFLICT (user_id, participant_id) DO UPDATE
      SET updated_at = CURRENT_TIMESTAMP`,
-    [id, userId1, userId2]
+    [id, userId1, userId2],
   );
 
   return id;
@@ -647,10 +650,10 @@ export async function getConversations(userId: string) {
      )
      WHERE c.user_id = $1 OR c.participant_id = $1
      ORDER BY c.updated_at DESC`,
-    [userId]
+    [userId],
   );
 
-  return result.rows.map(row => ({
+  return result.rows.map((row) => ({
     id: row.other_user_id,
     username: row.username,
     avatar: row.avatar,
@@ -678,7 +681,7 @@ export async function searchUsers(query: string, excludeUserId: string) {
      WHERE (username ILIKE $1 OR email ILIKE $1)
      AND id != $2
      LIMIT 10`,
-    [`%${query}%`, excludeUserId]
+    [`%${query}%`, excludeUserId],
   );
   return result.rows;
 }

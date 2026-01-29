@@ -19,18 +19,19 @@ A modern real-time messaging platform designed for seamless communication. Featu
 
 ## 🛠️ Tech Stack
 
-| Layer | Technology |
-|-------|-----------|
-| **Frontend** | Next.js 16, React 19, TypeScript 5, Tailwind CSS, Framer Motion |
-| **Real-time** | Socket.IO, WebRTC, Agora RTC |
-| **Backend** | Node.js, Express |
-| **Database** | PostgreSQL |
-| **Storage** | Cloudinary |
-| **Deployment** | Vercel, Railway |
+| Layer          | Technology                                                      |
+| -------------- | --------------------------------------------------------------- |
+| **Frontend**   | Next.js 16, React 19, TypeScript 5, Tailwind CSS, Framer Motion |
+| **Real-time**  | Socket.IO, WebRTC, Agora RTC                                    |
+| **Backend**    | Node.js, Express                                                |
+| **Database**   | PostgreSQL                                                      |
+| **Storage**    | Cloudinary                                                      |
+| **Deployment** | Vercel, Railway                                                 |
 
 ## 🚀 Quick Start
 
 ### Prerequisites
+
 - Node.js 18 or higher
 - PostgreSQL database
 - Git
@@ -94,48 +95,55 @@ webchat-app/
 ## 📡 API Endpoints
 
 ### Authentication
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| POST | `/api/auth/signup` | Create new account |
-| POST | `/api/auth/login` | User login |
-| GET | `/api/auth/me` | Get current user |
-| PUT | `/api/auth/profile` | Update profile |
+
+| Method | Endpoint            | Description        |
+| ------ | ------------------- | ------------------ |
+| POST   | `/api/auth/signup`  | Create new account |
+| POST   | `/api/auth/login`   | User login         |
+| GET    | `/api/auth/me`      | Get current user   |
+| PUT    | `/api/auth/profile` | Update profile     |
 
 ### Friends & Messages
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/friends` | List friends and requests |
-| POST | `/api/friends` | Send friend request |
-| PUT | `/api/friends/requests/[id]` | Accept/reject request |
-| GET | `/api/messages/direct/[userId]` | Get conversation |
-| POST | `/api/messages/direct/[userId]` | Send message |
+
+| Method | Endpoint                        | Description               |
+| ------ | ------------------------------- | ------------------------- |
+| GET    | `/api/friends`                  | List friends and requests |
+| POST   | `/api/friends`                  | Send friend request       |
+| PUT    | `/api/friends/requests/[id]`    | Accept/reject request     |
+| GET    | `/api/messages/direct/[userId]` | Get conversation          |
+| POST   | `/api/messages/direct/[userId]` | Send message              |
 
 ### Users
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/users/search` | Search users by username |
-| GET | `/api/users/[id]` | Get user profile |
+
+| Method | Endpoint            | Description              |
+| ------ | ------------------- | ------------------------ |
+| GET    | `/api/users/search` | Search users by username |
+| GET    | `/api/users/[id]`   | Get user profile         |
 
 ## 💾 Database Schema
 
 ### Core Tables
 
 **users** - User accounts and profiles
+
 ```sql
 id, username, email, password_hash, avatar, bio, status, created_at
 ```
 
 **friends** - Friend relationships
+
 ```sql
 id, user_id, friend_id, status, created_at
 ```
 
 **friend_requests** - Pending friend requests
+
 ```sql
 id, sender_id, receiver_id, status, created_at
 ```
 
 **direct_messages** - Conversation history
+
 ```sql
 id, sender_id, receiver_id, text, created_at, edited_at
 ```
@@ -157,6 +165,7 @@ id, sender_id, receiver_id, text, created_at, edited_at
 4. Set environment variables
 
 **Required Env Variables:**
+
 ```
 PORT=3001
 FRONTEND_URL=<your-vercel-url>
