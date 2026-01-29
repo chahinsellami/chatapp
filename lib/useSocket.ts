@@ -58,6 +58,10 @@ export function useSocket(userId: string | null) {
       reconnectionDelay: 5000, // Wait 5 seconds before reconnecting
       reconnectionAttempts: 3, // Only try 3 times to avoid spam
       timeout: 10000, // Connection timeout
+      // Add ngrok-specific headers for WebSocket support
+      extraHeaders: {
+        "ngrok-skip-browser-warning": "true",
+      },
     });
 
     socketRef.current = socket;
