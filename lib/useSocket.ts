@@ -115,6 +115,12 @@ export function useSocket(userId: string | null) {
       });
     });
 
+    // Handle initial list of online users when first connecting
+    socket.on("user-list", (userIds: string[]) => {
+      setOnlineUsers(new Set(userIds));
+      console.log(`📥 Received online users list:`, userIds);
+    });
+
     // Handle user coming online
     socket.on("user-online", (userId: string) => {
       setOnlineUsers((prev) => new Set([...prev, userId]));
