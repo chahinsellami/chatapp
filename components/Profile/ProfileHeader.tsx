@@ -42,15 +42,16 @@ export default function ProfileHeader({
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="relative w-full h-48 sm:h-64 md:h-80 lg:h-[350px] bg-gradient-to-br from-slate-700 via-slate-600 to-slate-700 overflow-hidden"
+          className="relative w-full aspect-[3/1] bg-gradient-to-br from-slate-700 via-slate-600 to-slate-700 overflow-hidden"
         >
           {coverImage ? (
             <Image
               src={coverImage}
               alt="Cover"
-              className="w-full h-full object-cover"
-              width={1200}
-              height={350}
+              className="object-cover object-center"
+              fill
+              sizes="100vw"
+              priority
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center">

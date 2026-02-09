@@ -10,7 +10,7 @@
  * - Friend management
  * - Modern glassmorphism UI with animations
  */
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import dynamic from "next/dynamic";
@@ -139,6 +139,11 @@ export default function ProfilePage() {
   const [success, setSuccess] = useState(false);
   const [tab, setTab] = useState("posts");
 
+  // Friends state (for friends tab)
+  const [profileFriends, setProfileFriends] = useState<any[]>([]);
+  const [profilePending, setProfilePending] = useState<any[]>([]);
+  const [friendsLoaded, setFriendsLoaded] = useState(false);
+
   // Post state
   const [postContent, setPostContent] = useState("");
   const [postImage, setPostImage] = useState<File | null>(null);
@@ -218,6 +223,35 @@ export default function ProfilePage() {
       fetchPosts();
     }
   }, [user, tab]);
+
+  /**
+   * Fetch friends data for the friends tab (once)
+   */
+  const fetchProfileFriends = useCallback(async () => {
+    if (!user || friendsLoaded) return;
+    try {
+      const token = localStorage.getItem("auth_token");
+      if (!token) return;
+      const res = await fetch("/api/friends", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setProfileFriends(data.friends || []);
+        setProfilePending(data.pendingRequests || []);
+        setFriendsLoaded(true);
+      }
+    } catch (err) {
+      console.error("Error fetching profile friends:", err);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id, friendsLoaded]);
+
+  useEffect(() => {
+    if (user && tab === "friends") {
+      fetchProfileFriends();
+    }
+  }, [user, tab, fetchProfileFriends]);
 
   /**
    * Handle image file selection
@@ -929,6 +963,7 @@ export default function ProfilePage() {
                 <div className="glass-card p-6 rounded-2xl">
                   <FriendsList
                     userId={user.id}
+                    friends={profileFriends}
                     onSelectFriend={(friendId: string) => {
                       router.push(`/messenger?friend=${friendId}`);
                     }}

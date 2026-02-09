@@ -55,14 +55,11 @@ export default function FriendRequests({ userId }: Props) {
       });
       const data = await response.json();
 
-      console.log("Friend requests API response:", data);
-
       if (!response.ok) {
         throw new Error(data.error || "Failed to fetch friend requests");
       }
 
       const requests = data.pendingRequests || [];
-      console.log("Pending requests:", requests);
       setRequests(requests);
     } catch (err) {
       console.error("Error fetching requests:", err);
@@ -72,29 +69,10 @@ export default function FriendRequests({ userId }: Props) {
     }
   };
 
-  // Fetch requests on mount
+  // Fetch requests once on mount
   useEffect(() => {
     fetchRequests();
-
-    // Refresh when user comes back to window
-    const handleVisibilityChange = () => {
-      if (document.visibilityState === "visible") {
-        fetchRequests();
-      }
-    };
-
-    // Also poll every 5 seconds to catch updates
-    const pollInterval = setInterval(() => {
-      if (document.visibilityState === "visible") {
-        fetchRequests();
-      }
-    }, 5000);
-
-    document.addEventListener("visibilitychange", handleVisibilityChange);
-    return () => {
-      document.removeEventListener("visibilitychange", handleVisibilityChange);
-      clearInterval(pollInterval);
-    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Handle accepting a friend request
