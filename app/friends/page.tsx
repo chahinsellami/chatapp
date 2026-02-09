@@ -18,13 +18,8 @@ const DirectMessages = dynamic(
     ),
   }
 );
+import { useAuth } from "@/context/AuthContext";
 import { useSocket } from "@/lib/useSocket";
-
-interface User {
-  userId: string;
-  username: string;
-  email: string;
-}
 
 interface Friend {
   id: string;
@@ -48,47 +43,22 @@ interface PendingRequest {
 
 export default function FriendsPage() {
   const router = useRouter();
-  const [user, setUser] = useState<User | null>(null);
+  const { user, isLoading } = useAuth();
   const [selectedFriendId, setSelectedFriendId] = useState<string | null>(null);
   const [selectedFriend, setSelectedFriend] = useState<Friend | null>(null);
-  const [loading, setLoading] = useState(true);
   const [friends, setFriends] = useState<Friend[]>([]);
   const [pendingRequests, setPendingRequests] = useState<PendingRequest[]>([]);
   const [expandPending, setExpandPending] = useState(true);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
 
   // Socket for online status
-  const { onlineUsers } = useSocket(user?.userId || null);
+  const { onlineUsers } = useSocket(user?.id || null);
 
   useEffect(() => {
-    const initializeAuth = async () => {
-      try {
-        const token = localStorage.getItem("auth_token");
-        if (!token) {
-          router.push("/login");
-          return;
-        }
-
-        const res = await fetch("/api/auth/me", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        if (!res.ok) {
-          localStorage.removeItem("auth_token");
-          router.push("/login");
-          return;
-        }
-        const userData = await res.json();
-        setUser(userData.user);
-      } catch (error) {
-        localStorage.removeItem("auth_token");
-        router.push("/login");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    initializeAuth();
-  }, [router]);
+    if (!isLoading && !user) {
+      router.push("/login");
+    }
+  }, [isLoading, user, router]);
 
   const fetchFriendsData = useCallback(async () => {
     if (!user) return;
@@ -194,7 +164,7 @@ export default function FriendsPage() {
     fetchFriendsData();
   };
 
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="flex items-center justify-center h-screen bg-black">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
@@ -230,11 +200,11 @@ export default function FriendsPage() {
         </div>
         {/* Add Friend Section */}
         <div className="p-4 border-b border-neutral-800">
-          <AddFriend userId={user.userId} onFriendAdded={handleFriendAdded} />
+          <AddFriend userId={user.id} onFriendAdded={handleFriendAdded} />
         </div>
         {/* Friends List */}
         <FriendsList
-          userId={user.userId}
+          userId={user.id}
           friends={friendsWithStatus}
           onlineUsers={onlineUsers}
           pendingRequests={formattedRequests}
@@ -251,7 +221,7 @@ export default function FriendsPage() {
       <div className="flex-1 flex flex-col">
         {selectedFriend ? (
           <DirectMessages
-            userId={user.userId}
+            userId={user.id}
             friendId={selectedFriend.id}
             friendName={selectedFriend.username}
             friendAvatar={selectedFriend.avatar}

@@ -55,13 +55,14 @@ export default function AddFriend({ userId, onFriendAdded }: AddFriendProps) {
     if (searchTerm.trim()) {
       const timeoutId = setTimeout(() => {
         handleSearch();
-      }, 300); // 300ms debounce
+      }, 500); // 500ms debounce to prevent rapid re-fetching
 
       return () => clearTimeout(timeoutId);
     } else {
       setUsers([]);
       setError(null);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchTerm]);
 
   /**
