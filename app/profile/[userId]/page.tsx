@@ -62,6 +62,7 @@ export default function UserProfilePage() {
   const [friendRequestSent, setFriendRequestSent] = useState(false);
   const [sendingRequest, setSendingRequest] = useState(false);
   const [isFriend, setIsFriend] = useState(false);
+  const [checkingFriendStatus, setCheckingFriendStatus] = useState(true);
   const [posts, setPosts] = useState<Post[]>([]);
   const [loadingPosts, setLoadingPosts] = useState(false);
 
@@ -104,6 +105,7 @@ export default function UserProfilePage() {
 
   const checkFriendStatus = async () => {
     try {
+      setCheckingFriendStatus(true);
       const token = localStorage.getItem("auth_token");
       const res = await fetch("/api/friends", {
         headers: { Authorization: `Bearer ${token}` },
@@ -112,10 +114,41 @@ export default function UserProfilePage() {
       if (res.ok) {
         const data = await res.json();
         const friends = data.friends || [];
-        setIsFriend(friends.some((f: any) => f.id === userId));
+        const pending = data.pendingRequests || [];
+        
+        // Check if already friends
+        const isAlreadyFriend = friends.some((f: any) => f.id === userId);
+        setIsFriend(isAlreadyFriend);
+        
+        // Check if a friend request was already sent (by current user to this profile)
+        // or received (from this profile to current user)
+        if (!isAlreadyFriend) {
+          const hasPendingRequest = pending.some(
+            (r: any) => r.sender_id === userId || r.sender?.id === userId
+          );
+          // Also check if current user sent a request to this profile
+          const sentRes = await fetch("/api/friends/sent", {
+            headers: { Authorization: `Bearer ${token}` },
+          }).catch(() => null);
+          
+          if (sentRes?.ok) {
+            const sentData = await sentRes.json();
+            const sentRequests = sentData.sentRequests || [];
+            const hasSentRequest = sentRequests.some(
+              (r: any) => r.receiver_id === userId
+            );
+            if (hasSentRequest || hasPendingRequest) {
+              setFriendRequestSent(true);
+            }
+          } else if (hasPendingRequest) {
+            setFriendRequestSent(true);
+          }
+        }
       }
     } catch (error) {
-      // Error checking friend status: (error)
+      console.error("Error checking friend status:", error);
+    } finally {
+      setCheckingFriendStatus(false);
     }
   };
 
@@ -295,7 +328,12 @@ export default function UserProfilePage() {
 
             {/* Action Buttons */}
             <div className="flex gap-3 pt-4 w-full sm:w-auto justify-center sm:justify-start">
-              {isFriend ? (
+              {checkingFriendStatus ? (
+                <Button variant="secondary" disabled className="flex items-center gap-2">
+                  <div className="w-4 h-4 border-2 border-neutral-400 border-t-transparent rounded-full animate-spin" />
+                  Loading...
+                </Button>
+              ) : isFriend ? (
                 <Button
                   variant="primary"
                   onClick={handleMessage}

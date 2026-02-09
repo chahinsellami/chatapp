@@ -413,6 +413,36 @@ export async function getPendingFriendRequests(userId: string) {
 }
 
 /**
+ * Get all sent (outgoing) friend requests by a user
+ * @param userId - ID of the user who sent the requests
+ * @returns Array of sent friend request objects
+ */
+export async function getSentFriendRequests(userId: string) {
+  const result = await pool.query(
+    `SELECT fr.id, fr.sender_id, fr.receiver_id, fr.status, fr.created_at,
+            u.id as receiver_user_id, u.username, u.avatar
+     FROM friend_requests fr
+     JOIN users u ON fr.receiver_id = u.id
+     WHERE fr.sender_id = $1 AND fr.status = 'pending'
+     ORDER BY fr.created_at DESC`,
+    [userId],
+  );
+
+  return result.rows.map((row) => ({
+    id: row.id,
+    sender_id: row.sender_id,
+    receiver_id: row.receiver_id,
+    status: row.status,
+    created_at: row.created_at,
+    receiver: {
+      id: row.receiver_user_id,
+      username: row.username,
+      avatar: row.avatar,
+    },
+  }));
+}
+
+/**
  * Create a new friend request
  * @param id - Generated UUID for the request
  * @param senderId - ID of the user sending the request

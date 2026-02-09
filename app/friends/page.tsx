@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import dynamic from "next/dynamic";
 const FriendsList = dynamic(() => import("@/components/Friends/FriendsList"), {
@@ -18,9 +18,7 @@ const DirectMessages = dynamic(
     ),
   }
 );
-import { verifyToken } from "@/lib/auth";
-
-// Force dynamic rendering - no static generation
+import { useSocket } from "@/lib/useSocket";
 
 interface User {
   userId: string;
@@ -35,12 +33,32 @@ interface Friend {
   status: string;
 }
 
+interface PendingRequest {
+  id: string;
+  sender_id: string;
+  receiver_id: string;
+  status: string;
+  created_at: string;
+  sender: {
+    id: string;
+    username: string;
+    avatar?: string;
+  };
+}
+
 export default function FriendsPage() {
   const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
   const [selectedFriendId, setSelectedFriendId] = useState<string | null>(null);
   const [selectedFriend, setSelectedFriend] = useState<Friend | null>(null);
   const [loading, setLoading] = useState(true);
+  const [friends, setFriends] = useState<Friend[]>([]);
+  const [pendingRequests, setPendingRequests] = useState<PendingRequest[]>([]);
+  const [expandPending, setExpandPending] = useState(true);
+  const [actionLoading, setActionLoading] = useState<string | null>(null);
+
+  // Socket for online status
+  const { onlineUsers } = useSocket(user?.userId || null);
 
   useEffect(() => {
     const initializeAuth = async () => {
@@ -55,14 +73,14 @@ export default function FriendsPage() {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (!res.ok) {
-          localStorage.removeItem("token");
+          localStorage.removeItem("auth_token");
           router.push("/login");
           return;
         }
         const userData = await res.json();
         setUser(userData.user);
       } catch (error) {
-        localStorage.removeItem("token");
+        localStorage.removeItem("auth_token");
         router.push("/login");
       } finally {
         setLoading(false);
@@ -72,20 +90,108 @@ export default function FriendsPage() {
     initializeAuth();
   }, [router]);
 
-  const handleSelectFriend = (friendId: string) => {
+  const fetchFriendsData = useCallback(async () => {
+    if (!user) return;
+    try {
+      const token = localStorage.getItem("auth_token");
+      const res = await fetch("/api/friends", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setFriends(data.friends || []);
+        setPendingRequests(data.pendingRequests || []);
+      }
+    } catch (error) {
+      console.error("Error fetching friends:", error);
+    }
+  }, [user]);
+
+  // Fetch friends on mount
+  useEffect(() => {
+    if (user) {
+      fetchFriendsData();
+    }
+  }, [user, fetchFriendsData]);
+
+  const handleSelectFriend = (friendId: string, friendData?: any) => {
     setSelectedFriendId(friendId);
-    // In a real app, fetch friend details from the friends list
-    // For now, use basic info
-    setSelectedFriend({
-      id: friendId,
-      username: `Friend ${friendId.slice(0, 4)}`,
-      status: "online",
-    });
+    if (friendData) {
+      setSelectedFriend({
+        id: friendData.id || friendId,
+        username: friendData.username || `Friend`,
+        avatar: friendData.avatar,
+        status: friendData.status || "offline",
+      });
+    } else {
+      const friend = friends.find((f) => f.id === friendId);
+      if (friend) {
+        setSelectedFriend(friend);
+      }
+    }
+  };
+
+  const handleAcceptRequest = async (requestId: string) => {
+    try {
+      setActionLoading(requestId);
+      const token = localStorage.getItem("auth_token");
+      const res = await fetch(`/api/friends/requests/${requestId}?action=accept`, {
+        method: "PUT",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.ok) {
+        await fetchFriendsData();
+      }
+    } catch (error) {
+      console.error("Error accepting request:", error);
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const handleRejectRequest = async (requestId: string) => {
+    try {
+      setActionLoading(requestId);
+      const token = localStorage.getItem("auth_token");
+      const res = await fetch(`/api/friends/requests/${requestId}?action=reject`, {
+        method: "PUT",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.ok) {
+        await fetchFriendsData();
+      }
+    } catch (error) {
+      console.error("Error rejecting request:", error);
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const handleRemoveFriend = async (friendId: string) => {
+    if (!confirm("Remove this friend?")) return;
+    try {
+      setActionLoading(friendId);
+      const token = localStorage.getItem("auth_token");
+      const res = await fetch(`/api/friends/${friendId}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (res.ok) {
+        await fetchFriendsData();
+        if (selectedFriendId === friendId) {
+          setSelectedFriendId(null);
+          setSelectedFriend(null);
+        }
+      }
+    } catch (error) {
+      console.error("Error removing friend:", error);
+    } finally {
+      setActionLoading(null);
+    }
   };
 
   const handleFriendAdded = () => {
-    // Trigger refresh of friends list
-    // This could be done with a callback to FriendsList
+    fetchFriendsData();
   };
 
   if (loading) {
@@ -99,6 +205,20 @@ export default function FriendsPage() {
   if (!user) {
     return null;
   }
+
+  // Map pending requests for FriendsList component format
+  const formattedRequests = pendingRequests.map((r) => ({
+    id: r.id,
+    username: r.sender?.username || "Unknown",
+    avatar: r.sender?.avatar || null,
+    createdAt: r.created_at,
+  }));
+
+  // Add online status to friends
+  const friendsWithStatus = friends.map((f) => ({
+    ...f,
+    status: onlineUsers.has(f.id) ? "online" : "offline",
+  }));
 
   return (
     <div className="flex h-screen bg-black">
@@ -115,8 +235,16 @@ export default function FriendsPage() {
         {/* Friends List */}
         <FriendsList
           userId={user.userId}
+          friends={friendsWithStatus}
+          onlineUsers={onlineUsers}
+          pendingRequests={formattedRequests}
+          expandPending={expandPending}
+          setExpandPending={setExpandPending}
+          handleAcceptRequest={handleAcceptRequest}
+          handleRejectRequest={handleRejectRequest}
+          handleRemoveFriend={handleRemoveFriend}
+          actionLoading={actionLoading}
           onSelectFriend={handleSelectFriend}
-          onRefresh={handleFriendAdded}
         />
       </div>
       {/* Right Main Area - Direct Messages */}
@@ -126,6 +254,7 @@ export default function FriendsPage() {
             userId={user.userId}
             friendId={selectedFriend.id}
             friendName={selectedFriend.username}
+            friendAvatar={selectedFriend.avatar}
             friendStatus={selectedFriend.status}
           />
         ) : (
