@@ -214,12 +214,15 @@ export function useAgoraCall(userId: string): UseAgoraCallReturn {
    */
   const startCall = useCallback(
     async (channelName: string, type: CallType) => {
+      console.log(`📞 Starting ${type} call on channel: ${channelName}`);
+      
       if (!clientRef.current) {
-        // ...existing code...
+        console.error("❌ Agora client not initialized");
         return;
       }
 
       if (!APP_ID) {
+        console.error("❌ APP_ID not configured");
         return;
       }
 
@@ -231,14 +234,14 @@ export function useAgoraCall(userId: string): UseAgoraCallReturn {
           client.connectionState === "CONNECTED" ||
           client.connectionState === "CONNECTING"
         ) {
+          console.log("⚠️ Already connected, skipping join");
           return;
         }
-
-        // ...existing code...
 
         // Fetch token from backend
         let token = "";
         try {
+          console.log("🔑 Requesting Agora token...");
           const res = await fetch("/api/agora/token", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -248,18 +251,25 @@ export function useAgoraCall(userId: string): UseAgoraCallReturn {
               role: "publisher",
             }),
           });
-          if (!res.ok) throw new Error("Failed to fetch Agora token");
+          if (!res.ok) {
+            const errorData = await res.json();
+            console.error("❌ Token request failed:", errorData);
+            throw new Error(`Failed to fetch Agora token: ${res.status}`);
+          }
           const data = await res.json();
           token = data.token;
+          console.log("✅ Agora token received");
         } catch (err) {
+          console.error("❌ Token fetch error:", err);
           return;
         }
 
-        // Join the channel with token
+        console.log("🔗 Joining Agora channel...");
         await client.join(APP_ID, channelName, token, userId);
-        // ...existing code...
+        console.log("✅ Joined channel");
 
         // Create audio track with optimized settings
+        console.log("🎤 Creating audio track...");
         const audioTrack = await AgoraRTC.createMicrophoneAudioTrack({
           encoderConfig: "music_standard", // High quality audio
           AEC: true, // Acoustic Echo Cancellation
@@ -267,11 +277,12 @@ export function useAgoraCall(userId: string): UseAgoraCallReturn {
           ANS: true, // Automatic Noise Suppression
         });
         setLocalAudioTrack(audioTrack);
-        // ...existing code...
+        console.log("✅ Audio track created");
 
         // Create video track if it's a video call
         let videoTrack: ICameraVideoTrack | null = null;
         if (type === "video") {
+          console.log("📹 Creating video track...");
           videoTrack = await AgoraRTC.createCameraVideoTrack({
             encoderConfig: {
               width: 640,
@@ -282,24 +293,26 @@ export function useAgoraCall(userId: string): UseAgoraCallReturn {
             },
           });
           setLocalVideoTrack(videoTrack);
-          // ...existing code...
+          console.log("✅ Video track created");
         }
 
         // Publish tracks to the channel
         const tracksToPublish = videoTrack
           ? [audioTrack, videoTrack]
           : [audioTrack];
+        console.log(`📤 Publishing ${tracksToPublish.length} track(s)...`);
         await client.publish(tracksToPublish);
-        // ...existing code...
+        console.log("✅ Tracks published");
 
         setCurrentChannel(channelName);
         setCallType(type);
         setIsCallActive(true);
         setIsAudioEnabled(true);
         setIsVideoEnabled(type === "video");
-
-        // ...existing code...
+        
+        console.log("✅ Call started successfully");
       } catch (error: unknown) {
+        console.error("❌ Call start error:", error);
         Sentry.captureException(error);
         await endCall();
       }
