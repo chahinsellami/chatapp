@@ -49,7 +49,7 @@ export async function PUT(request: NextRequest) {
         { status: 400 }
       );
     }
-    if (!status || !["online", "idle", "dnd", "invisible"].includes(status)) {
+    if (!status || !["online", "idle", "dnd", "invisible", "offline"].includes(status)) {
       return NextResponse.json({ error: "Invalid status" }, { status: 400 });
     }
     if (bio && typeof bio !== "string") {
