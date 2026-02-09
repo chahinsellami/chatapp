@@ -499,19 +499,21 @@ export async function acceptFriendRequest(
       requestId,
     ]);
 
-    // Create bidirectional friend relationships
+    // Create bidirectional friend relationships (ON CONFLICT handles re-accepts)
     const friendId1 = crypto.randomUUID?.() || Math.random().toString();
     const friendId2 = crypto.randomUUID?.() || Math.random().toString();
 
     await client.query(
       `INSERT INTO friends (id, user_id, friend_id, status)
-       VALUES ($1, $2, $3, 'accepted')`,
+       VALUES ($1, $2, $3, 'accepted')
+       ON CONFLICT (user_id, friend_id) DO UPDATE SET status = 'accepted'`,
       [friendId1, userId, friendId],
     );
 
     await client.query(
       `INSERT INTO friends (id, user_id, friend_id, status)
-       VALUES ($1, $2, $3, 'accepted')`,
+       VALUES ($1, $2, $3, 'accepted')
+       ON CONFLICT (user_id, friend_id) DO UPDATE SET status = 'accepted'`,
       [friendId2, friendId, userId],
     );
 

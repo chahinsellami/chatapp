@@ -367,13 +367,11 @@ export default function AddFriend({ userId, onFriendAdded }: AddFriendProps) {
               exit={{ opacity: 0, scale: 0.9 }}
               key="no-results"
             >
-              <motion.div
+              <div
                 className="w-16 h-16 rounded-2xl flex items-center justify-center mb-4 bg-neutral-800"
-                animate={{ rotate: [0, 5, -5, 0] }}
-                transition={{ duration: 2, repeat: Infinity }}
               >
                 <Users className="w-8 h-8 text-neutral-400" />
-              </motion.div>
+              </div>
               <h4 className="text-white font-medium mb-2">No users found</h4>
               <p className="text-neutral-400 text-sm">
                 Try searching with a different username
@@ -389,13 +387,11 @@ export default function AddFriend({ userId, onFriendAdded }: AddFriendProps) {
               exit={{ opacity: 0, scale: 0.9 }}
               key="empty"
             >
-              <motion.div
+              <div
                 className="w-16 h-16 rounded-2xl flex items-center justify-center mb-4 bg-blue-600"
-                animate={{ scale: [1, 1.05, 1] }}
-                transition={{ duration: 2, repeat: Infinity }}
               >
                 <Search className="w-8 h-8 text-white" />
-              </motion.div>
+              </div>
               <h4 className="text-white font-medium mb-2">
                 Search for friends
               </h4>

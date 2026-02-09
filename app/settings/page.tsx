@@ -437,14 +437,14 @@ export default function SettingsPage() {
                       <label className="block text-neutral-300 font-semibold mb-4">
                         Cover Image
                       </label>
-                      <div className="relative h-32 sm:h-40 rounded-lg overflow-hidden bg-gradient-to-br from-blue-600 to-blue-800 border border-neutral-700">
+                      <div className="relative w-full aspect-[3/1] rounded-lg overflow-hidden bg-gradient-to-br from-blue-600 to-blue-800 border border-neutral-700">
                         {coverImage && (
                           <Image
                             src={coverImage}
                             alt="Cover"
                             fill
-                            className="object-cover"
-                            sizes="(max-width: 768px) 100vw, 600px"
+                            className="object-cover object-center"
+                            sizes="(max-width: 768px) 100vw, 800px"
                           />
                         )}
                         <div className="absolute inset-0 flex items-center justify-center gap-3 bg-black/30 opacity-0 hover:opacity-100 transition-opacity">

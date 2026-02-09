@@ -772,15 +772,15 @@ export default function ProfilePage() {
                       <label className="block text-sm font-semibold text-slate-300 mb-3">
                         Cover Photo
                       </label>
-                      <div className="relative h-48 rounded-xl overflow-hidden bg-slate-800 flex items-center justify-center">
+                      <div className="relative w-full aspect-[3/1] rounded-xl overflow-hidden bg-slate-800 flex items-center justify-center">
                         {coverImage ? (
                           <>
                             <Image
                               src={coverImage}
                               alt="Cover preview"
-                              className="w-full h-full object-cover"
-                              width={192}
-                              height={192}
+                              className="object-cover object-center"
+                              fill
+                              sizes="(max-width: 768px) 100vw, 800px"
                             />
                             <motion.button
                               onClick={handleRemoveCoverImage}

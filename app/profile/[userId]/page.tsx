@@ -259,7 +259,7 @@ export default function UserProfilePage() {
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="relative h-32 sm:h-40 md:h-48 bg-gradient-to-br from-blue-600 to-blue-800 rounded-t-2xl overflow-hidden"
+          className="relative w-full aspect-[3/1] bg-gradient-to-br from-blue-600 to-blue-800 rounded-t-2xl overflow-hidden"
         >
           {profile.cover_image && (
             <Image

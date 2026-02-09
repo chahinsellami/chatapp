@@ -64,6 +64,7 @@ export default function FriendsPage() {
     if (!user) return;
     try {
       const token = localStorage.getItem("auth_token");
+      if (!token) return;
       const res = await fetch("/api/friends", {
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -71,18 +72,22 @@ export default function FriendsPage() {
         const data = await res.json();
         setFriends(data.friends || []);
         setPendingRequests(data.pendingRequests || []);
+      } else {
+        console.error("Friends API error:", res.status, await res.text().catch(() => ""));
       }
     } catch (error) {
       console.error("Error fetching friends:", error);
     }
-  }, [user]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id]);
 
   // Fetch friends on mount
   useEffect(() => {
     if (user) {
       fetchFriendsData();
     }
-  }, [user, fetchFriendsData]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id, fetchFriendsData]);
 
   const handleSelectFriend = (friendId: string, friendData?: any) => {
     setSelectedFriendId(friendId);
@@ -105,6 +110,7 @@ export default function FriendsPage() {
     try {
       setActionLoading(requestId);
       const token = localStorage.getItem("auth_token");
+      if (!token) return;
       const res = await fetch(
         `/api/friends/requests/${requestId}?action=accept`,
         {
@@ -114,6 +120,8 @@ export default function FriendsPage() {
       );
       if (res.ok) {
         await fetchFriendsData();
+      } else {
+        console.error("Accept request failed:", res.status, await res.text().catch(() => ""));
       }
     } catch (error) {
       console.error("Error accepting request:", error);

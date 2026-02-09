@@ -18,6 +18,7 @@ import {
   useEffect,
   useRef,
   useCallback,
+  useMemo,
   ReactNode,
 } from "react";
 import { io, Socket } from "socket.io-client";
@@ -271,17 +272,28 @@ export function SocketProvider({ children }: { children: ReactNode }) {
     [userId],
   );
 
-  // ─── Context value ────────────────────────────────────────────────────
-  const value: SocketContextType = {
-    socket: socketRef.current,
-    isConnected,
-    messages,
-    typingUsers,
-    onlineUsers,
-    userStatuses,
-    sendMessage,
-    sendTypingIndicator,
-  };
+  // ─── Context value (memoized to prevent unnecessary consumer re-renders) ──
+  const value: SocketContextType = useMemo(
+    () => ({
+      socket: socketRef.current,
+      isConnected,
+      messages,
+      typingUsers,
+      onlineUsers,
+      userStatuses,
+      sendMessage,
+      sendTypingIndicator,
+    }),
+    [
+      isConnected,
+      messages,
+      typingUsers,
+      onlineUsers,
+      userStatuses,
+      sendMessage,
+      sendTypingIndicator,
+    ],
+  );
 
   return (
     <SocketContext.Provider value={value}>{children}</SocketContext.Provider>
