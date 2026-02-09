@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
+import { useSocketContext } from "@/context/SocketContext";
 import dynamic from "next/dynamic";
 import Image from "next/image";
 import { Suspense } from "react";
@@ -26,11 +27,15 @@ import {
 export default function SettingsPage() {
   const router = useRouter();
   const { user, isLoading, updateUser, logout } = useAuth();
+  const { isConnected, userStatuses } = useSocketContext();
 
   // Profile state
   const [avatar, setAvatar] = useState("");
   const [username, setUsername] = useState("");
-  const [status, setStatus] = useState("online");
+  // Status is now auto-detected — derive it from the presence system
+  const autoStatus = user?.id
+    ? userStatuses.get(user.id) || (isConnected ? "online" : "offline")
+    : "offline";
   const [bio, setBio] = useState("");
   const [customImage, setCustomImage] = useState<string | null>(null);
   const [coverImage, setCoverImage] = useState<string | null>(null);
@@ -68,18 +73,16 @@ export default function SettingsPage() {
     "🖥️",
   ];
 
-  const STATUS_OPTIONS = [
-    { value: "online", label: "Online", color: "bg-green-500" },
-    { value: "idle", label: "Idle", color: "bg-yellow-500" },
-    { value: "dnd", label: "Do Not Disturb", color: "bg-red-500" },
-    { value: "invisible", label: "Offline", color: "bg-gray-500" },
-  ];
+  // Auto-detected status display config
+  const STATUS_DISPLAY: Record<string, { label: string; color: string; description: string }> = {
+    online: { label: "Online", color: "bg-green-500", description: "You're active and connected" },
+    offline: { label: "Offline", color: "bg-gray-500", description: "You appear offline to others" },
+  };
 
   useEffect(() => {
     if (user) {
       setUsername(user.username || "");
       setAvatar(user.avatar || "");
-      setStatus(user.status || "online");
       setBio(user.bio || "");
     }
   }, [user]);
@@ -169,7 +172,7 @@ export default function SettingsPage() {
         body: JSON.stringify({
           username,
           avatar: profileImageUrl,
-          status,
+          status: autoStatus,
           bio,
         }),
       });
@@ -404,30 +407,26 @@ export default function SettingsPage() {
                       </p>
                     </div>
 
-                    {/* Status */}
+                    {/* Auto-detected Status */}
                     <div className="mb-8">
                       <label className="block text-neutral-300 font-semibold mb-3">
                         Status
                       </label>
-                      <div className="grid grid-cols-2 gap-3">
-                        {STATUS_OPTIONS.map((option) => (
-                          <motion.button
-                            key={option.value}
-                            onClick={() => setStatus(option.value)}
-                            className={`p-3 rounded-lg flex items-center gap-2 transition-all ${
-                              status === option.value
-                                ? "bg-blue-600 text-white border-2 border-blue-400"
-                                : "bg-neutral-800 text-neutral-300 border-2 border-transparent hover:bg-neutral-700"
-                            }`}
-                            whileHover={{ scale: 1.02 }}
-                            whileTap={{ scale: 0.98 }}
-                          >
-                            <div
-                              className={`w-3 h-3 rounded-full ${option.color}`}
-                            />
-                            {option.label}
-                          </motion.button>
-                        ))}
+                      <div className="p-4 bg-neutral-800 rounded-lg border border-neutral-700">
+                        <div className="flex items-center gap-3">
+                          <div className={`w-3 h-3 rounded-full ${STATUS_DISPLAY[autoStatus]?.color || "bg-gray-500"} ${autoStatus === "online" ? "animate-pulse" : ""}`} />
+                          <div>
+                            <p className="text-white font-semibold">
+                              {STATUS_DISPLAY[autoStatus]?.label || "Unknown"}
+                            </p>
+                            <p className="text-neutral-400 text-sm">
+                              {STATUS_DISPLAY[autoStatus]?.description || ""}
+                            </p>
+                          </div>
+                        </div>
+                        <p className="text-neutral-500 text-xs mt-3">
+                          Your status is automatically detected based on your activity.
+                        </p>
                       </div>
                     </div>
 
