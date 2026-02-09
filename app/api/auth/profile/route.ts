@@ -32,7 +32,7 @@ export async function PUT(request: NextRequest) {
     ) {
       return NextResponse.json(
         { error: "Username must be 3-32 characters" },
-        { status: 400 }
+        { status: 400 },
       );
     }
     // Check if username is taken (case-insensitive, except for current user)
@@ -40,28 +40,31 @@ export async function PUT(request: NextRequest) {
     if (existing && existing.id !== decoded.userId) {
       return NextResponse.json(
         { error: "Username already exists" },
-        { status: 409 }
+        { status: 409 },
       );
     }
     if (!avatar || typeof avatar !== "string") {
       return NextResponse.json(
         { error: "Avatar is required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
-    if (!status || !["online", "idle", "dnd", "invisible", "offline"].includes(status)) {
+    if (
+      !status ||
+      !["online", "idle", "dnd", "invisible", "offline"].includes(status)
+    ) {
       return NextResponse.json({ error: "Invalid status" }, { status: 400 });
     }
     if (bio && typeof bio !== "string") {
       return NextResponse.json(
         { error: "Bio must be a string" },
-        { status: 400 }
+        { status: 400 },
       );
     }
     if (bio && bio.length > 150) {
       return NextResponse.json(
         { error: "Bio must be 150 characters or less" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -72,7 +75,7 @@ export async function PUT(request: NextRequest) {
       avatar,
       status,
       bio || "",
-      coverImage || ""
+      coverImage || "",
     );
 
     if (!updatedUser) {
@@ -93,7 +96,7 @@ export async function PUT(request: NextRequest) {
           createdAt: updatedUser.created_at,
         },
       },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error) {
     // Log the actual error for debugging
@@ -103,7 +106,7 @@ export async function PUT(request: NextRequest) {
         error: "Internal server error",
         details: error instanceof Error ? error.message : "Unknown error",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

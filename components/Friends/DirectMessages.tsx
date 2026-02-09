@@ -509,19 +509,38 @@ export default function DirectMessages({
 
     // Check microphone permissions before starting call
     try {
-      const permissionStatus = await navigator.permissions?.query({
+      const micPermission = await navigator.permissions?.query({
         name: "microphone" as PermissionName,
       });
-      if (permissionStatus?.state === "denied") {
+      if (micPermission?.state === "denied") {
         alert(
           "Microphone access is blocked. Please enable it in your browser settings:\n\n" +
-            "Chrome: Settings → Privacy and security → Site settings → Microphone\n" +
+            "Chrome: Click the lock icon in the address bar → Site settings → Microphone → Allow\n" +
             "Safari: Settings → Safari → Camera/Microphone",
         );
         return;
       }
     } catch (e) {
       // Permissions API not supported, continue anyway
+    }
+
+    // Check camera permissions before starting video call
+    if (type === "video") {
+      try {
+        const camPermission = await navigator.permissions?.query({
+          name: "camera" as PermissionName,
+        });
+        if (camPermission?.state === "denied") {
+          alert(
+            "Camera access is blocked. Please enable it in your browser settings:\n\n" +
+              "Chrome: Click the lock icon in the address bar → Site settings → Camera → Allow\n" +
+              "Safari: Settings → Safari → Camera/Microphone",
+          );
+          return;
+        }
+      } catch (e) {
+        // Permissions API not supported, continue anyway
+      }
     }
 
     // Send call request to friend via Socket.IO

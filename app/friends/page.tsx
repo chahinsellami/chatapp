@@ -16,7 +16,7 @@ const DirectMessages = dynamic(
     loading: () => (
       <div className="flex-1 flex items-center justify-center">Loading...</div>
     ),
-  }
+  },
 );
 import { useAuth } from "@/context/AuthContext";
 import { useSocket } from "@/lib/useSocket";
@@ -105,10 +105,13 @@ export default function FriendsPage() {
     try {
       setActionLoading(requestId);
       const token = localStorage.getItem("auth_token");
-      const res = await fetch(`/api/friends/requests/${requestId}?action=accept`, {
-        method: "PUT",
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await fetch(
+        `/api/friends/requests/${requestId}?action=accept`,
+        {
+          method: "PUT",
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      );
       if (res.ok) {
         await fetchFriendsData();
       }
@@ -123,10 +126,13 @@ export default function FriendsPage() {
     try {
       setActionLoading(requestId);
       const token = localStorage.getItem("auth_token");
-      const res = await fetch(`/api/friends/requests/${requestId}?action=reject`, {
-        method: "PUT",
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await fetch(
+        `/api/friends/requests/${requestId}?action=reject`,
+        {
+          method: "PUT",
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      );
       if (res.ok) {
         await fetchFriendsData();
       }

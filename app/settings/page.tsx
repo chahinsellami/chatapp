@@ -74,9 +74,20 @@ export default function SettingsPage() {
   ];
 
   // Auto-detected status display config
-  const STATUS_DISPLAY: Record<string, { label: string; color: string; description: string }> = {
-    online: { label: "Online", color: "bg-green-500", description: "You're active and connected" },
-    offline: { label: "Offline", color: "bg-gray-500", description: "You appear offline to others" },
+  const STATUS_DISPLAY: Record<
+    string,
+    { label: string; color: string; description: string }
+  > = {
+    online: {
+      label: "Online",
+      color: "bg-green-500",
+      description: "You're active and connected",
+    },
+    offline: {
+      label: "Offline",
+      color: "bg-gray-500",
+      description: "You appear offline to others",
+    },
   };
 
   useEffect(() => {
@@ -84,6 +95,7 @@ export default function SettingsPage() {
       setUsername(user.username || "");
       setAvatar(user.avatar || "");
       setBio(user.bio || "");
+      setCoverImage(user.coverImage || null);
     }
   }, [user]);
 
@@ -117,6 +129,31 @@ export default function SettingsPage() {
     setCustomImage(null);
     setImageFile(null);
     setAvatar("");
+  };
+
+  const handleCoverChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (!file.type.startsWith("image/")) {
+        setError("Please select an image file");
+        return;
+      }
+      if (file.size > 5 * 1024 * 1024) {
+        setError("Cover image size must be less than 5MB");
+        return;
+      }
+      setCoverFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setCoverImage(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleRemoveCover = () => {
+    setCoverImage(null);
+    setCoverFile(null);
   };
 
   const handleSave = async () => {
@@ -163,6 +200,29 @@ export default function SettingsPage() {
         profileImageUrl = uploadData.imageUrl;
       }
 
+      // Upload cover image if changed
+      let coverImageUrl = coverImage || "";
+      if (coverFile) {
+        const coverFormData = new FormData();
+        coverFormData.append("file", coverFile);
+
+        const coverUploadRes = await fetch("/api/upload/cover-image", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          body: coverFormData,
+        });
+
+        if (!coverUploadRes.ok) {
+          const data = await coverUploadRes.json();
+          throw new Error(data.error || "Failed to upload cover image");
+        }
+
+        const coverUploadData = await coverUploadRes.json();
+        coverImageUrl = coverUploadData.imageUrl;
+      }
+
       const res = await fetch("/api/auth/profile", {
         method: "PUT",
         headers: {
@@ -172,6 +232,7 @@ export default function SettingsPage() {
         body: JSON.stringify({
           username,
           avatar: profileImageUrl,
+          coverImage: coverImageUrl,
           status: autoStatus,
           bio,
         }),
@@ -371,6 +432,49 @@ export default function SettingsPage() {
                       </div>
                     )}
 
+                    {/* Cover Image Section */}
+                    <div className="mb-8">
+                      <label className="block text-neutral-300 font-semibold mb-4">
+                        Cover Image
+                      </label>
+                      <div className="relative h-32 sm:h-40 rounded-lg overflow-hidden bg-gradient-to-br from-blue-600 to-blue-800 border border-neutral-700">
+                        {coverImage && (
+                          <Image
+                            src={coverImage}
+                            alt="Cover"
+                            fill
+                            className="object-cover"
+                            sizes="(max-width: 768px) 100vw, 600px"
+                          />
+                        )}
+                        <div className="absolute inset-0 flex items-center justify-center gap-3 bg-black/30 opacity-0 hover:opacity-100 transition-opacity">
+                          <label className="cursor-pointer">
+                            <input
+                              type="file"
+                              accept="image/*"
+                              onChange={handleCoverChange}
+                              className="hidden"
+                            />
+                            <span className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg flex items-center gap-2 text-sm transition-colors">
+                              <Camera className="w-4 h-4" />
+                              {coverImage ? "Change Cover" : "Upload Cover"}
+                            </span>
+                          </label>
+                          {coverImage && (
+                            <button
+                              onClick={handleRemoveCover}
+                              className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-sm transition-colors"
+                            >
+                              Remove
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                      <p className="text-neutral-500 text-sm mt-2">
+                        Recommended: 1500×500 pixels. Hover over the banner to change.
+                      </p>
+                    </div>
+
                     {/* Username */}
                     <div className="mb-8">
                       <label className="block text-neutral-300 font-semibold mb-2">
@@ -414,7 +518,9 @@ export default function SettingsPage() {
                       </label>
                       <div className="p-4 bg-neutral-800 rounded-lg border border-neutral-700">
                         <div className="flex items-center gap-3">
-                          <div className={`w-3 h-3 rounded-full ${STATUS_DISPLAY[autoStatus]?.color || "bg-gray-500"} ${autoStatus === "online" ? "animate-pulse" : ""}`} />
+                          <div
+                            className={`w-3 h-3 rounded-full ${STATUS_DISPLAY[autoStatus]?.color || "bg-gray-500"} ${autoStatus === "online" ? "animate-pulse" : ""}`}
+                          />
                           <div>
                             <p className="text-white font-semibold">
                               {STATUS_DISPLAY[autoStatus]?.label || "Unknown"}
@@ -425,7 +531,8 @@ export default function SettingsPage() {
                           </div>
                         </div>
                         <p className="text-neutral-500 text-xs mt-3">
-                          Your status is automatically detected based on your activity.
+                          Your status is automatically detected based on your
+                          activity.
                         </p>
                       </div>
                     </div>

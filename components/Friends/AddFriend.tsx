@@ -89,7 +89,7 @@ export default function AddFriend({ userId, onFriendAdded }: AddFriendProps) {
         `/api/users/search?q=${encodeURIComponent(searchTerm)}`,
         {
           headers: { Authorization: `Bearer ${token}` },
-        }
+        },
       );
 
       if (!res.ok) {
@@ -312,8 +312,8 @@ export default function AddFriend({ userId, onFriendAdded }: AddFriendProps) {
                             user.status === "online"
                               ? "bg-green-400"
                               : user.status === "away"
-                              ? "bg-yellow-400"
-                              : "bg-neutral-500"
+                                ? "bg-yellow-400"
+                                : "bg-neutral-500"
                           }`}
                         />
                         {user.status}

@@ -282,18 +282,34 @@ export function useAgoraCall(userId: string): UseAgoraCallReturn {
         // Create video track if it's a video call
         let videoTrack: ICameraVideoTrack | null = null;
         if (type === "video") {
-          console.log("📹 Creating video track...");
-          videoTrack = await AgoraRTC.createCameraVideoTrack({
-            encoderConfig: {
-              width: 640,
-              height: 480,
-              frameRate: 30,
-              bitrateMax: 1000, // 1 Mbps max bitrate
-              bitrateMin: 400, // 400 Kbps min bitrate
-            },
-          });
-          setLocalVideoTrack(videoTrack);
-          console.log("✅ Video track created");
+          try {
+            console.log("📹 Creating video track...");
+            videoTrack = await AgoraRTC.createCameraVideoTrack({
+              encoderConfig: {
+                width: 640,
+                height: 480,
+                frameRate: 30,
+                bitrateMax: 1000, // 1 Mbps max bitrate
+                bitrateMin: 400, // 400 Kbps min bitrate
+              },
+            });
+            setLocalVideoTrack(videoTrack);
+            console.log("✅ Video track created");
+          } catch (camError: unknown) {
+            const msg = camError instanceof Error ? camError.message : String(camError);
+            if (msg.includes("PERMISSION_DENIED") || msg.includes("NotAllowedError")) {
+              console.warn("⚠️ Camera permission denied — falling back to audio-only");
+              alert(
+                "Camera access was denied. The call will continue with audio only.\n\n" +
+                "To enable your camera, click the lock/camera icon in the address bar and allow camera access, then try again."
+              );
+            } else {
+              console.error("❌ Camera error:", camError);
+              alert("Could not access camera. Continuing with audio only.");
+            }
+            // Continue with audio-only instead of failing the whole call
+            videoTrack = null;
+          }
         }
 
         // Publish tracks to the channel

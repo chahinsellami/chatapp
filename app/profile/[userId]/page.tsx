@@ -13,7 +13,7 @@ import dynamic from "next/dynamic";
 import Image from "next/image";
 const NavigationBar = dynamic(
   () => import("@/components/Layout/NavigationBar"),
-  { ssr: false }
+  { ssr: false },
 );
 const Avatar = dynamic(() => import("@/components/Common/Avatar"), {
   ssr: false,
@@ -115,27 +115,27 @@ export default function UserProfilePage() {
         const data = await res.json();
         const friends = data.friends || [];
         const pending = data.pendingRequests || [];
-        
+
         // Check if already friends
         const isAlreadyFriend = friends.some((f: any) => f.id === userId);
         setIsFriend(isAlreadyFriend);
-        
+
         // Check if a friend request was already sent (by current user to this profile)
         // or received (from this profile to current user)
         if (!isAlreadyFriend) {
           const hasPendingRequest = pending.some(
-            (r: any) => r.sender_id === userId || r.sender?.id === userId
+            (r: any) => r.sender_id === userId || r.sender?.id === userId,
           );
           // Also check if current user sent a request to this profile
           const sentRes = await fetch("/api/friends/sent", {
             headers: { Authorization: `Bearer ${token}` },
           }).catch(() => null);
-          
+
           if (sentRes?.ok) {
             const sentData = await sentRes.json();
             const sentRequests = sentData.sentRequests || [];
             const hasSentRequest = sentRequests.some(
-              (r: any) => r.receiver_id === userId
+              (r: any) => r.receiver_id === userId,
             );
             if (hasSentRequest || hasPendingRequest) {
               setFriendRequestSent(true);
@@ -194,7 +194,7 @@ export default function UserProfilePage() {
       setFriendRequestSent(true);
     } catch (err) {
       alert(
-        err instanceof Error ? err.message : "Error sending friend request"
+        err instanceof Error ? err.message : "Error sending friend request",
       );
     } finally {
       setSendingRequest(false);
@@ -278,7 +278,7 @@ export default function UserProfilePage() {
           <div className="flex flex-col items-center sm:items-start gap-4 sm:gap-6 px-4 sm:px-6">
             {/* Avatar */}
             <div className="relative -mt-12 sm:-mt-16">
-              <div className="w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 rounded-full border-4 border-neutral-900 overflow-hidden bg-blue-600 flex items-center justify-center">
+              <div className="relative w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 rounded-full border-4 border-neutral-900 overflow-hidden bg-blue-600 flex items-center justify-center">
                 {profile.avatar &&
                 (profile.avatar.startsWith("http") ||
                   profile.avatar.startsWith("/")) ? (
@@ -329,7 +329,11 @@ export default function UserProfilePage() {
             {/* Action Buttons */}
             <div className="flex gap-3 pt-4 w-full sm:w-auto justify-center sm:justify-start">
               {checkingFriendStatus ? (
-                <Button variant="secondary" disabled className="flex items-center gap-2">
+                <Button
+                  variant="secondary"
+                  disabled
+                  className="flex items-center gap-2"
+                >
                   <div className="w-4 h-4 border-2 border-neutral-400 border-t-transparent rounded-full animate-spin" />
                   Loading...
                 </Button>

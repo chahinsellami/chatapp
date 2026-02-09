@@ -193,7 +193,9 @@ export function SocketProvider({ children }: { children: ReactNode }) {
     socket.on(
       "user-status-change",
       (data: { userId: string; status: string }) => {
-        setUserStatuses((prev) => new Map([...prev, [data.userId, data.status]]));
+        setUserStatuses(
+          (prev) => new Map([...prev, [data.userId, data.status]]),
+        );
         if (data.status === "offline") {
           setOnlineUsers((prev) => {
             const s = new Set(prev);
@@ -226,10 +228,9 @@ export function SocketProvider({ children }: { children: ReactNode }) {
       if (token) {
         navigator.sendBeacon(
           "/api/users/status",
-          new Blob(
-            [JSON.stringify({ status: "offline", token })],
-            { type: "application/json" },
-          ),
+          new Blob([JSON.stringify({ status: "offline", token })], {
+            type: "application/json",
+          }),
         );
       }
     };
