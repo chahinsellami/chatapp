@@ -6,6 +6,7 @@ import Image from "next/image";
 
 import dynamic from "next/dynamic";
 import { useAuth } from "@/context/AuthContext";
+import { useSocket } from "@/lib/useSocket";
 const FriendsList = dynamic(() => import("@/components/Friends/FriendsList"), {
   ssr: false,
 });
@@ -98,6 +99,65 @@ function MessengerContent() {
       // Only refresh on mount, don't poll constantly
     }
   }, [user]);
+
+  // Listen for incoming messages and add new conversations if needed
+  const { socket } = useSocket();
+  useEffect(() => {
+    if (!socket || !user) return;
+
+    const handleIncomingMessage = (data: {
+      messageId: string;
+      senderId: string;
+      receiverId: string;
+      text: string;
+      createdAt: string;
+    }) => {
+      // Only process if we're the receiver
+      if (data.receiverId !== user.id) return;
+
+      // Check if sender is already in conversations
+      setConversations((prev) => {
+        const existingConversation = prev.find(
+          (conv) => conv.id === data.senderId
+        );
+
+        // If sender not in conversations, fetch user info and add them
+        if (!existingConversation) {
+          const token = localStorage.getItem("auth_token");
+          fetch(`/api/users/${data.senderId}`, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          })
+            .then((res) => res.json())
+            .then((userData) => {
+              if (userData.user) {
+                setConversations((current) => [
+                  {
+                    id: userData.user.id,
+                    username: userData.user.username,
+                    avatar: userData.user.avatar,
+                    status: userData.user.status || "online",
+                  },
+                  ...current,
+                ]);
+              }
+            })
+            .catch(() => {
+              /* Error fetching user */
+            });
+        }
+
+        return prev;
+      });
+    };
+
+    socket.on("receive-message", handleIncomingMessage);
+
+    return () => {
+      socket.off("receive-message", handleIncomingMessage);
+    };
+  }, [socket, user]);
 
   useEffect(() => {
     const friendId = searchParams.get("friend");
