@@ -137,14 +137,12 @@ export function SocketProvider({ children }: { children: ReactNode }) {
 
     // ── Connection lifecycle ──────────────────────────────────────────
     socket.on("connect", () => {
-      console.log("🟢 Socket connected (global)");
       setIsConnected(true);
       socket.emit("join", userId);
       currentStatusRef.current = "online";
     });
 
-    socket.on("disconnect", (reason) => {
-      console.log("🔴 Socket disconnected:", reason);
+    socket.on("disconnect", () => {
       setIsConnected(false);
     });
 
@@ -171,7 +169,6 @@ export function SocketProvider({ children }: { children: ReactNode }) {
       const statusMap = new Map<string, string>();
       userIds.forEach((id) => statusMap.set(id, "online"));
       setUserStatuses(statusMap);
-      console.log("📥 Online users list:", userIds);
     });
 
     // ── Presence: someone came online ────────────────────────────────

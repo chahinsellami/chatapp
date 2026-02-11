@@ -161,15 +161,6 @@ export default function DirectMessages({
     callerName: string;
   } | null>(null);
 
-  // Debug: Log online users status changes
-  useEffect(() => {
-    console.log(`🟢 Online users:`, Array.from(onlineUsers));
-    console.log(
-      `👤 ${friendName} status:`,
-      onlineUsers.has(friendId) ? "Online" : "Offline",
-    );
-  }, [onlineUsers, friendId, friendName]);
-
   // Fetch messages when conversation changes
   useEffect(() => {
     if (friendId && userId) {

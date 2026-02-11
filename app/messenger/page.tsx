@@ -61,7 +61,6 @@ function MessengerContent() {
       });
       if (res.ok) {
         const data = await res.json();
-        console.log("Conversations loaded:", data.conversations);
         setConversations(data.conversations || []);
       } else {
         console.error("Failed to fetch conversations:", res.status);
@@ -85,7 +84,6 @@ function MessengerContent() {
       });
       if (res.ok) {
         const data = await res.json();
-        console.log("Friends loaded:", data.friends);
         setFriends(data.friends || []);
       }
     } catch (error) {

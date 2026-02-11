@@ -64,9 +64,6 @@ export async function POST(req: NextRequest) {
       privilegeExpireTs,
     );
 
-    console.log(
-      `✅ Agora token generated for channel: ${channelName}, user: ${uid}`,
-    );
     return NextResponse.json({ token });
   } catch (error) {
     console.error("❌ Error generating Agora token:", error);

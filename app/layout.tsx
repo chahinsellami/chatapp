@@ -1,6 +1,5 @@
 import "./globals.css";
 import "../sentry.client";
-import "./_console-silence";
 import { AuthProvider } from "@/context/AuthContext";
 import { SocketProvider } from "@/context/SocketContext";
 

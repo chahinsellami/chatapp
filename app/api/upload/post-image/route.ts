@@ -61,8 +61,6 @@ export async function POST(request: NextRequest) {
     // Return the full Cloudinary URL
     const imageUrl = uploadResult.secure_url;
 
-    console.log("✅ Post image uploaded successfully:", imageUrl);
-
     return NextResponse.json({
       success: true,
       imageUrl,

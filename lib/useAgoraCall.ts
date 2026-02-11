@@ -214,17 +214,8 @@ export function useAgoraCall(userId: string): UseAgoraCallReturn {
    */
   const startCall = useCallback(
     async (channelName: string, type: CallType) => {
-      console.log(`📞 Starting ${type} call on channel: ${channelName}`);
-      
-      if (!clientRef.current) {
-        console.error("❌ Agora client not initialized");
-        return;
-      }
-
-      if (!APP_ID) {
-        console.error("❌ APP_ID not configured");
-        return;
-      }
+      if (!clientRef.current) return;
+      if (!APP_ID) return;
 
       try {
         const client = clientRef.current;
@@ -234,14 +225,12 @@ export function useAgoraCall(userId: string): UseAgoraCallReturn {
           client.connectionState === "CONNECTED" ||
           client.connectionState === "CONNECTING"
         ) {
-          console.log("⚠️ Already connected, skipping join");
           return;
         }
 
         // Fetch token from backend
         let token = "";
         try {
-          console.log("🔑 Requesting Agora token...");
           const res = await fetch("/api/agora/token", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -253,61 +242,50 @@ export function useAgoraCall(userId: string): UseAgoraCallReturn {
           });
           if (!res.ok) {
             const errorData = await res.json();
-            console.error("❌ Token request failed:", errorData);
             throw new Error(`Failed to fetch Agora token: ${res.status}`);
           }
           const data = await res.json();
           token = data.token;
-          console.log("✅ Agora token received");
         } catch (err) {
-          console.error("❌ Token fetch error:", err);
+          console.error("Token fetch error:", err);
           return;
         }
 
-        console.log("🔗 Joining Agora channel...");
         await client.join(APP_ID, channelName, token, userId);
-        console.log("✅ Joined channel");
 
         // Create audio track with optimized settings
-        console.log("🎤 Creating audio track...");
         const audioTrack = await AgoraRTC.createMicrophoneAudioTrack({
-          encoderConfig: "music_standard", // High quality audio
-          AEC: true, // Acoustic Echo Cancellation
-          AGC: true, // Automatic Gain Control
-          ANS: true, // Automatic Noise Suppression
+          encoderConfig: "music_standard",
+          AEC: true,
+          AGC: true,
+          ANS: true,
         });
         setLocalAudioTrack(audioTrack);
-        console.log("✅ Audio track created");
 
         // Create video track if it's a video call
         let videoTrack: ICameraVideoTrack | null = null;
         if (type === "video") {
           try {
-            console.log("📹 Creating video track...");
             videoTrack = await AgoraRTC.createCameraVideoTrack({
               encoderConfig: {
                 width: 640,
                 height: 480,
                 frameRate: 30,
-                bitrateMax: 1000, // 1 Mbps max bitrate
-                bitrateMin: 400, // 400 Kbps min bitrate
+                bitrateMax: 1000,
+                bitrateMin: 400,
               },
             });
             setLocalVideoTrack(videoTrack);
-            console.log("✅ Video track created");
           } catch (camError: unknown) {
             const msg = camError instanceof Error ? camError.message : String(camError);
             if (msg.includes("PERMISSION_DENIED") || msg.includes("NotAllowedError")) {
-              console.warn("⚠️ Camera permission denied — falling back to audio-only");
               alert(
                 "Camera access was denied. The call will continue with audio only.\n\n" +
                 "To enable your camera, click the lock/camera icon in the address bar and allow camera access, then try again."
               );
             } else {
-              console.error("❌ Camera error:", camError);
               alert("Could not access camera. Continuing with audio only.");
             }
-            // Continue with audio-only instead of failing the whole call
             videoTrack = null;
           }
         }
@@ -316,19 +294,15 @@ export function useAgoraCall(userId: string): UseAgoraCallReturn {
         const tracksToPublish = videoTrack
           ? [audioTrack, videoTrack]
           : [audioTrack];
-        console.log(`📤 Publishing ${tracksToPublish.length} track(s)...`);
         await client.publish(tracksToPublish);
-        console.log("✅ Tracks published");
 
         setCurrentChannel(channelName);
         setCallType(type);
         setIsCallActive(true);
         setIsAudioEnabled(true);
         setIsVideoEnabled(type === "video");
-        
-        console.log("✅ Call started successfully");
       } catch (error: unknown) {
-        console.error("❌ Call start error:", error);
+        console.error("Call start error:", error);
         Sentry.captureException(error);
         await endCall();
       }
