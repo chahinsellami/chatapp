@@ -78,6 +78,7 @@ export default function DirectMessages({
   const [messageText, setMessageText] = useState(""); // Current message being typed
   const [sending, setSending] = useState(false); // Whether a message is being sent
   const [error, setError] = useState<string | null>(null); // Error message display
+  const [successMessage, setSuccessMessage] = useState<string | null>(null); // Success feedback (auto-hide)
   const [loading, setLoading] = useState(true); // Initial loading state
   const [showStatusDropdown, setShowStatusDropdown] = useState(false); // Status dropdown visibility
 
@@ -320,7 +321,7 @@ export default function DirectMessages({
 
   /**
    * Send a new message to the conversation
-   * Saves to database first, then broadcasts via Socket.IO
+   * Optimistic UI: Message appears immediately, API call happens in background
    */
   const handleSendMessage = async () => {
     const text = messageText.trim();
@@ -336,55 +337,80 @@ export default function DirectMessages({
         return;
       }
 
-      // Send message to server/database first
-      const res = await fetch(`/api/messages/direct/${friendId}`, {
+      // Format message for immediate display (optimistic UI)
+      const messageId = `temp-${Date.now()}`;
+      const formattedMessage: DirectMessage = {
+        id: messageId,
+        senderId: userId,
+        receiverId: friendId,
+        text: text,
+        createdAt: new Date().toISOString(),
+        username: "You",
+      };
+
+      // Add to local state immediately for instant UI feedback
+      setMessages((prev) => [...prev, formattedMessage]);
+      setMessageText("");
+
+      // Show instant feedback
+      setSuccessMessage("Message sent");
+      setTimeout(() => setSuccessMessage(null), 1500);
+
+      // Send message to server/database in background
+      fetch(`/api/messages/direct/${friendId}`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ text }),
-      });
+      })
+        .then(async (res) => {
+          if (!res.ok) {
+            const errorData = await res.json();
+            throw new Error(errorData.error || "Failed to send message");
+          }
 
-      if (!res.ok) {
-        const errorData = await res.json();
-        throw new Error(errorData.error || "Failed to send message");
-      }
+          const newMessage = await res.json();
 
-      const newMessage = await res.json();
+          // Update the temporary message with the real ID and timestamp
+          setMessages((prev) =>
+            prev.map((msg) =>
+              msg.id === messageId
+                ? {
+                    ...msg,
+                    id: newMessage.id,
+                    createdAt: newMessage.createdAt || msg.createdAt,
+                  }
+                : msg,
+            ),
+          );
 
-      // Format message for local display
-      const formattedMessage: DirectMessage = {
-        id: newMessage.id,
-        senderId: userId,
-        receiverId: friendId,
-        text: text,
-        createdAt: newMessage.createdAt || new Date().toISOString(),
-        username: "You",
-      };
-
-      // Add to local state immediately for instant UI feedback
-      setMessages((prev) => [...prev, formattedMessage]);
-
-      // Broadcast message via Socket.IO for real-time delivery
-      if (socket && isConnected) {
-        sendMessage({
-          messageId: newMessage.id,
-          senderId: userId,
-          receiverId: friendId,
-          text: text,
-          createdAt: formattedMessage.createdAt,
+          // Broadcast message via Socket.IO for real-time delivery
+          if (socket && isConnected) {
+            sendMessage({
+              messageId: newMessage.id,
+              senderId: userId,
+              receiverId: friendId,
+              text: text,
+              createdAt: newMessage.createdAt || formattedMessage.createdAt,
+            });
+          }
+        })
+        .catch((err) => {
+          const errorMsg =
+            err instanceof Error ? err.message : "Error sending message";
+          setError(errorMsg);
+          // Don't remove the message - let user see it anyway with error indicator
+        })
+        .finally(() => {
+          setSending(false);
         });
-      }
-
-      setMessageText("");
-      setError(null);
     } catch (err) {
+      setSending(false);
       const errorMsg =
         err instanceof Error ? err.message : "Error sending message";
       setError(errorMsg);
-    } finally {
-      setSending(false);
     }
   };
 
@@ -842,6 +868,23 @@ export default function DirectMessages({
             <div className="flex items-center gap-2">
               <AlertCircle className="w-4 h-4 text-red-400 flex-shrink-0" />
               <p className="text-red-300 text-sm font-medium">{error}</p>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Success Feedback - Message Sent */}
+      <AnimatePresence>
+        {successMessage && (
+          <motion.div
+            className="px-4 md:px-6 py-3 border-t border-green-500/20 backdrop-blur-sm relative z-10 bg-green-500/10"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+          >
+            <div className="flex items-center gap-2">
+              <Check className="w-4 h-4 text-green-400 flex-shrink-0" />
+              <p className="text-green-300 text-sm font-medium">{successMessage}</p>
             </div>
           </motion.div>
         )}

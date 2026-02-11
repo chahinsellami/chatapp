@@ -107,12 +107,12 @@ export default function AddFriend({ userId, onFriendAdded }: AddFriendProps) {
 
   /**
    * Send a friend request to another user
-   * Creates a new friend request relationship
+   * Optimistic UI: Shows "Sent" immediately, API call happens in background
+   * If error occurs, state reverts to allow retry
    */
   const handleSendFriendRequest = async (recipientId: string) => {
     try {
       setError(null);
-      setLoading(true);
 
       const token = localStorage.getItem("auth_token");
       if (!token) {
@@ -120,37 +120,45 @@ export default function AddFriend({ userId, onFriendAdded }: AddFriendProps) {
         return;
       }
 
-      const res = await fetch("/api/friends", {
+      // OPTIMISTIC: Show success immediately
+      setSentRequests((prev) => new Set([...prev, recipientId]));
+      setSuccessMessage("Friend request sent!");
+
+      // API call happens in background - don't wait for it
+      fetch("/api/friends", {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ receiverId: recipientId }),
-      });
-
-      if (!res.ok) {
-        const errData = await res.json().catch(() => ({}));
-        throw new Error(errData.error || "Failed to send friend request");
-      }
-
-      // Add to sent requests and show success
-      setSentRequests((prev) => new Set([...prev, recipientId]));
-      setSuccessMessage("Friend request sent!");
-
-      // Notify parent component
-      onFriendAdded?.();
-
-      // Clear success message and reset search after delay
-      setTimeout(() => {
-        setSuccessMessage(null);
-        setSearchTerm("");
-        setUsers([]);
-      }, 2000);
+      })
+        .then((res) => {
+          if (!res.ok) {
+            return res.json().then((data) => {
+              throw new Error(data.error || "Failed to send friend request");
+            });
+          }
+          // Success - notify parent and clear UI after delay
+          onFriendAdded?.();
+          setTimeout(() => {
+            setSuccessMessage(null);
+            setSearchTerm("");
+            setUsers([]);
+          }, 2000);
+        })
+        .catch((err) => {
+          // Error - revert optimistic state
+          setSentRequests((prev) => {
+            const updated = new Set(prev);
+            updated.delete(recipientId);
+            return updated;
+          });
+          setError(err instanceof Error ? err.message : "Error sending request");
+          setSuccessMessage(null);
+        });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Error sending request");
-    } finally {
-      setLoading(false);
     }
   };
 
